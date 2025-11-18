@@ -1,0 +1,107 @@
+###############################
+# 👨‍💻 Visual Studio & .NET #
+###############################
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio cache / generated files
+.vs/
+.vscode/
+*.log
+*.tlog
+*.cache
+*.bak
+*.backup
+*.tmp
+
+# Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.vspscc
+*.pdb
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NuGet packages
+*.nupkg
+# The packages folder can be ignored unless you commit packages manually
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+# Microsoft Azure Web Apps publish settings
+*.PublishSettings
+# Publish folder
+publish/
+*.pubxml
+*.pubxml.user
+
+# Resharper / Rider
+_ReSharper*/
+*.DotSettings.user
+
+# Backup & autosave
+*.bak
+*.old
+*.orig
+
+# SQL Server / LocalDB
+*.mdf
+*.ldf
+
+# Others
+*.DS_Store
+Thumbs.db
+*.vsmdi
+*.psess
+*.vsp
+*.suo
+*.userprefs
+
+# Build folders for intermediate or cache files
+x64/
+x86/
+*.dbmdl
+*.opendb
+*.ide/
+*.ipch/
+*.iobj/
+*.idb/
+*.ilk/
+
+# Generated code & Designer
+# *.designer.cs
+*.resources
+
+# JetBrains Rider project files
+.idea/
+
+# Temporary folders
+_Temp/
+temp/
+.tmp/
+__pycache__/
+
+# Windows image cache
+ehthumbs.db
+Desktop.ini
+appsettings.Development.json
