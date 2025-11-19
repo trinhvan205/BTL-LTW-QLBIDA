@@ -1,0 +1,33 @@
+﻿@model List<BTL_LTW_QLBIDA.Models.Dichvu>
+
+<div class="dichvu-grid">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var dv in Model)
+        {
+            var disabledClass = (dv.Soluong ?? 0) <= 0 ? "disabled" : "";
+
+            // ← CẬP NHẬT: Icon theo IDLOAI (CSDL mới)
+            var icon = "🍽️";
+            if (dv.Idloai == "LDV001") icon = "🥤"; // Đồ uống
+            else if (dv.Idloai == "LDV002") icon = "🍔"; // Đồ ăn
+            else if (dv.Idloai == "LDV003") icon = "📦"; // Khác
+
+            <div class="dichvu-item @disabledClass"
+                 data-id="@dv.Iddv"
+                 data-ten="@dv.Tendv">
+                <div class="dichvu-icon">@icon</div>
+                <div class="dichvu-name">@dv.Tendv</div>
+                <div class="dichvu-price">@((dv.Giatien ?? 0).ToString("N0"))đ</div>
+                @if ((dv.Soluong ?? 0) <= 0)
+                {
+                    <small class="text-danger">Hết hàng</small>
+                }
+                else
+                {
+                    <small class="text-muted">Còn: @dv.Soluong</small>
+                }
+            </div>
+        }
+    }
+</div>

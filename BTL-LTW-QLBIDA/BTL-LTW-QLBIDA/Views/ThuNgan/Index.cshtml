@@ -1,0 +1,144 @@
+﻿@{
+    ViewData["Title"] = "Thu Ngân";
+    Layout = "~/Views/Shared/_LayoutFullWidth.cshtml"; // ← Dùng layout mới
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/thungan.css" />
+}
+
+<div class="thungan-container">
+    <!-- BÊN TRÁI: Danh sách bàn / Thực đơn -->
+    <div class="thungan-left">
+        <!-- Header Tabs -->
+        <div class="thungan-header">
+            <button id="btnShowBan" class="tab-btn active">
+                <i class="bi bi-grid-3x3"></i> Phòng bàn
+            </button>
+            <button id="btnShowDichVu" class="tab-btn">
+                <i class="bi bi-cup-straw"></i> Thực đơn
+            </button>
+        </div>
+
+
+        <!-- Tabs Khu vực / Loại dịch vụ -->
+        <div class="thungan-tabs">
+            <!-- ============================================
+                 TABS KHU VỰC (Giữ nguyên)
+                 ============================================ -->
+            <div id="tabsKhuVuc" class="tabs-container-inline">
+                @{
+                    var khuVucs = ViewBag.KhuVucs as List<BTL_LTW_QLBIDA.Models.Khuvuc>;
+                    int maxVisible = 7; // Số tabs hiển thị tối đa (bao gồm cả "Tất cả")
+                    int visibleCount = khuVucs != null ? Math.Min(maxVisible - 1, khuVucs.Count) : 0;
+                }
+
+                <!-- Tab "Tất cả" luôn hiển thị -->
+                <button class="filter-btn active" data-khu="">Tất cả</button>
+
+                <!-- Hiển thị các khu vực đầu tiên -->
+                @if (khuVucs != null)
+                {
+                    for (int i = 0; i < visibleCount; i++)
+                    {
+                        <button class="filter-btn" data-khu="@khuVucs[i].Idkhu">@khuVucs[i].Tenkhu</button>
+                    }
+                }
+
+                <!-- Dropdown chỉ hiện khi có nhiều khu vực hơn -->
+                @if (khuVucs != null && khuVucs.Count > visibleCount)
+                {
+                    <div class="khuvuc-dropdown-inline">
+                        <button class="filter-btn dropdown-toggle-inline" id="dropdownMoreKhuVuc">
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu-inline" id="menuMoreKhuVuc">
+                            @for (int i = visibleCount; i < khuVucs.Count; i++)
+                            {
+                                <button class="dropdown-item-inline" data-khu="@khuVucs[i].Idkhu">
+                                    @khuVucs[i].Tenkhu
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Tabs Loại dịch vụ -->
+            <!-- ============================================
+                 TABS LOẠI DỊCH VỤ (MỚI - TƯƠNG TỰ KHU VỰC)
+                 ============================================ -->
+            <div id="tabsLoaiDv" class="tabs-container-inline" style="display: none;">
+                @{
+                    var loaiDichVus = ViewBag.LoaiDichVus as List<BTL_LTW_QLBIDA.Models.Loaidichvu>;
+                    int maxVisibleLoaiDv = 7; // Số tabs loại DV hiển thị tối đa (bao gồm "Tất cả")
+                    int visibleCountLoaiDv = loaiDichVus != null ? Math.Min(maxVisibleLoaiDv - 1, loaiDichVus.Count) : 0;
+                }
+                <!-- Tab "Tất cả" luôn hiển thị -->
+                <button class="filter-btn active" data-loai="">Tất cả</button>
+                <!-- Hiển thị các loại dịch vụ đầu tiên -->
+                @if (loaiDichVus != null)
+                {
+                    for (int i = 0; i < visibleCountLoaiDv; i++)
+                    {
+                        // Icon cho từng loại
+                        var icon = "";
+                        if (loaiDichVus[i].Idloai == "LDV001") icon = "🥤";
+                        else if (loaiDichVus[i].Idloai == "LDV002") icon = "🍔";
+                        else if (loaiDichVus[i].Idloai == "LDV003") icon = "📦";
+
+                        <button class="filter-btn" data-loai="@loaiDichVus[i].Idloai">
+                            @icon @loaiDichVus[i].Tenloai
+                        </button>
+                    }
+                }
+                <!-- Dropdown cho loại dịch vụ còn lại -->
+                @if (loaiDichVus != null && loaiDichVus.Count > visibleCountLoaiDv)
+                {
+                    <div class="loaidv-dropdown-inline">
+                        <button class="filter-btn dropdown-toggle-inline" id="dropdownMoreLoaiDv">
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu-inline" id="menuMoreLoaiDv">
+                            @for (int i = visibleCountLoaiDv; i < loaiDichVus.Count; i++)
+                            {
+                                var icon = "";
+                                if (loaiDichVus[i].Idloai == "LDV001") icon = "🥤";
+                                else if (loaiDichVus[i].Idloai == "LDV002") icon = "🍔";
+                                else if (loaiDichVus[i].Idloai == "LDV003") icon = "📦";
+
+                                <button class="dropdown-item-inline" data-loai="@loaiDichVus[i].Idloai">
+                                    @icon @loaiDichVus[i].Tenloai
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Nội dung động -->
+        <div id="contentArea" class="content-area">
+            <!-- Partial View sẽ load vào đây -->
+        </div>
+    </div>
+
+    <!-- BÊN PHẢI: Hóa đơn chi tiết -->
+    <div class="thungan-right">
+        <div class="hoadon-header">
+            <i class="bi bi-receipt"></i>
+            <span id="tenBanHienTai">Chưa chọn bàn</span>
+        </div>
+
+        <div id="hoaDonArea" class="hoadon-area">
+            <div class="empty-state">
+                <i class="bi bi-cart-x"></i>
+                <p>Vui lòng chọn bàn</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/thungan.js"></script>
+}

@@ -1,0 +1,37 @@
+﻿@model List<BTL_LTW_QLBIDA.Models.Ban>
+
+<div class="ban-grid">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var ban in Model)
+        {
+            var trangThaiClass = ban.Trangthai == true ? "dang-choi" : "trong";
+            var phienChoi = ban.Phienchois.FirstOrDefault(p => p.Gioketthuc == null);
+
+            <div class="ban-item @trangThaiClass"
+                 data-id="@ban.Idban"
+                 data-ten="@ban.Idban"
+                 data-trangthai="@ban.Trangthai">
+
+                <div class="ban-icon">🎱</div>
+                <div class="ban-name">@ban.Idban</div>
+                <div class="ban-price">@((ban.Giatien ?? 0).ToString("N0"))đ/giờ</div>
+
+                @if (ban.Trangthai == true && phienChoi != null)
+                {
+                    var gioChoi = DateTime.Now - (phienChoi.Giobatdau ?? DateTime.Now);
+                    <div class="ban-time">
+                        @((int)gioChoi.TotalHours)h @(gioChoi.Minutes)m
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 48px; color: #ccc;"></i>
+            <p class="text-muted mt-2">Không có bàn nào</p>
+        </div>
+    }
+</div>
