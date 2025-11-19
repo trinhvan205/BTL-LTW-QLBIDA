@@ -12,8 +12,10 @@ public partial class Ban
     public decimal? Giatien { get; set; }
 
     public bool? Trangthai { get; set; }
+    public string? Ghichu { get; set; }
 
     public virtual Khuvuc? IdkhuNavigation { get; set; }
+
 
     public virtual ICollection<Phienchoi> Phienchois { get; set; } = new List<Phienchoi>();
 }

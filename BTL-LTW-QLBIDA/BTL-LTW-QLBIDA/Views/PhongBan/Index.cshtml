@@ -1,0 +1,736 @@
+﻿@model BTL_LTW_QLBIDA.Models.PhongBanIndexViewModel
+@{
+    ViewData["Title"] = "Quản lý Bàn";
+}
+
+<div class="row">
+
+    <div class="col-md-3">
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="card-title fw-bold mb-0">Khu vực</h6>
+                    <div>
+                        <button type="button" class="btn btn-sm" id="btnAddKhuVuc" title="Thêm khu vực">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm" id="btnEditKhuVuc" title="Sửa khu vực">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </div>
+                </div>
+                <select id="khuVucSelect" asp-for="SelectedKhuVuc" asp-items="Model.KhuVucs" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="card-title fw-bold mb-2">Tìm kiếm</h6>
+                <input type="text" id="searchString" asp-for="SearchString" class="form-control" placeholder="Theo tên bàn">
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <a href="#collapseTrangThai" class="text-decoration-none text-dark" data-bs-toggle="collapse" aria-expanded="true" aria-controls="collapseTrangThai">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                    <h6 class="card-title fw-bold mb-0">Trạng thái</h6>
+                    <i class="bi bi-chevron-up collapse-arrow"></i>
+                </div>
+            </a>
+
+            <div class="collapse show" id="collapseTrangThai">
+                <div class="card-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="SelectedTrangThai" value="true" id="radioHoatDong"> @* <-- ĐÃ SỬA *@
+                        <label class="form-check-label" for="radioHoatDong">Đang hoạt động</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="SelectedTrangThai" value="false" id="radioNgung"> @* <-- ĐÃ SỬA *@
+                        <label class="form-check-label" for="radioNgung">Trống </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="SelectedTrangThai" value="" id="radioTatCa"> @* <-- ĐÃ SỬA *@
+                        <label class="form-check-label" for="radioTatCa">Tất cả</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+            <span class="fw-bold">Số bản ghi:</span>
+
+            <div class="dropdown">
+                <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="pageSizeButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    10
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="pageSizeButton" id="pageSizeMenu">
+                    <li><a class="dropdown-item active" href="#" data-value="10">10 <i class="bi bi-check float-end"></i></a></li>
+                    <li><a class="dropdown-item" href="#" data-value="15">15</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="20">20</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="30">30</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="50">50</a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-9">
+        @* KHU VỰC BẢNG (Giữ nguyên) *@
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Bàn</h3>
+            <div>
+                <button type="button" class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#phongBanModal"
+                        id="btnShowCreateModal">
+                    Thêm bàn
+                </button>
+            </div>
+        </div>
+
+        @* Div container (Giữ nguyên) *@
+        <div id="tableContainer">
+            @await Html.PartialAsync("_BanTablePartial", Model.PagedBans)
+        </div>
+    </div>
+</div>
+
+@* MODAL (Thêm Bàn) *@
+<div class="modal fade" id="phongBanModal" tabindex="-1" aria-labelledby="phongBanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="phongBanModalLabel">Thêm bàn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
+                <button type="button" class="btn btn-success" id="btnLuu">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* MODAL (Thêm Khu Vực) *@
+<div class="modal fade" id="khuVucModal" tabindex="-1" aria-labelledby="khuVucModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="khuVucModalLabel">Thêm khu vực</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formThemKhuVuc" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label for="inputTenKhuVuc" class="form-label">Tên khu vực <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="inputTenKhuVuc" name="tenKhuVuc" required>
+                        <div class="invalid-feedback" id="khuVucError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputGhiChu" class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="inputGhiChu" name="ghiChu" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
+                <button type="button" class="btn btn-primary" id="btnLuuKhuVuc">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* MODAL (Sửa Khu Vực) *@
+<div class="modal fade" id="editKhuVucModal" tabindex="-1" aria-labelledby="editKhuVucModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editKhuVucModalLabel">Sửa khu vực bàn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formSuaKhuVuc" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="editIdKhu" name="editIdKhu" />
+
+                    <div class="mb-3">
+                        <label for="editTenKhuVuc" class="form-label">Tên khu vực <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editTenKhuVuc" name="editTenKhuVuc" required>
+                        <div class="invalid-feedback" id="editKhuVucError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editGhiChu" class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="editGhiChu" name="editGhiChu" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-danger" id="btnXoaKhuVuc">Xóa</button>
+
+                <div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
+                    <button type="button" class="btn btn-primary" id="btnLuuKhuVucMoi">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteKhuVucModal" tabindex="-1" aria-labelledby="deleteKhuVucModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: none;">
+                <h5 class="modal-title" id="deleteKhuVucModalLabel">Xóa khu vực</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteModalMessage"></p>
+                <small class="text-muted">Xóa khu vực đồng nghĩa xóa tất cả bàn thuộc khu vực. Bạn có chắc chắn không?</small>
+            </div>
+            <div class="modal-footer" style="border-top: none;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmDeleteKhuVuc">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editBanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Sửa thông tin bàn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formSuaBan">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 col-form-label fw-bold">Tên bàn <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control bg-light" id="editIdBan" name="editIdBan" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 col-form-label fw-bold">Khu vực</label>
+                        <div class="col-sm-8">
+                            <select class="form-select" id="editIdKhuBan" name="editIdKhuBan" asp-items="Model.KhuVucs"></select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 col-form-label fw-bold">Giá tiền/giờ</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" id="editGiaTien" name="editGiaTien">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-success" id="btnLuuSuaBan"><i class="bi bi-save"></i> Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Bỏ qua</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteBanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Xóa bàn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa bàn <strong id="deleteBanName"></strong>?</p>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-danger" id="btnConfirmDeleteBan"><i class="bi bi-trash"></i> Đồng ý</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Bỏ qua</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i> <span id="toastMessage">Cập nhật dữ liệu thành công</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+
+            // === 1. KHỞI TẠO MODAL ===
+            var modal = new bootstrap.Modal(document.getElementById('phongBanModal'));
+            var modalBody = $('#modalBody');
+
+            var khuVucModal = new bootstrap.Modal(document.getElementById('khuVucModal'));
+            var formKhuVuc = $('#formThemKhuVuc');
+            var inputTenKhuVuc = $('#inputTenKhuVuc');
+            var khuVucError = $('#khuVucError');
+
+            var editKhuVucModal = new bootstrap.Modal(document.getElementById('editKhuVucModal'));
+            var formSuaKhuVuc = $('#formSuaKhuVuc');
+            var inputEditTenKhuVuc = $('#editTenKhuVuc');
+            var inputEditIdKhu = $('#editIdKhu');
+            var inputEditGhiChu = $('#editGhiChu');
+            var editKhuVucError = $('#editKhuVucError');
+
+            // Code mới:
+            var deleteKhuVucModal = new bootstrap.Modal(document.getElementById('deleteKhuVucModal'));
+            var btnConfirmDeleteKhuVuc = $('#btnConfirmDeleteKhuVuc');
+            var deleteModalMessage = $('#deleteModalMessage');
+
+            // === 2. GÁN SỰ KIỆN & HÀM ===
+            // Xử lý mũi tên
+            var collapseToggle = $('[data-bs-target="#collapseTrangThai"]');
+            var collapseIcon = collapseToggle.find('.collapse-arrow');
+            $('#collapseTrangThai').on('show.bs.collapse', function () { collapseIcon.removeClass('bi-chevron-down').addClass('bi-chevron-up'); });
+            $('#collapseTrangThai').on('hide.bs.collapse', function () { collapseIcon.removeClass('bi-chevron-up').addClass('bi-chevron-down'); });
+
+            // Mở modal Thêm Khu Vực
+            $('#btnAddKhuVuc').on('click', function() {
+                formKhuVuc[0].reset();
+                inputTenKhuVuc.removeClass('is-invalid');
+                khuVucError.text('');
+                khuVucModal.show();
+            });
+
+            // Ẩn/Hiện nút Sửa Khu Vực
+            var editKhuVucButton = $('#btnEditKhuVuc');
+            var khuVucSelect = $('#khuVucSelect');
+            function updateEditButtonVisibility() {
+                var selectedValue = khuVucSelect.val();
+                if (selectedValue === "") { editKhuVucButton.hide(); }
+                else { editKhuVucButton.show(); }
+            }
+            updateEditButtonVisibility();
+
+            // Xử lý dropdown Số Bản Ghi
+            $('#pageSizeMenu').on('click', '.dropdown-item', function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var selectedValue = $this.data('value');
+                $('#pageSizeButton').text(selectedValue);
+                $('#pageSizeMenu .dropdown-item').removeClass('active').find('i.bi-check').remove();
+                $this.addClass('active').append(' <i class="bi bi-check float-end"></i>');
+                applyFilters(1);
+            });
+
+            // === 3. CODE LỌC AJAX (applyFilters) ===
+            function applyFilters(page = 1) {
+                var khuVuc = $('#khuVucSelect').val();
+                var trangThai = $('input[name="SelectedTrangThai"]:checked').val();
+                var timKiem = $('#searchString').val();
+                var pageSize = $('#pageSizeButton').text().trim();
+
+                $('#tableContainer').html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+
+                $.ajax({
+                    url: '@Url.Action("FilterBan", "PhongBan")',
+                    type: 'GET',
+                    data: {
+                        khuVuc: khuVuc,
+                        trangThai: trangThai,
+                        timKiem: timKiem,
+                        pageSize: pageSize,
+                        page: page
+                    },
+                    success: function (result) {
+                        $('#tableContainer').html(result);
+                    },
+                    error: function () {
+                        $('#tableContainer').html('<p class="text-danger">Không thể tải dữ liệu.</p>');
+                    }
+                });
+            }
+
+            // === 4. GÁN SỰ KIỆN LỌC ===
+            $('#khuVucSelect').on('change', function () {
+                applyFilters(1);
+                updateEditButtonVisibility();
+            });
+            $('input[name="SelectedTrangThai"]').on('change', function () { applyFilters(1); });
+            $('#searchString').on('keypress', function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    applyFilters(1);
+                }
+            });
+            $('#tableContainer').on('click', '.pagination-link', function(e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                if(page){
+                    applyFilters(page);
+                }
+            });
+
+
+            // === 5. CODE MODAL (THÊM BÀN) ===
+            $('#btnShowCreateModal').on('click', function () {
+                $.get('@Url.Action("Create", "PhongBan")', function (data) {
+                    modalBody.html(data);
+                });
+            });
+            $('#btnLuu').on('click', function () {
+                var form = $('#formThemBan');
+                if (form.valid()) {
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: form.attr('method'),
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                modal.hide();
+                                applyFilters(1);
+                            } else {
+                                modalBody.html(response);
+                            }
+                        },
+                        error: function (xhr) { modalBody.html(xhr.responseText); }
+                    });
+                }
+            });
+            $('#phongBanModal').on('hidden.bs.modal', function () {
+                modalBody.html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+            });
+
+
+            // === 6. CODE MODAL (THÊM KHU VỰC) ===
+            $('#btnLuuKhuVuc').on('click', function() {
+                var tenKhuVuc = inputTenKhuVuc.val().trim();
+                if (tenKhuVuc === "") {
+                    inputTenKhuVuc.addClass('is-invalid');
+                    khuVucError.text('Tên khu vực không được để trống.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("CreateKhuVuc", "PhongBan")',
+                    method: 'POST',
+                    data: formKhuVuc.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            var newKhu = response.newKhuVuc;
+                            var newOption = new Option(newKhu.ten, newKhu.id);
+                            $('#khuVucSelect').append(newOption);
+                            $('#khuVucSelect').val(newKhu.id);
+                            applyFilters(1);
+                            updateEditButtonVisibility();
+                            khuVucModal.hide();
+                        } else {
+                            inputTenKhuVuc.addClass('is-invalid');
+                            khuVucError.text(response.message);
+                        }
+                    },
+                    error: function() { alert('Đã xảy ra lỗi không mong muốn, vui lòng thử lại.'); }
+                });
+            });
+
+            // === 7. CODE MỞ MODAL (SỬA KHU VỰC) ===
+            $('#btnEditKhuVuc').on('click', function() {
+                var selectedId = khuVucSelect.val();
+                if (selectedId === "") return;
+
+                inputEditTenKhuVuc.removeClass('is-invalid');
+                editKhuVucError.text('');
+
+                $.ajax({
+                    url: '@Url.Action("GetKhuVucDetails", "PhongBan")',
+                    type: 'GET',
+                    data: { id: selectedId },
+                    success: function(data) {
+                        inputEditIdKhu.val(data.idkhu);
+                        inputEditTenKhuVuc.val(data.tenkhu);
+                        inputEditGhiChu.val(data.ghichu);
+                        editKhuVucModal.show();
+                    },
+                    error: function() {
+                        alert('Không thể tải thông tin khu vực.');
+                    }
+                });
+            });
+
+            // === 8. CODE LƯU MODAL (SỬA KHU VỰC) ===
+            $('#btnLuuKhuVucMoi').on('click', function() {
+                var tenKhuVuc = inputEditTenKhuVuc.val().trim();
+                if (tenKhuVuc === "") {
+                    inputEditTenKhuVuc.addClass('is-invalid');
+                    editKhuVucError.text('Tên khu vực không được để trống.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("UpdateKhuVuc", "PhongBan")',
+                    method: 'POST',
+                    data: formSuaKhuVuc.serialize(), // Gửi cả form
+                    success: function(response) {
+                        if (response.success) {
+                            $('#khuVucSelect option:selected').text(tenKhuVuc);
+                            editKhuVucModal.hide();
+                            applyFilters(1);
+                        } else {
+                            inputEditTenKhuVuc.addClass('is-invalid');
+                            editKhuVucError.text(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Đã xảy ra lỗi khi cập nhật.');
+                    }
+                });
+            });
+
+            // === 9. CODE MỚI: MỞ MODAL XÁC NHẬN XÓA ===
+            $('#btnXoaKhuVuc').on('click', function() {
+                var idCanXoa = inputEditIdKhu.val();
+                var tenKhuVuc = inputEditTenKhuVuc.val();
+
+                // Cập nhật nội dung modal
+                deleteModalMessage.html('Bạn có chắc chắn muốn xóa khu vực <strong>' + tenKhuVuc + '</strong> không?');
+
+                // Gắn ID cần xóa vào nút "Đồng ý"
+                btnConfirmDeleteKhuVuc.data('id-to-delete', idCanXoa);
+
+                // Ẩn modal SỬA và hiện modal XÓA
+                editKhuVucModal.hide();
+                deleteKhuVucModal.show();
+            });
+
+            // === 10. CODE MỚI: XÁC NHẬN XÓA (Click nút "Đồng ý") ===
+            btnConfirmDeleteKhuVuc.on('click', function() {
+                var idCanXoa = $(this).data('id-to-delete');
+
+                var token = formSuaKhuVuc.find('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '@Url.Action("DeleteKhuVuc", "PhongBan")',
+                    method: 'POST',
+                    data: {
+                        id: idCanXoa,
+                        __RequestVerificationToken: token
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#khuVucSelect option[value="' + idCanXoa + '"]').remove();
+                            khuVucSelect.val('');
+
+                            deleteKhuVucModal.hide();
+                            applyFilters(1);
+                            updateEditButtonVisibility();
+                        } else {
+                            deleteKhuVucModal.hide();
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        deleteKhuVucModal.hide();
+                        alert('Đã xảy ra lỗi khi xóa.');
+                    }
+                });
+            });
+
+            // ================================================================
+            // BƯỚC 4: XỬ LÝ CLICK VÀO DÒNG ĐỂ HIỆN CHI TIẾT (Tab Thông tin/Lịch sử)
+            // ================================================================
+
+            // Dùng .on() để gán sự kiện cho cả các dòng được sinh ra sau khi lọc AJAX
+            $('#tableContainer').on('click', 'tr.clickable-row', function() {
+                var tr = $(this);
+                var id = tr.data('id');                 // Lấy ID bàn từ data-id
+                var detailRow = $('#detail-row-' + id); // Tìm dòng ẩn chứa chi tiết
+                var detailContent = $('#detail-content-' + id); // Tìm div để chứa nội dung
+
+                // TRƯỜNG HỢP 1: Nếu dòng chi tiết đang mở -> Đóng lại
+                if (detailRow.is(':visible')) {
+                    detailRow.hide();
+                    tr.removeClass('table-active'); // Bỏ màu highlight
+                }
+                // TRƯỜNG HỢP 2: Nếu dòng chi tiết đang đóng -> Mở ra
+                else {
+                    // 1. (Tùy chọn) Đóng tất cả các dòng khác đang mở để nhìn cho gọn
+                    $('.detail-row').hide();
+                    $('tr.clickable-row').removeClass('table-active');
+
+                    // 2. Highlight dòng vừa click và hiện dòng chi tiết
+                    tr.addClass('table-active');
+                    detailRow.show();
+
+                    // 3. Kiểm tra Cache: Nếu đã tải nội dung rồi thì không gọi AJAX nữa
+                    if (detailContent.html().trim() !== "") {
+                        return;
+                    }
+
+                    // 4. Hiển thị icon Loading trong lúc chờ
+                    detailContent.html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"></div></div>');
+
+                    // 5. Gọi AJAX lấy Partial View chứa Tab Thông tin & Lịch sử
+                    $.ajax({
+                        url: '@Url.Action("GetBanDetail", "PhongBan")',
+                        type: 'GET',
+                        data: { id: id },
+                        success: function(result) {
+                            detailContent.html(result);
+                        },
+                        error: function() {
+                            detailContent.html('<div class="text-danger p-3">Lỗi tải dữ liệu chi tiết.</div>');
+                        }
+                    });
+                }
+            });
+            // ================================================================
+            // KẾT THÚC BƯỚC 4
+            // ================================================================
+
+            // ... (Giữ nguyên các code cũ) ...
+
+            // === CODE MỚI: XỬ LÝ SỬA & XÓA BÀN ===
+            var editBanModal = new bootstrap.Modal(document.getElementById('editBanModal'));
+            var deleteBanModal = new bootstrap.Modal(document.getElementById('deleteBanModal'));
+
+            // 1. CLICK NÚT "CẬP NHẬT" (MỞ MODAL SỬA)
+            // Dùng delegate event vì nút này nằm trong Partial View AJAX
+            $(document).on('click', '.btn-open-edit-ban', function() {
+                var id = $(this).data('id');
+
+                // Gọi AJAX lấy dữ liệu bàn
+                $.ajax({
+                    url: '@Url.Action("GetBanForEdit", "PhongBan")',
+                    type: 'GET',
+                    data: { id: id },
+                    success: function(data) {
+                        // Đổ dữ liệu vào Form Modal
+                        $('#editIdBan').val(data.id);
+                        $('#editIdKhuBan').val(data.idKhu);
+                        $('#editGiaTien').val(data.giaTien);
+
+                        // Hiện Modal
+                        editBanModal.show();
+                    },
+                    error: function() { alert("Lỗi tải dữ liệu bàn."); }
+                });
+            });
+
+            // 2. CLICK NÚT "LƯU" (THỰC HIỆN SỬA)
+            $('#btnLuuSuaBan').on('click', function() {
+                var formData = $('#formSuaBan').serialize(); // Lấy dữ liệu form
+
+                $.ajax({
+                    url: '@Url.Action("UpdateBan", "PhongBan")',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            editBanModal.hide();
+                            applyFilters(1); // Tải lại bảng
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() { alert("Lỗi cập nhật."); }
+                });
+            });
+
+            // 3. CLICK NÚT "XÓA" (MỞ MODAL XÓA)
+            var idBanCanXoa = ""; // Biến tạm lưu ID
+            $(document).on('click', '.btn-open-delete-ban', function() {
+                idBanCanXoa = $(this).data('id');
+                $('#deleteBanName').text(idBanCanXoa); // Hiển thị tên bàn lên modal
+                deleteBanModal.show();
+            });
+
+            // 4. CLICK NÚT "ĐỒNG Ý" (THỰC HIỆN XÓA)
+            $('#btnConfirmDeleteBan').on('click', function() {
+                // Lấy token từ form bất kỳ để bảo mật
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+
+                $.ajax({
+                    url: '@Url.Action("DeleteBan", "PhongBan")',
+                    type: 'POST',
+                    data: { id: idBanCanXoa, __RequestVerificationToken: token },
+                    success: function(response) {
+                        if (response.success) {
+                            deleteBanModal.hide();
+                            applyFilters(1); // Tải lại bảng
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() { alert("Lỗi khi xóa bàn."); }
+                });
+            });
+
+            // ... (Giữ nguyên các code cũ) ...
+
+            // === CODE MỚI: XỬ LÝ NÚT ĐỔI TRẠNG THÁI & TOAST ===
+
+            // 1. Hàm hiển thị Toast
+            var toastEl = document.getElementById('liveToast');
+            var toast = new bootstrap.Toast(toastEl); // Khởi tạo Bootstrap Toast
+
+            function showToast(message) {
+                $('#toastMessage').text(message); // Gán nội dung thông báo
+                toast.show(); // Hiện lên
+            }
+
+            // 2. Xử lý click nút "Ngừng/Cho phép hoạt động"
+            // Dùng 'document' vì nút này nằm trong Partial View được load lại
+            $(document).on('click', '.btn-toggle-status', function() {
+                var id = $(this).data('id');
+
+                // Lấy token bảo mật từ form bất kỳ
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+
+                $.ajax({
+                    url: '@Url.Action("ToggleStatusBan", "PhongBan")',
+                    type: 'POST',
+                    data: { id: id, __RequestVerificationToken: token },
+                    success: function(response) {
+                        if (response.success) {
+                            // A. Hiện thông báo thành công
+                            showToast(response.message);
+
+                            // B. Tải lại bảng dữ liệu để cập nhật trạng thái mới
+                            // (Lưu ý: Khi tải lại bảng, dòng chi tiết sẽ tự đóng lại - đây là hành vi bình thường)
+                            applyFilters(1);
+
+                            // C. Cập nhật lại bộ lọc "Trống/Đang hoạt động" nếu cần
+                            // updateEditButtonVisibility();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Đã xảy ra lỗi khi cập nhật trạng thái.');
+                    }
+                });
+            });
+            // === HẾT CODE MỚI ===
+
+        });
+    </script>
+}

@@ -1,12 +1,15 @@
-using BTL_LTW_QLBIDA.Models;
+﻿using BTL_LTW_QLBIDA.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// 🟢 Đã sửa: Thay "DefaultConnection" bằng "QlquanBilliardLtw2Context"
 builder.Services.AddDbContext<QlquanBilliardLtw2Context>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("QlquanBilliardLtw2Context")));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
