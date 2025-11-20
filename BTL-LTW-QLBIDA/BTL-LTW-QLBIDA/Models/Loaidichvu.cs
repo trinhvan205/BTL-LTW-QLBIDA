@@ -9,5 +9,5 @@ public partial class Loaidichvu
 
     public string? Tenloai { get; set; }
 
-    public virtual ICollection<Dichvu> Dichvus { get; set; } = new List<Dichvu>();
+    public virtual ICollection<Dichvu> Dichvus { get; set; } = [];
 }

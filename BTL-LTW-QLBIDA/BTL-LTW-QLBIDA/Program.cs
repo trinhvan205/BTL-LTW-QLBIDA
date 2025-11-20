@@ -1,13 +1,17 @@
-using BTL_LTW_QLBIDA.Models;
+﻿using BTL_LTW_QLBIDA.Models;
 using Microsoft.EntityFrameworkCore;
-
+using OfficeOpenXml;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<QlquanBilliardLtw2Context>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Sửa <> thành <QlquanBilliardLtwContext>
+builder.Services.AddDbContext<QlquanBilliardLtwContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("QlquanBilliardLtwContext")));
+
 var app = builder.Build();
+
+ExcelPackage.License.SetNonCommercialPersonal("TrinhVan205");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -15,5 +15,5 @@ public partial class Ban
 
     public virtual Khuvuc? IdkhuNavigation { get; set; }
 
-    public virtual ICollection<Phienchoi> Phienchois { get; set; } = new List<Phienchoi>();
+    public virtual ICollection<Phienchoi> Phienchois { get; set; } = [];
 }
