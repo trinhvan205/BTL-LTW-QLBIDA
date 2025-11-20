@@ -1,8 +1,273 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model BTL_LTW_QLBIDA.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<link rel="stylesheet" href="~/css/Dashboard/Dashboard.css" asp-append-version="true" />
+
+<div class="container-fluid dashboard-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 dashboard-page-title">Tổng Quan Kinh Doanh</h1>
+        <div>
+            <span class="mr-2">Xem theo:</span>
+            <select id="chartType" class="form-control filter-time-select" onchange="refreshAllCharts()">
+                <option value="day">7 Ngày qua</option>
+                <option value="month">Theo Tháng (Năm nay)</option>
+                <option value="year">Theo Năm</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-4 mb-4">
+            <div class="card kpi-card kpi-border-primary">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số bàn</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="valTongBan">@Model.TongBan</div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-table kpi-icon"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-4 mb-4">
+            <div class="card kpi-card kpi-border-success">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">TB Doanh Thu / Kỳ</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="valAvgDoanhThu">
+                                @Model.TrungBinhDoanhThu.ToString("#,##0") ₫
+                            </div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-dollar-sign kpi-icon"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-4 mb-4">
+            <div class="card kpi-card kpi-border-warning">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">TB Khách / Kỳ</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="valAvgKhach">
+                                @Model.TrungBinhKhach.ToString("0.0") lượt
+                            </div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-users kpi-icon"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Biểu Đồ Doanh Thu (VNĐ)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-main">
+                        <canvas id="chartDoanhThu"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Biểu Đồ Lượng Khách (Lượt khách)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-main">
+                        <canvas id="chartKhachHang"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">Top Món Bán Chạy</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-pie">
+                        <canvas id="chartSanPham"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-secondary">Hoạt Động Gần Đây</h6>
+                </div>
+                <div class="card-body">
+                    <div class="recent-activity-scroll">
+                        <table class="table table-bordered recent-activity-table">
+                            <thead>
+                                <tr>
+                                    <th>Khách hàng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Thời gian</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.HoatDongGanDay != null)
+                                {
+                                    foreach (var item in Model.HoatDongGanDay)
+                                    {
+                                        <tr>
+                                            <td>@item.TenKhachHang</td>
+                                            <td>
+                                                @{
+                                                    // Kiểm tra nếu là "Đang chơi" thì dùng class màu xanh, ngược lại dùng màu tím
+                                                    var statusClass = item.LoaiHoatDong == "Đang chơi" ? "status-playing" : "status-finished";
+                                                }
+                                                <span class="@statusClass">
+                                                    @item.LoaiHoatDong
+                                                </span>
+                                            </td>
+                                            <td>@item.SoTien.ToString("#,##0")</td>
+                                            <td>@item.ThoiGian.ToString("dd/MM HH:mm")</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // (Giữ nguyên phần script JS như cũ vì ID không đổi)
+        let chartDoanhThu = null;
+        let chartKhachHang = null;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            refreshAllCharts();
+        });
+
+        // ... (Phần còn lại của script giữ nguyên) ...
+        function refreshAllCharts() {
+            const type = document.getElementById('chartType').value;
+            loadDoanhThu(type);
+            loadLuuLuongKhach(type);
+            loadGeneralStats(type);
+        }
+
+        // Paste lại các hàm loadGeneralStats, loadDoanhThu, loadLuuLuongKhach, và Pie Chart y hệt như cũ
+        // vì chúng ta chỉ đổi CSS class, không đổi ID của các thẻ HTML
+        function loadGeneralStats(type) {
+            fetch(`/Home/GetGeneralStats?type=${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('valTongBan').innerText = data.tongBan;
+                    const revenueFormatted = new Intl.NumberFormat('vi-VN', {
+                        style: 'currency',
+                        currency: 'VND'
+                    }).format(data.avgDoanhThu);
+                    document.getElementById('valAvgDoanhThu').innerText = revenueFormatted;
+                    document.getElementById('valAvgKhach').innerText = data.avgKhach.toFixed(1) + " lượt";
+                });
+        }
+
+        function loadDoanhThu(type) {
+            fetch(`/Home/GetDoanhThuData?type=${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    const ctx = document.getElementById('chartDoanhThu').getContext('2d');
+                    if (chartDoanhThu) chartDoanhThu.destroy();
+
+                    chartDoanhThu = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(x => x.label),
+                            datasets: [{
+                                label: 'Doanh thu (VNĐ)',
+                                data: data.map(x => x.value),
+                                backgroundColor: 'rgba(78, 115, 223, 0.7)',
+                                borderColor: 'rgba(78, 115, 223, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+                });
+        }
+
+        function loadLuuLuongKhach(type) {
+            fetch(`/Home/GetLuuLuongKhachData?type=${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    const ctx = document.getElementById('chartKhachHang').getContext('2d');
+                    if (chartKhachHang) chartKhachHang.destroy();
+
+                    chartKhachHang = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map(x => x.label),
+                            datasets: [{
+                                label: 'Số lượng khách (Lượt)',
+                                data: data.map(x => x.value),
+                                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                                borderColor: 'rgba(28, 200, 138, 1)',
+                                pointBackgroundColor: 'rgba(28, 200, 138, 1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 1 }
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        @if (Model.Top10SanPham != null && Model.Top10SanPham.Count > 0)
+        {
+                <text>
+                    new Chart(document.getElementById('chartSanPham'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: [@Html.Raw(string.Join(",", Model.Top10SanPham.Select(s => "'" + s.TenSanPham + "'")))],
+                            datasets: [{
+                                data: [@string.Join(",", Model.Top10SanPham.Select(s => s.SoLuongBan))],
+                                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
+                            }]
+                        },
+                        options: { maintainAspectRatio: false, legend: { position: 'bottom' } }
+                    });
+                </text>
+        }
+    </script>
+}
