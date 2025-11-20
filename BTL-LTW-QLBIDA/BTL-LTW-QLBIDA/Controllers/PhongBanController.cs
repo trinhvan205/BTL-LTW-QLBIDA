@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System; // Import System để sử dụng Math
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
@@ -16,23 +19,43 @@ namespace BTL_LTW_QLBIDA.Controllers
             _context = context;
         }
 
-        // --- HÀM 1: Index (Giữ nguyên) ---
+        // 🟢 HÀM HỖ TRỢ: TÌM ID BÀN TIẾP THEO
+        private string GetNextBanId()
+        {
+            // Lọc các Id có thể chuyển thành số (ví dụ: B010)
+            var maxId = _context.Bans
+                .Select(b => b.Idban)
+                .AsEnumerable()
+                .Where(id => id != null && id.StartsWith("B") && int.TryParse(id.Substring(1), out _))
+                .Select(id => int.Parse(id.Substring(1)))
+                .DefaultIfEmpty(0) // Nếu không có bàn nào, bắt đầu từ 0
+                .Max();
+
+            // Tăng lên 1 và định dạng lại (ví dụ: 11 thành B011)
+            return $"B{(maxId + 1):D3}";
+        }
+
+        // ====================================================================
+        // I. QUẢN LÝ BÀN (Bàn)
+        // ====================================================================
+
+        // [HÀM 1] HIỂN THỊ TRANG CHÍNH (Giữ nguyên)
         public async Task<IActionResult> Index()
         {
             int page = 1;
             int pageSize = 10;
 
             var banQuery = _context.Bans
-                                .Include(b => b.IdkhuNavigation)
-                                .Where(b => b.Trangthai == true)
-                                .AsQueryable();
+                                        .Include(b => b.IdkhuNavigation)
+                                        .Where(b => b.Trangthai == true)
+                                        .AsQueryable();
 
             var totalItems = await banQuery.CountAsync();
 
             var pagedItems = await banQuery
-                                    .Skip((page - 1) * pageSize)
-                                    .Take(pageSize)
-                                    .ToListAsync();
+                                                .Skip((page - 1) * pageSize)
+                                                .Take(pageSize)
+                                                .ToListAsync();
 
             var pagedResult = new PagedResult<Ban>
             {
@@ -43,8 +66,8 @@ namespace BTL_LTW_QLBIDA.Controllers
             };
 
             var khuVucList = await _context.Khuvucs
-                                      .Select(k => new { k.Idkhu, k.Tenkhu })
-                                      .ToListAsync();
+                                             .Select(k => new { k.Idkhu, k.Tenkhu })
+                                             .ToListAsync();
 
             var viewModel = new PhongBanIndexViewModel
             {
@@ -58,15 +81,14 @@ namespace BTL_LTW_QLBIDA.Controllers
             return View(viewModel);
         }
 
-        // --- HÀM 2: FilterBan (Giữ nguyên) ---
+        // [HÀM 2] LỌC BÀN (AJAX/Partial View) - Giữ nguyên logic phân trang
         [HttpGet]
         public async Task<IActionResult> FilterBan(string khuVuc, string trangThai, string timKiem, int pageSize = 10, int page = 1)
         {
             var banQuery = _context.Bans
-                                .Include(b => b.IdkhuNavigation)
-                                .AsQueryable();
+                                         .Include(b => b.IdkhuNavigation)
+                                         .AsQueryable();
 
-            // 1. Lọc Trạng thái
             bool? selectedTrangThai = null;
             if (trangThai == "true") selectedTrangThai = true;
             else if (trangThai == "false") selectedTrangThai = false;
@@ -76,13 +98,11 @@ namespace BTL_LTW_QLBIDA.Controllers
                 banQuery = banQuery.Where(b => b.Trangthai == selectedTrangThai.Value);
             }
 
-            // 2. Lọc Khu Vực
             if (!string.IsNullOrEmpty(khuVuc))
             {
                 banQuery = banQuery.Where(b => b.Idkhu != null && b.Idkhu.Trim() == khuVuc.Trim());
             }
 
-            // 3. Lọc Tìm kiếm
             if (!string.IsNullOrEmpty(timKiem))
             {
                 banQuery = banQuery.Where(b => b.Idban.Contains(timKiem));
@@ -90,10 +110,18 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             var totalItems = await banQuery.CountAsync();
 
+            // Tính toán và điều chỉnh số trang
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            page = Math.Min(page, Math.Max(1, totalPages));
+
+            if (totalItems > 0 && page < 1) page = 1;
+            if (totalItems == 0) page = 1;
+
+
             var pagedItems = await banQuery
-                                    .Skip((page - 1) * pageSize)
-                                    .Take(pageSize)
-                                    .ToListAsync();
+                                                 .Skip((page - 1) * pageSize)
+                                                 .Take(pageSize)
+                                                 .ToListAsync();
 
             var viewModel = new PagedResult<Ban>
             {
@@ -106,32 +134,185 @@ namespace BTL_LTW_QLBIDA.Controllers
             return PartialView("_BanTablePartial", viewModel);
         }
 
-
-        // --- HÀM 3 & 4: Create (Bàn) (Giữ nguyên) ---
+        // [HÀM 3] GET FORM THÊM BÀN (Partial View) - 🟢 ĐÃ SỬA: Lấy ID bàn tự động
         public async Task<IActionResult> Create()
         {
             ViewData["KhuVucList"] = new SelectList(await _context.Khuvucs.ToListAsync(), "Idkhu", "Tenkhu");
+
+            // 🟢 Thêm ID bàn tiếp theo vào ViewBag
+            ViewBag.NextBanId = GetNextBanId();
+
             return PartialView("_CreatePartial");
         }
+
+        // [HÀM 4] POST THÊM BÀN (ĐÃ SỬA: Thêm tham số page và pageSize)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Idban,Idkhu,Giatien")] Ban ban)
+        public async Task<IActionResult> Create([Bind("Idban,Idkhu,Giatien")] Ban ban, [FromForm] int page, [FromForm] int pageSize)
         {
             ban.Trangthai = false;
+
             if (ModelState.IsValid)
             {
                 _context.Add(ban);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true });
+
+                return Json(new { success = true, message = "Thêm bàn thành công!" });
             }
+
+            // Nếu thất bại, trả về ID tiếp theo (nếu chưa có) hoặc giữ ID cũ (nếu có)
             ViewData["KhuVucList"] = new SelectList(await _context.Khuvucs.ToListAsync(), "Idkhu", "Tenkhu", ban.Idkhu);
+            ViewBag.NextBanId = ban.Idban ?? GetNextBanId();
+
             return PartialView("_CreatePartial", ban);
         }
 
-        // --- HÀM 5: CREATE KHU VỰC (Giữ nguyên) ---
+        // [HÀM 9] LẤY CHI TIẾT BÀN & LỊCH SỬ (Partial View) - Giữ nguyên
+        [HttpGet]
+        public async Task<IActionResult> GetBanDetail(string id)
+        {
+            var ban = await _context.Bans
+                                         .Include(b => b.IdkhuNavigation)
+                                         .FirstOrDefaultAsync(b => b.Idban == id);
+
+            if (ban == null) return NotFound();
+
+            var history = await _context.Hoadons
+                                                 .Include(h => h.IdphienNavigation)
+                                                 .Where(h => h.IdphienNavigation.Idban == id)
+                                                 .OrderByDescending(h => h.Ngaylap)
+                                                 .Take(10)
+                                                 .Include(h => h.IdnvNavigation)
+                                                 .ToListAsync();
+
+            ViewBag.History = history;
+
+            return PartialView("_BanDetailTabsPartial", ban);
+        }
+
+        // [HÀM 10] LẤY DỮ LIỆU BÀN ĐỂ SỬA (GET JSON) - Giữ nguyên
+        [HttpGet]
+        public async Task<IActionResult> GetBanForEdit(string id)
+        {
+            var ban = await _context.Bans.FindAsync(id);
+            if (ban == null) return NotFound();
+
+            var khuVucList = new SelectList(
+                await _context.Khuvucs.ToListAsync(),
+                "Idkhu",
+                "Tenkhu",
+                ban.Idkhu
+            );
+
+            return Json(new
+            {
+                id = ban.Idban,
+                idKhu = ban.Idkhu,
+                giaTien = ban.Giatien,
+                trangThai = ban.Trangthai,
+                khuVucList = khuVucList.Select(x => new { value = x.Value, text = x.Text, selected = x.Selected })
+            });
+        }
+
+        // [HÀM 11] CẬP NHẬT BÀN (POST) - ĐÃ SỬA: Thêm tham số page và pageSize
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateKhuVuc([FromForm] string tenKhuVuc, [FromForm] string? ghiChu)
+        public async Task<IActionResult> UpdateBan([Bind("Idban,Idkhu,Giatien")] Ban updatedBan, [FromForm] int page, [FromForm] int pageSize)
+        {
+            var ban = await _context.Bans.FindAsync(updatedBan.Idban);
+
+            if (ban == null) return Json(new { success = false, message = "Không tìm thấy bàn." });
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Where(x => x.Value.Errors.Count > 0)
+                                         .ToDictionary(
+                                             kvp => kvp.Key,
+                                             kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                                         );
+
+                return Json(new { success = false, message = "Dữ liệu nhập không hợp lệ.", errors = errors });
+            }
+
+            // ⚠️ KHÔNG CHO CẬP NHẬT BÀN ĐANG HOẠT ĐỘNG (Logic bảo mật)
+            if (ban.Trangthai == true)
+            {
+                return Json(new { success = false, message = "Không thể cập nhật thông tin bàn đang hoạt động." });
+            }
+
+            ban.Idkhu = updatedBan.Idkhu;
+            ban.Giatien = updatedBan.Giatien;
+
+            try
+            {
+                _context.Update(ban);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Json(new { success = false, message = "Lỗi đồng bộ dữ liệu. Vui lòng thử lại." });
+            }
+
+            return Json(new { success = true, message = "Cập nhật thành công!" });
+        }
+
+        // [HÀM 12] XÓA BÀN (POST) - ĐÃ SỬA: Thêm tham số page và pageSize
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteBan([FromForm] string id, [FromForm] int page, [FromForm] int pageSize)
+        {
+            var ban = await _context.Bans.FindAsync(id);
+            if (ban == null) return Json(new { success = false, message = "Không tìm thấy bàn." });
+
+            if (ban.Trangthai == true)
+            {
+                return Json(new { success = false, message = "Không thể xóa bàn đang hoạt động. Vui lòng chuyển bàn sang trạng thái 'Trống' trước khi xóa." });
+            }
+
+            // XÓA TẦNG (Cascading Delete logic) - Giữ nguyên
+            var phienChoiToDelete = await _context.Phienchois.Where(p => p.Idban == id).ToListAsync();
+            foreach (var phien in phienChoiToDelete)
+            {
+                var hoaDonToDelete = await _context.Hoadons.Where(h => h.Idphien == phien.Idphien).ToListAsync();
+                foreach (var hoaDon in hoaDonToDelete)
+                {
+                    var hoaDonDv = await _context.Hoadondvs.Where(hdv => hdv.Idhd == hoaDon.Idhd).ToListAsync();
+                    _context.Hoadondvs.RemoveRange(hoaDonDv);
+                }
+                _context.Hoadons.RemoveRange(hoaDonToDelete);
+            }
+            _context.Phienchois.RemoveRange(phienChoiToDelete);
+
+            _context.Bans.Remove(ban);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Đã xóa bàn thành công!" });
+        }
+
+        // [HÀM 13] ĐỔI TRẠNG THÁI BÀN (Toggle) - ĐÃ SỬA: Thêm tham số page và pageSize
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatusBan([FromForm] string id, [FromForm] int page, [FromForm] int pageSize)
+        {
+            var ban = await _context.Bans.FindAsync(id);
+            if (ban == null) return Json(new { success = false, message = "Không tìm thấy bàn." });
+
+            ban.Trangthai = !(ban.Trangthai ?? false);
+
+            _context.Update(ban);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Cập nhật dữ liệu thành công" });
+        }
+
+        // ====================================================================
+        // II. QUẢN LÝ KHU VỰC - Sửa để giữ nguyên trang bàn sau khi thêm/sửa/xóa khu vực
+        // ====================================================================
+
+        // [HÀM 5] CREATE KHU VỰC (ĐÃ SỬA: Thêm tham số page và pageSize)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateKhuVuc([FromForm] string tenKhuVuc, [FromForm] string? ghiChu, [FromForm] int page, [FromForm] int pageSize)
         {
             string newIdKhu = tenKhuVuc.Trim();
             if (string.IsNullOrEmpty(newIdKhu))
@@ -143,6 +324,7 @@ namespace BTL_LTW_QLBIDA.Controllers
             {
                 return Json(new { success = false, message = "Tên khu vực này đã tồn tại." });
             }
+
             var newKhu = new Khuvuc
             {
                 Idkhu = newIdKhu,
@@ -151,6 +333,7 @@ namespace BTL_LTW_QLBIDA.Controllers
             };
             _context.Khuvucs.Add(newKhu);
             await _context.SaveChangesAsync();
+
             return Json(new
             {
                 success = true,
@@ -159,25 +342,10 @@ namespace BTL_LTW_QLBIDA.Controllers
             });
         }
 
-        // --- HÀM 6: GET KHU VỰC (Giữ nguyên) ---
-        [HttpGet]
-        public async Task<IActionResult> GetKhuVucDetails(string id)
-        {
-            var khuvuc = await _context.Khuvucs
-                                 .Where(k => k.Idkhu == id)
-                                 .Select(k => new { k.Idkhu, k.Tenkhu, k.Ghichu })
-                                 .FirstOrDefaultAsync();
-            if (khuvuc == null)
-            {
-                return NotFound();
-            }
-            return Json(khuvuc);
-        }
-
-        // --- HÀM 7: UPDATE KHU VỰC (Giữ nguyên) ---
+        // [HÀM 7] UPDATE KHU VỰC (ĐÃ SỬA: Thêm tham số page và pageSize)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateKhuVuc([FromForm] string editIdKhu, [FromForm] string editTenKhuVuc, [FromForm] string? editGhiChu)
+        public async Task<IActionResult> UpdateKhuVuc([FromForm] string editIdKhu, [FromForm] string editTenKhuVuc, [FromForm] string? editGhiChu, [FromForm] int page, [FromForm] int pageSize)
         {
             var khuvuc = await _context.Khuvucs.FindAsync(editIdKhu);
             if (khuvuc == null)
@@ -196,176 +364,38 @@ namespace BTL_LTW_QLBIDA.Controllers
             khuvuc.Ghichu = editGhiChu;
             _context.Update(khuvuc);
             await _context.SaveChangesAsync();
+
             return Json(new { success = true, message = "Cập nhật thành công!" });
         }
 
-        // --- HÀM 8: DELETE KHU VỰC (ĐÃ SỬA LOGIC XÓA TẦNG) ---
+        // [HÀM 8] DELETE KHU VỰC (ĐÃ SỬA: Thêm tham số page và pageSize)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteKhuVuc([FromForm] string id)
+        public async Task<IActionResult> DeleteKhuVuc([FromForm] string id, [FromForm] int page, [FromForm] int pageSize)
         {
             try
             {
-                // 1. Tìm khu vực cần xóa
                 var khuvuc = await _context.Khuvucs.FindAsync(id);
                 if (khuvuc == null)
                 {
                     return Json(new { success = false, message = "Không tìm thấy khu vực." });
                 }
 
-                // 2. Tìm tất cả Bàn liên quan
-                var bansToDelete = await _context.Bans.Where(b => b.Idkhu == id).ToListAsync();
-                if (bansToDelete.Any())
+                var banCount = await _context.Bans.CountAsync(b => b.Idkhu == id);
+                if (banCount > 0)
                 {
-                    // 3. Với mỗi Bàn, tìm và xóa các Phiên chơi, Hóa đơn... (Xóa tầng)
-                    foreach (var ban in bansToDelete)
-                    {
-                        var phienChoiToDelete = await _context.Phienchois.Where(p => p.Idban == ban.Idban).ToListAsync();
-                        if (phienChoiToDelete.Any())
-                        {
-                            foreach (var phien in phienChoiToDelete)
-                            {
-                                var hoaDonToDelete = await _context.Hoadons.Where(h => h.Idphien == phien.Idphien).ToListAsync();
-                                if (hoaDonToDelete.Any())
-                                {
-                                    foreach (var hoaDon in hoaDonToDelete)
-                                    {
-                                        var hoaDonDvToDelete = await _context.Hoadondvs.Where(hdv => hdv.Idhd == hoaDon.Idhd).ToListAsync();
-                                        _context.Hoadondvs.RemoveRange(hoaDonDvToDelete);
-                                    }
-                                    _context.Hoadons.RemoveRange(hoaDonToDelete);
-                                }
-                            }
-                            _context.Phienchois.RemoveRange(phienChoiToDelete);
-                        }
-                    }
-                    // 4. Xóa các Bàn
-                    _context.Bans.RemoveRange(bansToDelete);
+                    return Json(new { success = false, message = $"Không thể xóa khu vực này vì vẫn còn {banCount} bàn thuộc về nó. Vui lòng xóa hoặc chuyển bàn trước." });
                 }
 
-                // 5. Xóa Khu vực
                 _context.Khuvucs.Remove(khuvuc);
-
-                // 6. Lưu tất cả thay đổi
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Xóa khu vực và tất cả dữ liệu liên quan thành công!" });
+                return Json(new { success = true, message = "Xóa khu vực thành công!" });
             }
             catch (DbUpdateException ex)
             {
-                // Bắt lỗi nếu vẫn còn ràng buộc nào đó (hiếm khi xảy ra nếu logic trên đúng)
                 return Json(new { success = false, message = "Lỗi CSDL: Không thể xóa. " + ex.InnerException?.Message });
             }
         }
-
-        // --- HÀM 9: LẤY CHI TIẾT BÀN & LỊCH SỬ (KHÔNG CẦN SỬA DB) ---
-        [HttpGet]
-        public async Task<IActionResult> GetBanDetail(string id)
-        {
-            // 1. Lấy thông tin Bàn
-            var ban = await _context.Bans
-                                .Include(b => b.IdkhuNavigation)
-                                .FirstOrDefaultAsync(b => b.Idban == id);
-
-            if (ban == null) return NotFound();
-
-            // 2. Lấy lịch sử giao dịch (10 hóa đơn gần nhất của bàn này)
-            // Logic: Hóa đơn -> Phiên chơi -> Bàn
-            var history = await _context.Hoadons
-                                    .Include(h => h.IdphienNavigation) // Join với Phiên
-                                    .Where(h => h.IdphienNavigation.Idban == id) // Lọc theo Bàn
-                                    .OrderByDescending(h => h.Ngaylap)
-                                    .Take(10)
-                                    .Include(h => h.IdnvNavigation) // Lấy tên nhân viên
-                                    .ToListAsync();
-
-            ViewBag.History = history;
-
-            return PartialView("_BanDetailTabsPartial", ban);
-        }
-
-        // --- HÀM 10: LẤY DỮ LIỆU BÀN ĐỂ SỬA (GET JSON) ---
-        [HttpGet]
-        public async Task<IActionResult> GetBanForEdit(string id)
-        {
-            var ban = await _context.Bans.FindAsync(id);
-            if (ban == null) return NotFound();
-
-            // Trả về JSON để JavaScript điền vào Modal
-            return Json(new
-            {
-                id = ban.Idban,
-                idKhu = ban.Idkhu,
-                giaTien = ban.Giatien,
-                trangThai = ban.Trangthai
-            });
-        }
-
-        // --- HÀM 11: CẬP NHẬT BÀN (POST) ---
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateBan([FromForm] string editIdBan, [FromForm] string editIdKhuBan, [FromForm] decimal editGiaTien)
-        {
-            var ban = await _context.Bans.FindAsync(editIdBan);
-            if (ban == null) return Json(new { success = false, message = "Không tìm thấy bàn." });
-
-            // Cập nhật thông tin
-            ban.Idkhu = editIdKhuBan;
-            ban.Giatien = editGiaTien;
-            // (Nếu có thêm cột Ghi chú, Số ghế thì gán ở đây)
-
-            _context.Update(ban);
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true, message = "Cập nhật thành công!" });
-        }
-
-        // --- HÀM 12: XÓA BÀN (POST) ---
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteBan([FromForm] string id)
-        {
-            var ban = await _context.Bans.FindAsync(id);
-            if (ban == null) return Json(new { success = false, message = "Không tìm thấy bàn." });
-
-            // XÓA TẦNG (Cascading Delete): Xóa Phiên -> Hóa đơn -> Chi tiết trước
-            var phienChoiToDelete = await _context.Phienchois.Where(p => p.Idban == id).ToListAsync();
-            foreach (var phien in phienChoiToDelete)
-            {
-                var hoaDonToDelete = await _context.Hoadons.Where(h => h.Idphien == phien.Idphien).ToListAsync();
-                foreach (var hoaDon in hoaDonToDelete)
-                {
-                    var hoaDonDv = await _context.Hoadondvs.Where(hdv => hdv.Idhd == hoaDon.Idhd).ToListAsync();
-                    _context.Hoadondvs.RemoveRange(hoaDonDv);
-                }
-                _context.Hoadons.RemoveRange(hoaDonToDelete);
-            }
-            _context.Phienchois.RemoveRange(phienChoiToDelete);
-
-            // Cuối cùng xóa Bàn
-            _context.Bans.Remove(ban);
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true, message = "Đã xóa bàn thành công!" });
-        }
-
-        // --- HÀM 13: ĐỔI TRẠNG THÁI BÀN (Toggle) ---
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleStatusBan([FromForm] string id)
-        {
-            var ban = await _context.Bans.FindAsync(id);
-            if (ban == null) return Json(new { success = false, message = "Không tìm thấy bàn." });
-
-            // Đảo ngược trạng thái (True thành False, False thành True)
-            // Lưu ý: Nếu Trangthai là null thì coi như false rồi chuyển thành true
-            ban.Trangthai = !(ban.Trangthai ?? false);
-
-            _context.Update(ban);
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true, message = "Cập nhật dữ liệu thành công" });
-        }
-
     }
 }

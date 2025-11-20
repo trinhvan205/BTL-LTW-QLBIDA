@@ -1,0 +1,179 @@
+﻿/* ====================================================================== */
+/* CSS TÙY CHỈNH CHO TRANG QUẢN LÝ BÀN (BAN.CSS) */
+/* Đồng bộ màu tím đậm: #8971B7 */
+/* ====================================================================== */
+
+/* --- 1. KHỐI LỌC (FILTER CARDS) --- */
+
+/* Áp dụng bo góc tròn triệt để, đổ bóng và viền cho toàn bộ thẻ card */
+.sidebar-filter-card {
+    border-radius: 12px !important; /* Dùng !important để tránh bị Bootstrap ghi đè */
+    overflow: hidden !important; /* Quan trọng: Cắt nội dung tràn góc */
+    border: 1px solid #7a63a3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+}
+
+    /* Áp dụng màu nền tím đậm: #8971B7 và chữ trắng cho Filter Cards */
+    .sidebar-filter-card .card-body {
+        background-color: #8971B7 !important;
+        color: white;
+        padding: 1rem;
+        /* Đảm bảo bo góc dưới */
+        border-radius: 0 0 12px 12px !important;
+    }
+
+    .sidebar-filter-card .card-header {
+        background-color: #8971B7 !important;
+        color: white;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.75rem 1rem;
+        /* Đảm bảo bo góc trên */
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+        /* Đảm bảo text tiêu đề là trắng */
+        .sidebar-filter-card .card-body h6,
+        .sidebar-filter-card .card-header h6 {
+            color: white !important;
+            margin-bottom: 0;
+        }
+
+    /* Đảm bảo các label và dropdown text trong khối lọc cũng là trắng */
+    .sidebar-filter-card .form-check-label {
+        color: white;
+        cursor: pointer;
+    }
+
+    /* Làm cho input Tìm kiếm và select Khu vực nổi bật trên nền tím đậm */
+    .sidebar-filter-card .form-control,
+    .sidebar-filter-card .form-select {
+        background-color: #ffffff;
+        color: #333;
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+
+        /* Khi input/select được focus */
+        .sidebar-filter-card .form-control:focus,
+        .sidebar-filter-card .form-select:focus {
+            border-color: #5d489b;
+            box-shadow: 0 0 0 0.25rem rgba(137, 113, 183, 0.25);
+        }
+
+    /* Kiểu cho radio buttons */
+    .sidebar-filter-card .form-check-input {
+        border-color: rgba(255, 255, 255, 0.5);
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+        .sidebar-filter-card .form-check-input:checked {
+            background-color: white;
+            border-color: white;
+        }
+
+            .sidebar-filter-card .form-check-input:checked[type="radio"] {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%238971B7'/%3e%3c/svg%3e");
+            }
+
+    /* Xử lý mũi tên collapse cho trạng thái */
+    .sidebar-filter-card .collapse-arrow {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .sidebar-filter-card .collapse-arrow.bi-chevron-up {
+            transform: rotate(0deg);
+        }
+
+        .sidebar-filter-card .collapse-arrow.bi-chevron-down {
+            transform: rotate(180deg);
+        }
+
+
+/* --- 2. DROPDOWN SỐ BẢN GHI (PAGE SIZE) và NÚT ICON --- */
+
+#pageSizeButton {
+    background-color: #F8F9FA !important;
+    border-color: #8971B7 !important;
+    border-radius: 6px;
+    color: #333;
+    font-weight: 500;
+}
+
+#pageSizeMenu .dropdown-item:active,
+#pageSizeMenu .dropdown-item.active {
+    background-color: #8971B7 !important;
+    color: white !important;
+}
+
+#pageSizeMenu .dropdown-item:hover {
+    background-color: #A090C8 !important;
+    color: white !important;
+}
+
+#btnAddKhuVuc, #btnEditKhuVuc {
+    color: white;
+    padding: 0.25rem 0.5rem;
+}
+
+    #btnAddKhuVuc:hover, #btnEditKhuVuc:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+    }
+
+
+/* ====================================================================== */
+/* --- 3. KIỂU DÁNG BẢNG KHUNG (GRID TABLE) --- */
+/* ====================================================================== */
+
+.table {
+    /* Đảm bảo viền gộp lại thành khung */
+    border-collapse: collapse;
+    border-spacing: 0;
+    /* KHUNG VIỀN NGOÀI CÙNG */
+    border-radius: 6px;
+    border: 1px solid #8971B7; /* Viền ngoài màu tím đậm */
+    overflow: hidden; /* Cần thiết để bo góc bảng hoạt động */
+    margin-top: 0;
+}
+
+    /* Thiết lập màu nền và chữ cho tiêu đề bảng (thay thế inline style) */
+    .table .thead-custom {
+        background-color: #8971B7;
+        color: white;
+    }
+
+    /* Áp dụng nền trắng cho hàng (tbody) để chỉ nội dung bảng có nền trắng */
+    .table tbody tr {
+        background-color: white;
+    }
+
+    /* Áp dụng viền nội bộ và căn giữa cho các ô */
+    .table tbody td,
+    .table thead th {
+        border: 1px solid #dee2e6; /* Viền nội bộ nhạt màu */
+        vertical-align: middle;
+        padding: 0.75rem;
+    }
+
+    /* Đảm bảo viền dưới của thead là cùng màu với thead */
+    .table thead th {
+        border-bottom: 1px solid #8971B7 !important;
+    }
+
+    /* Loại bỏ viền thừa cho hàng chi tiết khi mở rộng */
+    .table tbody tr.detail-row td {
+        border: none !important;
+        padding: 0;
+    }
+
+
+/* ====================================================================== */
+/* --- 4. TÙY CHỈNH NỀN TRANG (BODY) --- */
+/* ====================================================================== */
+
+body {
+    /* Đặt nền xám nhạt cho toàn bộ trang để làm nổi bật các khối màu trắng và tím */
+    background-color: #F8F9FA;
+}

@@ -10,12 +10,14 @@
 
             <div class="mb-3">
                 <label asp-for="Idban" class="form-label">Tên bàn</label>
-                <input asp-for="Idban" class="form-control" />
+                @* 🟢 TỰ ĐỘNG ĐIỀN ID BÀN TIẾP THEO TỪ VIEWBAG *@
+                <input asp-for="Idban" class="form-control" value="@ViewBag.NextBanId" />
                 <span asp-validation-for="Idban" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Idkhu" class="form-label">Khu vực</label>
+                @* Đảm bảo ViewData key là "KhuVucList" *@
                 <select asp-for="Idkhu" class="form-select" asp-items="@(ViewData["KhuVucList"] as SelectList)">
                     <option value="">-- Lựa chọn --</option>
                 </select>
@@ -24,10 +26,20 @@
 
             <div class="mb-3">
                 <label asp-for="Giatien" class="form-label">Giá tiền</label>
-                <input asp-for="Giatien" class="form-control" type="number" />
+                @* 🟢 GIỮ NGUYÊN step="any" để cho phép nhập số thập phân chính xác *@
+                <input asp-for="Giatien" class="form-control" type="number" step="any" />
                 <span asp-validation-for="Giatien" class="text-danger"></span>
             </div>
+
+            @* Bạn có thể thêm các trường không bắt buộc như Ghichu tại đây nếu muốn *@
 
         </form>
     </div>
 </div>
+
+@* --- BỔ SUNG QUAN TRỌNG: Script Validation --- *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
