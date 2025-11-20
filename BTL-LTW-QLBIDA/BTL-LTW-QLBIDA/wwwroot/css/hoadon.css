@@ -1,445 +1,250 @@
-﻿/* ==============================================================
-   🎯 1. LAYOUT CHUNG
-============================================================== */
-/*body {
-    background: #f5f7fa;
-}
-
-.invoice-card {
-    border-radius: 10px;
-    background: white;
-    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.08);
-    padding: 15px;
-}*/
-
-/* ==============================================================
-   🎯 2. SIDEBAR LỌC
-============================================================== */
-/*.invoice-filter-card {
-    border-radius: 10px;
-    background: #fff;
-    border: none;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-
-    .invoice-filter-card h5 {
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-    }
-
-    .invoice-filter-card input,
-    .invoice-filter-card select {
-        font-size: 0.9rem;
-    }*/
-
-/* ==============================================================
-   🎯 3. BẢNG HÓA ĐƠN
-============================================================== */
-
-/*table.invoice-table {
-    font-size: 0.9rem;
-    margin-bottom: 0;
-}
-
-.invoice-table thead th {
-    background: #2f855a;
-    color: #fff;
-    font-weight: 600;
-    vertical-align: middle;
-    border: none;
-}
-
-.invoice-table tbody tr {
-    cursor: pointer;
-    transition: all .15s ease-in-out;
-}
-
-    .invoice-table tbody tr:hover {
-        background: #e8f5e9 !important;*/ /* Xanh nhạt hover */
-        /*transform: translateY(-1px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-        position: relative;
-        z-index: 1;
-    }
-
-    .invoice-table tbody tr.selected-row {
-        background: #c8e6c9 !important;
-        border-left: 4px solid #2f855a;
-    }*/
-
-/* Tổng tiền */
-/*.invoice-table .text-primary {
-    color: #2f855a !important;
-    font-weight: 600;
-}*/
-
-/* Badge trạng thái */
-/*.badge-success {
-    background: #2f855a !important;
-}*/
-
-/* ==============================================================
-   🎯 4. NÚT THAO TÁC (ACTION BUTTONS)
-============================================================== */
-
-/*.invoice-actions .btn {
-    padding: 4px 7px;
-    font-size: 0.8rem;
-    margin: 0 2px;
-    border-radius: 6px;
-    transition: all .2s ease;
-}
-
-.invoice-actions .btn-outline-info:hover i {
-    color: #0dcaf0;
-}
-
-.invoice-actions .btn-outline-warning:hover i {
-    color: #ffc107;
-}
-
-.invoice-actions .btn-outline-danger:hover i {
-    color: #dc3545;
-}
-
-.invoice-actions .btn-outline-primary:hover i {
-    color: #0d6efd;
-}*/
-
-/* ==============================================================
-   🎯 5. MODAL CHI TIẾT HÓA ĐƠN
-============================================================== */
-
-/*.invoice-detail-table td {
-    padding: 8px 5px;
-    border-bottom: 1px solid #f1f1f1;
-}
-
-.invoice-detail-header {
-    border-bottom: 2px solid #2f855a;
-    margin-bottom: 10px;
-}
-
-.modal-header.bg-info {
-    background: #2f855a !important;
-    color: white;
-}*/
-
-/* ==============================================================
-   🎯 6. SCROLL TABLE (INFINITY SCROLL)
-============================================================== */
-/*#tableScrollArea {
-    max-height: 600px;
-    overflow-y: auto;
-    border: 1px solid #dfdfdf;
-    border-radius: 10px;
-}*/
-
-/* Loading row */
-/*#loadingRow td {
-    background: #f5f7fa !important;
-}*/
-
-/* ==============================================================
-   🎯 7. GLOBAL LOADING OVERLAY
-============================================================== */
-
-/*.global-loading {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    backdrop-filter: blur(2px);
-}*/
-/* ... Các code cũ giữ nguyên ... */
-
-/* ==============================================================
-   🎯 8. FIX GIAO DIỆN TABLE & BUTTONS
-============================================================== */
-
-/* Ép nội dung bảng không xuống dòng (trừ cột Khách/Nhân viên) */
-/*.table th, .table td {
-    white-space: nowrap;
-    vertical-align: middle;
-}*/
-
-/* Cho phép tên dài xuống dòng */
-/*.col-khach, .col-nhanvien {
-    white-space: normal;
-    min-width: 140px;
-    max-width: 200px;
-}*/
-
-/* Căn chỉnh cột thao tác */
-/*.col-thaotac {
-    min-width: 180px;*/ /* Đảm bảo đủ chỗ cho 5 nút nằm ngang */
-/*}*/
-
-/* Tinh chỉnh nút bấm nhỏ gọn hơn */
-/*.invoice-actions .btn,
-.table .btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.85rem;
-    margin: 0;*/ /* Reset margin vì đã dùng gap-1 của Bootstrap */
-    /*display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}*/
-
-/* Hiệu ứng hover cho các dòng */
-/*#invoiceBody tr:hover {
-    background-color: #f1f8ff;*/ /* Màu nền xanh rất nhạt khi hover */
-/*}*/
-/* ============================================================
-   🌿 THEME CHUNG (màu, font, background)
+﻿/* ============================================================
+   🌸 GLOBAL
 ============================================================ */
 body {
-    background: #f5f6fa;
-    font-family: "Segoe UI", sans-serif;
+    font-family: "Inter", sans-serif !important;
+    background: #f3f4fd; /* tím nhạt */
+    color: #2d3436;
 }
 
-/* Card mặc định */
-.card, .invoice-card, .dv-sidebar-card, .dv-detail-card {
-    border-radius: 10px;
-    border: none;
-    background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
-
-/* ------------------------------------------------------------
-   🌿 HEADER MÀU XANH THỐNG NHẤT
------------------------------------------------------------- */
-.table thead th,
-.invoice-table thead th,
-.table-dv thead th {
-    background: #2f855a !important;
-    color: #fff !important;
-    font-weight: 600;
-    font-size: 0.9rem;
+/* Bọc bảng */
+#tableScrollArea {
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
+    padding: 0;
+    border: none !important;
 }
 
 /* ============================================================
-   🌿 TABLE CHUNG (Hóa đơn + Dịch vụ)
+   🌸 TABLE – Áp dụng cho table trong Index Hóa đơn
 ============================================================ */
-.table,
-.invoice-table,
-.table-dv {
+
+.table {
     font-size: 0.9rem !important;
 }
 
-    .table tbody tr,
-    .invoice-table tbody tr,
-    .table-dv tbody tr {
-        transition: 0.15s ease-in-out;
-        cursor: pointer;
+    /* HEADER – tím đặc */
+    .table thead th {
+        background: #6a11cb !important;
+        color: #fff !important;
+        border: none !important;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 12px;
     }
 
-        .table tbody tr:hover,
-        .invoice-table tbody tr:hover,
-        .table-dv tbody tr:hover {
-            background-color: #e8f5e9 !important; /* Xanh nhạt */
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-        }
+    /* BODY CELL */
+    .table tbody td {
+        padding: 12px 14px !important;
+        vertical-align: middle;
+        background: #ffffff;
+        border-bottom: 1px solid #eee3ff; /* tím nhạt */
+        color: #333;
+    }
 
-/* Selected row (kích vào row) */
-.selected-row,
-.active-row {
-    background-color: #c8e6c9 !important;
-    border-left: 4px solid #2f855a;
+/* HOVER */
+.table-hover tbody tr:hover td {
+    background: #f6efff !important; /* tím pastel nhẹ */
+    transform: translateY(-1px);
+    transition: 0.18s ease;
 }
 
-/* Ảnh trong bảng */
-.table-dv img {
-    border-radius: 6px;
+/* SELECTED / ACTIVE ROW */
+.selected-row td,
+.active-row td {
+    background: #eadbff !important; /* tím nhạt hơn hover */
+    border-left: 4px solid #6a11cb;
+}
+
+/* ============================================================
+   🌸 CỘT ĐẶC THÙ (Khách – Nhân viên – Thao tác)
+============================================================ */
+
+/* Tên khách / nhân viên cho phép xuống dòng */
+.col-khach,
+.col-nhanvien {
+    white-space: normal !important;
+    max-width: 220px;
+    font-weight: 500;
+}
+
+/* Cột thao tác cố định kích thước */
+.col-thaotac {
+    min-width: 210px;
+    white-space: nowrap;
+}
+
+/* Tổng tiền */
+.col-tongtien {
+    font-weight: 700;
+    color: #6a11cb !important;
+}
+
+/* Trạng thái */
+.badge-status {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.badge-success {
+    background: #6a11cb !important;
+}
+
+.badge-pending {
+    background: #b693ff !important;
+}
+
+/* ============================================================
+   🌸 ACTION BUTTONS (Chi tiết – Sửa – Xóa – In)
+============================================================ */
+
+.btn-detail,
+.btn-edit,
+.btn-delete,
+.btn-print {
+    border-radius: 8px !important;
+    padding: 6px 8px !important;
+    margin: 0 2px;
+    background: #f3f0fd;
+    border: 1px solid #d7c6ff;
     transition: 0.2s;
 }
 
-    .table-dv img:hover {
-        transform: scale(1.12);
+    .btn-detail:hover,
+    .btn-edit:hover,
+    .btn-delete:hover,
+    .btn-print:hover {
+        transform: translateY(-3px);
+        background: #ece3ff;
     }
 
-/* ------------------------------------------------------------
-   🌿 Kích cỡ cột cho đồng bộ 
------------------------------------------------------------- */
-.col-thaotac {
-    min-width: 180px;
-    white-space: nowrap;
-}
-
-.table td, .table th {
-    white-space: nowrap;
-    vertical-align: middle;
-}
-
-.col-khach, .col-nhanvien {
-    white-space: normal !important;
-    max-width: 200px;
-}
-
-/* ============================================================
-   🌿 NÚT ACTION (Sửa – Xóa – Chi tiết – Toggle)
-============================================================ */
-.btn-edit,
-.btn-delete,
-.btn-detail,
-.btn-toggle,
-.invoice-actions .btn,
-.table .btn-sm {
-    padding: 4px 7px !important;
-    font-size: 0.8rem !important;
-    border-radius: 6px;
-    margin: 0 1px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
+    /* Icon màu */
     .btn-detail i {
-        color: #0d6efd;
+        color: #2575fc !important;
     }
 
     .btn-edit i {
-        color: #ffc107;
+        color: #f7971e !important;
     }
 
     .btn-delete i {
-        color: #dc3545;
+        color: #e63946 !important;
     }
 
-    .btn-toggle i {
-        color: #2f855a;
-    }
-
-.btn-print i {
-    color: #6c757d;
-}
-
-.btn:hover i {
-    transform: scale(1.1);
-}
-
-/* ============================================================
-   🌿 SIDEBAR FILTER (Dịch vụ + Hóa đơn)
-============================================================ */
-.invoice-filter-card,
-.dv-sidebar-card {
-    border-radius: 10px;
-    padding: 15px;
-}
-
-    .invoice-filter-card h5,
-    .dv-sidebar-card h5 {
-        font-size: 1rem;
-        color: #2f855a;
-        font-weight: 700;
-    }
-
-    .invoice-filter-card label,
-    .dv-sidebar-card label {
-        font-size: 0.85rem;
-        font-weight: 600;
+    .btn-print i {
+        color: #6a11cb !important;
     }
 
 /* ============================================================
-   🌿 DETAIL PANEL (Dịch vụ)
+   🌸 LOADING ROW / EMPTY
 ============================================================ */
-.dv-detail-card {
-    padding: 15px;
-    min-height: 260px;
+
+#loadingRow td {
+    background: #f6efff !important;
+    color: #6a11cb !important;
+    font-weight: 600;
 }
 
-    .dv-detail-card th {
-        width: 120px;
-        color: #555;
-    }
-
-/* ============================================================
-   🌿 SWITCH TRẠNG THÁI
-============================================================ */
-.form-switch .form-check-input.status-toggle {
-    width: 2.8rem;
-    height: 1.3rem;
-    cursor: pointer;
-}
-
-    .form-switch .form-check-input.status-toggle:checked {
-        background-color: #2f855a;
-    }
-
-/* ============================================================
-   🌿 MODAL FORM (Add / Edit)
-============================================================ */
-#preview_add_img, #editPreview {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    border: 2px dashed #e2e8f0;
-    background: #f8fafc;
-    object-fit: cover;
-    transition: 0.25s;
-}
-
-    #preview_add_img:hover,
-    #editPreview:hover {
-        transform: scale(1.05);
-    }
-
-/* ============================================================
-   🌿 BADGES (Loại dịch vụ thống nhất màu)
-============================================================ */
-.badge-success {
-    background: #2f855a !important;
-}
-
-.badge-food {
-    background: #ffe08a;
-    color: #7a5901;
-}
-
-.badge-drink {
-    background: #bee3f8;
-    color: #1a5276;
-}
-
-.badge-smoke {
-    background: #444;
-    color: #fff;
-}
-
-.badge-combo {
-    background: #e53e3e;
-    color: #fff;
+.no-more td {
+    background: #fff !important;
+    padding: 16px;
+    color: #777;
 }
 
 /* ============================================================
-   🌿 SCROLLBAR
+   🌸 SCROLLBAR
 ============================================================ */
-#tableScrollArea::-webkit-scrollbar,
-#dichvuTable::-webkit-scrollbar {
+#tableScrollArea::-webkit-scrollbar {
     width: 6px;
 }
 
-#tableScrollArea::-webkit-scrollbar-thumb,
-#dichvuTable::-webkit-scrollbar-thumb {
-    background: #a0aec0;
-    border-radius: 6px;
+#tableScrollArea::-webkit-scrollbar-thumb {
+    background: #a18cd1;
+    border-radius: 10px;
 }
 
-    #tableScrollArea::-webkit-scrollbar-thumb:hover,
-    #dichvuTable::-webkit-scrollbar-thumb:hover {
-        background: #718096;
+    #tableScrollArea::-webkit-scrollbar-thumb:hover {
+        background: #764ba2;
+    }
+/* ============================================================
+   🌸 CARD FILTER – HÓA ĐƠN
+============================================================ */
+#filterForm {
+    font-size: 0.9rem;
+}
+
+.card.shadow-sm.p-3 {
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12) !important;
+}
+
+    .card.shadow-sm.p-3 h5 {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #6a11cb; /* tím đặc */
+        margin-bottom: 15px;
+    }
+
+/* Label */
+#filterForm label.form-label {
+    font-weight: 600;
+    color: #6a11cb;
+    font-size: 0.85rem;
+}
+
+/* Input + select */
+#filterForm input,
+#filterForm select {
+    border-radius: 8px;
+    border: 1px solid #d4c8ff;
+    transition: 0.2s;
+}
+
+    #filterForm input:focus,
+    #filterForm select:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
     }
 
 /* ============================================================
-   🌿 INFINITE SCROLL - Loading Row
+   🌸 BUTTON: LỌC – TONE TÍM
 ============================================================ */
-#loadingRow td {
-    background: #f5f6fa !important;
-    color: #4a5568;
-    font-size: 0.85rem;
+#filterForm .btn.btn-primary {
+    background-color: #6a11cb !important;
+    border-color: #6a11cb !important;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(106, 17, 203, 0.25);
+    transition: 0.2s;
 }
+
+    #filterForm .btn.btn-primary:hover {
+        background-color: #5a0fb0 !important;
+        border-color: #5a0fb0 !important;
+        transform: translateY(-2px);
+    }
+
+/* ============================================================
+   🌸 BUTTON: XÓA LỌC – THEO DỊCH VỤ (CAM)
+============================================================ */
+#btnClearFilter {
+    border-radius: 8px !important;
+    border-color: #f7971e !important;
+    color: #f7971e !important;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+    #btnClearFilter:hover {
+        background-color: #f7971e !important;
+        color: #fff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(247, 151, 30, 0.35);
+    }

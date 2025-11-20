@@ -1,195 +1,303 @@
 ﻿/* ============================================================
-   🎯 1. GLOBAL PAGE STYLE
+   🌈 GLOBAL STYLE – Tone tím Dashboard
 ============================================================ */
 body {
-    background-color: #f5f6fa;
-    font-family: "Segoe UI", sans-serif;
+    font-family: 'Inter', sans-serif !important;
+    background: #f3f4fd;
+    color: #2d3436;
 }
 
+/* Card mặc định */
 .card {
-    border-radius: 10px;
+    border-radius: 18px;
     border: none;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
 }
 
 /* ============================================================
-   🎯 2. SIDEBAR FILTER
+   🌈 SIDEBAR FILTER
 ============================================================ */
 .dv-sidebar-card {
-    border-radius: 12px;
+    border-radius: 18px;
     background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    padding: 18px;
+    box-shadow: 0 4px 14px rgba(118, 75, 162, 0.15);
 }
 
     .dv-sidebar-card h5 {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #2f855a;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #6a11cb;
     }
 
-    /* Form filter label */
     .dv-sidebar-card label {
-        font-size: 0.82rem;
+        font-size: 0.85rem;
         font-weight: 600;
+        color: #4b5563;
     }
 
-/* Reset button */
 #clearFilter {
-    border-radius: 6px;
-    font-size: 0.85rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(247,151,30,0.3);
+    transition: 0.2s;
 }
 
+    #clearFilter:hover {
+        transform: translateY(-2px);
+    }
+
 /* ============================================================
-   🎯 3. TABLE LIST (MAIN)
+   🌈 TABLE – Danh sách dịch vụ
 ============================================================ */
+
 .table-dv {
-    font-size: 0.88rem;
+    border-collapse: separate !important;
+    border-spacing: 0 10px !important; /* mỗi hàng như 1 thẻ card */
+    font-size: 0.9rem;
+    width: 100%;
 }
 
     .table-dv thead th {
-        background: #2f855a;
-        color: #ffffff;
-        font-weight: 600;
+        background: #6a11cb;
+        color: #fff;
+        padding: 12px;
+        font-weight: 700;
+        font-size: 0.78rem;
         border: none;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
-    .table-dv tbody tr:hover {
-        background-color: #f0fff4 !important; /* xanh mint */
-        cursor: pointer;
-        transition: 0.2s;
+    /* Hàng dạng card */
+    .table-dv tbody tr {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(118, 75, 162, 0.08);
+        transition: 0.25s;
     }
 
-    /* ẢNH TRONG BẢNG */
+        .table-dv tbody tr td:first-child {
+            border-top-left-radius: 14px;
+            border-bottom-left-radius: 14px;
+        }
+
+        .table-dv tbody tr td:last-child {
+            border-top-right-radius: 14px;
+            border-bottom-right-radius: 14px;
+        }
+
+        /* Hover tím */
+        .table-dv tbody tr:hover {
+            transform: scale(1.01);
+            box-shadow: 0 6px 18px rgba(118, 75, 162, 0.18);
+            background: #f8f5ff !important;
+        }
+
+    .table-dv td {
+        padding: 14px 16px !important;
+        color: #2d2d2d;
+    }
+
+    /* Ảnh */
     .table-dv img {
-        border-radius: 6px;
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        object-fit: cover;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         transition: 0.2s;
     }
 
         .table-dv img:hover {
-            transform: scale(1.15);
+            transform: scale(1.12);
         }
 
-/* ============================================================
-   🎯 4. DETAIL PANEL (BÊN PHẢI)
-============================================================ */
-.dv-detail-card {
-    border-radius: 12px;
-    background: #ffffff;
-    padding: 15px;
-    min-height: 250px;
-}
-
-    .dv-detail-card table {
-        font-size: 0.9rem;
-    }
-
-    .dv-detail-card th {
-        width: 120px;
-        color: #555;
-    }
-
-/* ============================================================
-   🎯 5. SWITCH STATUS
-============================================================ */
-.form-switch .form-check-input.status-toggle {
-    width: 2.8rem;
-    height: 1.3rem;
-    cursor: pointer;
-    border-color: #d1d1d1;
-}
-
-    .form-switch .form-check-input.status-toggle:checked {
-        background-color: #38a169;
-        border-color: #38a169;
-    }
-
-/* ============================================================
-   🎯 6. MODAL FORM (ADD + EDIT)
-============================================================ */
-#preview_add_img, #editPreview {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    border: 2px dashed #e2e8f0;
-    object-fit: cover;
-    background: #f8fafc;
-    transition: 0.25s ease-in-out;
-}
-
-    #preview_add_img:hover, #editPreview:hover {
-        transform: scale(1.05);
-    }
-
-/* Input file custom */
-input[type="file"] {
-    font-size: 0.85rem;
+/* Giá */
+.price {
+    font-weight: 700;
+    color: #6a11cb;
 }
 
 /* ============================================================
-   🎯 7. INFINITE SCROLL "Loading..."
+   🌈 Trạng thái
 ============================================================ */
-#dvLoading {
-    font-size: 0.85rem;
-    color: #4a5568;
-}
-
-/* ============================================================
-   🎯 8. BADGES (Loại dịch vụ)
-============================================================ */
-.badge-food {
-    background: #ffe08a;
-    color: #7a5901;
-}
-
-.badge-drink {
-    background: #bee3f8;
-    color: #1a5276;
-}
-
-.badge-smoke {
-    background: #444;
+.badge-status {
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 0.75rem;
     color: #fff;
 }
 
-.badge-combo {
-    background: #e53e3e;
-    color: #fff;
+.badge-active {
+    background: #1abc9c;
+}
+
+.badge-stop {
+    background: #d35400;
 }
 
 /* ============================================================
-   🎯 9. BUTTONS
+   🌈 BUTTON ACTIONS
 ============================================================ */
-.btn-edit,
-.btn-delete,
-.btn-detail,
-.btn-toggle {
-    border-radius: 4px !important;
-    padding: 4px 7px !important;
+.action-btn {
+    border-radius: 10px !important;
+    padding: 6px 8px !important;
+    background: #f3f0fd;
+    border: 1px solid #d7c6ff;
+    margin: 0 2px;
+    transition: 0.2s;
+}
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        background: #ece3ff;
+    }
+
+/* Icon màu */
+.action-view i {
+    color: #3b82f6;
+}
+
+.action-edit i {
+    color: #eab308;
+}
+
+.action-toggle i {
+    color: #16a34a;
+}
+
+.action-delete i {
+    color: #dc2626;
 }
 
 /* ============================================================
-   🎯 10. SCROLLBAR CUSTOM (TABLE)
+   🌈 SCROLLBAR
 ============================================================ */
 #dichvuTable::-webkit-scrollbar {
     width: 6px;
 }
 
 #dichvuTable::-webkit-scrollbar-thumb {
-    background: #a0aec0;
-    border-radius: 6px;
+    background: #a18cd1;
+    border-radius: 10px;
 }
 
     #dichvuTable::-webkit-scrollbar-thumb:hover {
-        background: #718096;
+        background: #764ba2;
     }
+
+/* ============================================================
+   🌈 DETAIL PANEL
+============================================================ */
 .dv-detail-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 15px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 18px;
     min-height: 300px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
 }
 
-.active-row {
-    background-color: #e6f7ff !important;
-    border-left: 4px solid #1890ff;
+    .dv-detail-card th {
+        width: 130px;
+        color: #6a11cb;
+        font-weight: 700;
+    }
+
+/* ============================================================
+   🌈 LOADING
+============================================================ */
+#dvLoading {
+    padding: 10px;
+    color: #764ba2;
+    font-weight: 600;
+    font-size: 0.85rem;
 }
+/* ============================================================
+   🌸 NÚT LỌC (btn-success cũ → đổi sang tím)
+============================================================ */
+#dvFilterForm .btn.btn-success,
+#filterForm .btn.btn-success {
+    background-color: #6a11cb !important; /* tím đậm */
+    border-color: #6a11cb !important;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(106, 17, 203, 0.25);
+    transition: 0.2s;
+}
+
+    #dvFilterForm .btn.btn-success:hover,
+    #filterForm .btn.btn-success:hover {
+        background-color: #5a0fb0 !important;
+        border-color: #5a0fb0 !important;
+        transform: translateY(-1px);
+    }
+
+
+/* ============================================================
+   🎨 CARD FILTER – DỊCH VỤ
+============================================================ */
+#dvFilterForm label.form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #6a11cb; /* tím giống header của dịch vụ */
+}
+
+#dvFilterForm input,
+#dvFilterForm select {
+    border-radius: 8px;
+    border: 1px solid #d4c8ff;
+    transition: 0.2s;
+}
+
+    #dvFilterForm input:focus,
+    #dvFilterForm select:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+    }
+
+/* ============================================================
+   🌿 NÚT "LỌC" – màu xanh lá theo dịch vụ
+============================================================ */
+#dvFilterForm .btn-success {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 6px 10px;
+    background-color: #38a169 !important;
+    border-color: #38a169 !important;
+    box-shadow: 0 3px 10px rgba(56, 161, 105, 0.25);
+    transition: 0.2s;
+}
+
+    #dvFilterForm .btn-success:hover {
+        background-color: #2f855a !important;
+        border-color: #2f855a !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(56, 161, 105, 0.4);
+    }
+
+/* ============================================================
+   🍊 NÚT "XÓA LỌC" – GIỐNG HÓA ĐƠN 100%
+      Cam nhạt → hover cam đặc
+============================================================ */
+#dvFilterForm #clearFilter {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border: 1px solid #f7971e !important;
+    color: #f7971e !important;
+    background: transparent !important;
+    transition: 0.2s;
+}
+
+    #dvFilterForm #clearFilter:hover {
+        background: #f7971e !important;
+        color: #fff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(247, 151, 30, 0.35);
+    }

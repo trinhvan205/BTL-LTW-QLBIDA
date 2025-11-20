@@ -208,7 +208,7 @@
             $("#editModalBody").html(html);
             $("#editModal").modal("show");
         });
-    });
+    }); 
 
     $(document).on("click", "#btnSaveEdit", function () {
 
