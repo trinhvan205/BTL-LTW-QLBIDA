@@ -200,17 +200,17 @@
 .ban-item {
     border: none;
     border-radius: 12px;
-    padding: 12px 8px;
+    padding: 14px 10px; /* ← TĂNG */
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
     background: #f9fafb;
-    height: 132px; /* ← CỐ ĐỊNH chiều cao */
+    height: 140px; /* ← TĂNG */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    overflow: hidden; /* ← CẮT phần thừa */
+    overflow: hidden;
 }
 
     .ban-item.trong {
@@ -245,50 +245,50 @@
         }
 
 .ban-icon {
-    font-size: 32px;
-    margin-bottom: 4px;
+    font-size: 36px; /* ← TĂNG */
+    margin-bottom: 6px; /* ← TĂNG */
     flex-shrink: 0;
     line-height: 1;
 }
 
 .ban-name {
     font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 2px;
+    font-size: 15px; /* ← TĂNG */
+    margin-bottom: 3px; /* ← TĂNG */
     flex-shrink: 0;
     line-height: 1.2;
 }
 
 .ban-price {
     color: #6b7280;
-    font-size: 11px;
-    margin-bottom: 4px;
+    font-size: 12px; /* ← TĂNG */
+    margin-bottom: 6px; /* ← TĂNG */
     flex-shrink: 0;
     line-height: 1.2;
 }
 
 .ban-time {
-    margin-top: 4px;
-    padding: 4px 8px;
+    margin-top: 6px; /* ← TĂNG */
+    padding: 5px 10px; /* ← TĂNG */
     background: var(--primary-color);
     color: white;
     border-radius: 4px;
-    font-size: 10px;
+    font-size: 11px; /* ← TĂNG */
     font-weight: 600;
-    min-height: 22px;
-    max-height: 22px; /* ← CỐ ĐỊNH */
+    min-height: 24px; /* ← TĂNG */
+    max-height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     overflow: hidden;
-    white-space: nowrap; /* ← Text 1 dòng */
+    white-space: nowrap;
 }
 
 .ban-item > div:last-child {
-    min-height: 22px;
-    max-height: 22px;
-    margin-top: 4px;
+    min-height: 24px;
+    max-height: 24px;
+    margin-top: 6px; /* ← TĂNG */
     flex-shrink: 0;
 }
 
@@ -1038,9 +1038,9 @@
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 10px;
-    align-content: start; /* ← THÊM: Item bắt đầu từ trên */
-    grid-auto-rows: 132px; /* ← THÊM: Cố định chiều cao hàng */
-    padding-bottom: 4px; /* ← GIẢM xuống 4px */
+    align-content: start;
+    grid-auto-rows: 140px; /* ← TĂNG lên 150px */
+    padding-bottom: 8px;
 }
 
 .pagination-controls {

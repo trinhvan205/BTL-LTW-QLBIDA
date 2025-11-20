@@ -14,6 +14,9 @@ $(document).ready(function () {
     // Load danh sách bàn mặc định
     loadDanhSachBan();
 
+    // ← THÊM: Khôi phục bàn selected sau khi load xong
+    setTimeout(khoiPhucBanSelected, 200);
+
     // Xử lý nút chuyển tab (Phòng bàn / Thực đơn)
     $('#btnShowBan').click(function () {
         if (viewHienTai !== 'ban') {
@@ -24,7 +27,10 @@ $(document).ready(function () {
             $('#tabsKhuVuc').show();
             $('#tabsLoaiDv').hide();
 
+            // ← SỬA: Không truyền khuVucId để load tất cả
             loadDanhSachBan();
+
+            // ← KHÔNG CẦN: khoiPhucBanSelected đã tự động gọi trong loadDanhSachBan
         }
     });
 
@@ -172,6 +178,8 @@ $(document).on('click', '#tabsKhuVuc .filter-btn:not(.dropdown-toggle-inline)', 
 
     let khuVucId = $(this).data('khu');
     loadDanhSachBan(khuVucId);
+
+    // ← KHÔNG CẦN gọi thêm, khoiPhucBanSelected đã tự động chạy
 });
 
 // ===========================
@@ -252,6 +260,9 @@ function loadDanhSachBan(khuVucId = '') {
         data: { khuVucId: khuVucId },
         success: function (html) {
             $('#contentArea').html(html);
+
+            // ← THÊM: Sau khi load xong, khôi phục bàn selected
+            setTimeout(khoiPhucBanSelected, 200);
         },
         error: function (xhr, status, error) {
             console.error('Load bàn error:', error);
@@ -290,6 +301,9 @@ function chonBan(idBan, tenBan) {
 
     // Cập nhật tên bàn ở header
     $('#tenBanHienTai').text(tenBan);
+
+    // ← THÊM: Lưu vào localStorage
+    luuBanSelected(idBan);
 
     // Load hóa đơn chi tiết
     loadHoaDonChiTiet(idBan);
@@ -392,6 +406,10 @@ function batDauChoi(idBan) {
         success: function (response) {
             if (response.success) {
                 showToast('✅ Đã bắt đầu tính giờ!');
+
+                // ← THÊM: Lưu lại bàn trước khi reload
+                luuBanSelected(idBan);
+
                 loadDanhSachBan();
                 if (banDangChon === idBan) {
                     loadHoaDonChiTiet(idBan);
@@ -816,6 +834,10 @@ function resetAfterPayment() {
 
     currentHoaDonId = null;
     banDangChon = null;
+
+    // ← THÊM: Xóa bàn selected khỏi localStorage
+    xoaBanSelected();
+
     $('#tenBanHienTai').text('Chưa chọn bàn');
     loadDanhSachBan();
     $('#hoaDonArea').html(`
@@ -922,3 +944,58 @@ $('#modalThanhToan').on('shown.bs.modal', function () {
 $('#modalThanhToan').on('hidden.bs.modal', function () {
     $(document).off('keypress.modal');
 });
+
+
+
+// ===========================
+// GIỮ BÀN SELECTED BẰNG LOCALSTORAGE
+// ===========================
+
+// Lưu bàn selected vào localStorage
+function luuBanSelected(idBan) {
+    localStorage.setItem('selectedBanId', idBan);
+    console.log('💾 Đã lưu bàn:', idBan);
+}
+
+// Khôi phục bàn selected từ localStorage HOẶC biến toàn cục
+function khoiPhucBanSelected() {
+    // Ưu tiên dùng banDangChon (biến toàn cục)
+    const banId = banDangChon || localStorage.getItem('selectedBanId');
+
+    if (banId) {
+        const banItem = $(`.ban-item[data-id="${banId}"]`);
+        if (banItem.length > 0) {
+            // Bàn tồn tại trong DOM
+            const tenBan = banItem.data('ten') || banId;
+
+            // Highlight
+            $('.ban-item').removeClass('selected');
+            banItem.addClass('selected');
+
+            // Cập nhật biến toàn cục
+            banDangChon = banId;
+
+            // Cập nhật header
+            $('#tenBanHienTai').text(tenBan);
+
+            // Lưu localStorage (đảm bảo đồng bộ)
+            localStorage.setItem('selectedBanId', banId);
+
+            console.log('✅ Đã khôi phục bàn:', banId);
+        } else {
+            // Bàn không tồn tại trong khu vực này
+            console.log('⚠️ Bàn', banId, 'không có trong khu vực này');
+
+            // KHÔNG xóa localStorage - giữ lại để chuyển khu vực khác vẫn nhớ
+            // Chỉ xóa banDangChon tạm thời
+            // banDangChon = null; // ← BỎ dòng này để giữ nguyên
+        }
+    }
+}
+
+// Xóa bàn selected khỏi localStorage
+function xoaBanSelected() {
+    localStorage.removeItem('selectedBanId');
+    banDangChon = null;
+    console.log('🗑️ Đã xóa bàn selected');
+}
