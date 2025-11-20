@@ -6,8 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 // Sửa <> thành <QlquanBilliardLtwContext>
-builder.Services.AddDbContext<QlquanBilliardLtwContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("QlquanBilliardLtwContext")));
+builder.Services.AddDbContext<QlquanBilliardLtw2Context>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("QlquanBilliardLtw2Context")));
 
 var app = builder.Build();
 

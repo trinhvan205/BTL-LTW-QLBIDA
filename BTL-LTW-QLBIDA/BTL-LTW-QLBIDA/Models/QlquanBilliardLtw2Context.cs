@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BTL_LTW_QLBIDA.Models;
 
-public partial class QlquanBilliardLtwContext : DbContext
+public partial class QlquanBilliardLtw2Context : DbContext
 {
-    public QlquanBilliardLtwContext()
+    public QlquanBilliardLtw2Context()
     {
     }
 
-    public QlquanBilliardLtwContext(DbContextOptions<QlquanBilliardLtwContext> options)
+    public QlquanBilliardLtw2Context(DbContextOptions<QlquanBilliardLtw2Context> options)
         : base(options)
     {
     }

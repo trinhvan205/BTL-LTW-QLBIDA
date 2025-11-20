@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
-    public class HoadonsController(QlquanBilliardLtwContext context) : Controller
+    public class HoadonsController(QlquanBilliardLtw2Context context) : Controller
     {
-        private readonly QlquanBilliardLtwContext _db = context;
+        private readonly QlquanBilliardLtw2Context _db = context;
 
         // ============================
         // INDEX
@@ -20,8 +20,8 @@ namespace BTL_LTW_QLBIDA.Controllers
         {
             return View();
         }
-
         // ============================
+
         // INFINITY SCROLL ROWS
         // ============================
         //public IActionResult LoadTable(string? ma, string? khach, string? from, string? to, bool? trangthai, int page = 1)

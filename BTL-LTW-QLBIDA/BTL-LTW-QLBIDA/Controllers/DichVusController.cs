@@ -9,9 +9,9 @@ using System.Drawing;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
-    public class DichvusController(QlquanBilliardLtwContext context, IWebHostEnvironment env) : Controller
+    public class DichvusController(QlquanBilliardLtw2Context context, IWebHostEnvironment env) : Controller
     {
-        private readonly QlquanBilliardLtwContext _context = context;
+        private readonly QlquanBilliardLtw2Context _context = context;
         private readonly IWebHostEnvironment _env = env;
 
         // =====================================================

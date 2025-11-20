@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
-    public class LoaidichvusController(QlquanBilliardLtwContext context) : Controller
+    public class LoaidichvusController(QlquanBilliardLtw2Context context) : Controller
     {
-        private readonly QlquanBilliardLtwContext _context = context;
+        private readonly QlquanBilliardLtw2Context _context = context;
 
         // =====================================================
         // HELPER: Generate Auto ID (LDVxxx)
