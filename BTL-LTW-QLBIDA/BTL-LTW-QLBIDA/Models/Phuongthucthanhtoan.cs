@@ -21,3 +21,4 @@ namespace BTL_LTW_QLBIDA.Models
         public virtual ICollection<Hoadon> Hoadons { get; set; }
     }
 }
+

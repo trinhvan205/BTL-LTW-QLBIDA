@@ -1,0 +1,150 @@
+﻿@model BTL_LTW_QLBIDA.Models.Ban
+
+@if (Model == null)
+{
+    <div class="empty-state">
+        <i class="bi bi-cart-x"></i>
+        <p>Vui lòng chọn bàn</p>
+    </div>
+}
+else
+{
+    var phienChoi = Model.Phienchois.FirstOrDefault(p => p.Gioketthuc == null);
+    var hoaDon = phienChoi?.Hoadons.FirstOrDefault(h => h.Trangthai == false);
+
+    if (phienChoi == null)
+    {
+        <!-- BÀN CHƯA MỞ -->
+        <div class="hoadon-content">
+            <div class="ban-chua-mo">
+                <div class="ban-info-card">
+                    <i class="bi bi-stopwatch" style="font-size: 64px; color: #16a34a;"></i>
+                    <h4>@Model.Idban</h4>
+                    <p class="text-muted">Bàn đang trống</p>
+                    <div class="ban-price-info">
+                        <span class="price-label">Giá:</span>
+                        <span class="price-value">@((Model.Giatien ?? 0).ToString("N0"))đ/giờ</span>
+                    </div>
+                </div>
+
+                <button class="btn-batdau" data-ban="@Model.Idban">
+                    <i class="bi bi-play-circle"></i>
+                    BẮT ĐẦU TÍNH GIỜ
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        // Tính toán trước
+        decimal tienGioTotal = ViewBag.TienGio ?? 0;
+        decimal tienDichVu = 0;
+
+        if (hoaDon != null)
+        {
+            foreach (var item in hoaDon.Hoadondvs)
+            {
+                tienDichVu += (item.IddvNavigation?.Giatien ?? 0) * (item.Soluong ?? 0);
+            }
+        }
+
+        decimal tongTien = tienGioTotal + tienDichVu;
+
+        <!-- BÀN ĐANG CHƠI -->
+        <div class="hoadon-content">
+
+            <!-- GIỜ CHƠI - COMPACT -->
+            <div class="hoadon-section gio-choi">
+                <div class="section-header">
+                    <i class="bi bi-clock"></i>
+                    <span>Giờ chơi</span>
+                </div>
+                <div class="section-body">
+                    <div class="info-row">
+                        <span class="info-label">Bắt đầu:</span>
+                        <span class="info-value">@phienChoi.Giobatdau?.ToString("HH:mm dd/MM/yyyy")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Thời gian:</span>
+                        <span class="info-value">
+                            <strong id="thoiGianDisplay">
+                                @ViewBag.SoGio giờ @ViewBag.SoPhut phút @ViewBag.SoGiay giây
+                            </strong>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <small style="color: #6b7280;">
+                                (Tính: @ViewBag.PhutTinhTien phút - Block 15')
+                            </small>
+                        </span>
+                    </div>
+                    <!-- ← THÊM: Hidden inputs để JS dùng -->
+                    <input type="hidden" id="gioBatDau" value="@phienChoi.Giobatdau?.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                    <input type="hidden" id="giaTienBan" value="@Model.Giatien" />
+                    <input type="hidden" id="tienDichVuHidden" value="@tienDichVu" />
+                </div>
+            </div>
+
+            <!-- DANH SÁCH DỊCH VỤ -->
+            @if (hoaDon != null && hoaDon.Hoadondvs.Any())
+            {
+                <div class="hoadon-section dichvu-list">
+                    <div class="section-header">
+                        <i class="bi bi-cup-straw"></i>
+                        <span>Dịch vụ đã gọi (@hoaDon.Hoadondvs.Count)</span>
+                    </div>
+                    <div class="section-body">
+                        @foreach (var item in hoaDon.Hoadondvs)
+                        {
+                            @await Html.PartialAsync("~/Views/Shared/ThuNgan/_ItemDichVu.cshtml", item)
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="hoadon-section dichvu-list">
+                    <div class="section-header">
+                        <i class="bi bi-cup-straw"></i>
+                        <span>Dịch vụ đã gọi (0)</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="empty-state" style="min-height: 100px;">
+                            <i class="bi bi-cart-x" style="font-size: 32px;"></i>
+                            <p style="font-size: 13px;">Chưa gọi dịch vụ nào</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- FOOTER TỔNG TIỀN -->
+            <div class="hoadon-footer">
+                <div class="subtotal-row">
+                    <span>Tiền giờ:</span>
+                    <span id="tienGioDisplay">@tienGioTotal.ToString("N0")đ</span>
+                </div>
+                <div class="subtotal-row">
+                    <span>Tiền dịch vụ:</span>
+                    <span>@tienDichVu.ToString("N0")đ</span>
+                </div>
+                <div class="total-row">
+                    <span>TỔNG TIỀN:</span>
+                    <span class="total-amount" id="tongTienDisplay">@tongTien.ToString("N0")đ</span>
+                </div>
+
+
+                <button class="btn-thanhtoan" data-hd="@hoaDon?.Idhd" data-ban="@Model.Idban">
+                    <i class="bi bi-credit-card"></i>
+                    THANH TOÁN (F9)
+                </button>
+            </div>
+
+
+
+            <!-- MODAL THANH TOÁN -->
+            <!-- MODAL THANH TOÁN - GIỐNG KIOTVIET -->
+
+        </div>
+    }
+}

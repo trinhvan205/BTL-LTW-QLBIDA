@@ -23,7 +23,7 @@ public partial class Hoadon
     public string? Idpttt { get; set; }
 
     // Navigation properties
-    public virtual ICollection<Hoadondv> Hoadondvs { get; set; } = [];
+    public virtual ICollection<Hoadondv> Hoadondvs { get; set; } = new List<Hoadondv>();
     public virtual Khachhang? IdkhNavigation { get; set; }
     public virtual Nhanvien? IdnvNavigation { get; set; }
     public virtual Phienchoi? IdphienNavigation { get; set; }

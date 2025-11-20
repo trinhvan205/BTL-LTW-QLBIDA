@@ -1,0 +1,33 @@
+﻿@model BTL_LTW_QLBIDA.Models.Hoadondv
+
+@{
+    var dichVu = Model.IddvNavigation;
+    var thanhTien = (dichVu.Giatien ?? 0) * (Model.Soluong ?? 0);
+}
+
+<div class="dichvu-row">
+    <div class="dichvu-info">
+        <div class="dichvu-name-hd">@dichVu.Tendv</div>
+        <div class="dichvu-price-hd">@((dichVu.Giatien ?? 0).ToString("N0"))đ</div>
+    </div>
+
+    <div class="item-controls">
+        <button class="btn-control btn-giam"
+                data-hd="@Model.Idhd"
+                data-dv="@dichVu.Iddv">
+            <i class="bi bi-dash"></i>
+        </button>
+
+        <span class="item-quantity">@Model.Soluong</span>
+
+        <button class="btn-control btn-tang"
+                data-hd="@Model.Idhd"
+                data-dv="@dichVu.Iddv">
+            <i class="bi bi-plus"></i>
+        </button>
+    </div>
+
+    <div class="dichvu-total">
+        @thanhTien.ToString("N0")đ
+    </div>
+</div>

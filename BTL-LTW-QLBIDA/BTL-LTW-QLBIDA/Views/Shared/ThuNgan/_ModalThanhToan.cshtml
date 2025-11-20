@@ -1,0 +1,160 @@
+﻿<!-- MODAL THANH TOÁN - GIỐNG KIOTVIET -->
+<div class="modal fade" id="modalThanhToan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1">
+                        Thanh toán #<span id="maHoaDonModal"></span>
+                        <span class="ms-3"><span id="tenBanModal"></span></span>
+                    </h5>
+                    <div style="font-size: 13px; opacity: 0.9;">
+                        <i class="bi bi-clock"></i> <span id="thoiGianModal"></span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <div class="row g-0">
+                    <!-- BÊN TRÁI: Chi tiết đơn hàng -->
+                    <div class="col-md-7 border-end">
+                        <div class="p-3">
+                            <!-- Khách hàng -->
+                            <div class="mb-3 d-flex align-items-center">
+                                <i class="bi bi-person-circle" style="font-size: 24px; color: #6b7280;"></i>
+                                <div class="ms-2">
+                                    <div style="font-weight: 600; font-size: 14px;">Khách lẻ</div>
+                                </div>
+                            </div>
+
+                            <!-- Bảng chi tiết -->
+                            <div class="table-responsive" style="max-height: calc(100vh - 350px); overflow-y: auto;">
+                                <table class="table table-borderless table-sm">
+                                    <thead style="background: #f3f4f6; position: sticky; top: 0;">
+                                        <tr>
+                                            <th style="font-size: 12px; color: #6b7280; font-weight: 600;">TÊN</th>
+                                            <th class="text-center" style="font-size: 12px; color: #6b7280; font-weight: 600;">SL</th>
+                                            <th class="text-end" style="font-size: 12px; color: #6b7280; font-weight: 600;">ĐƠN GIÁ</th>
+                                            <th class="text-end" style="font-size: 12px; color: #6b7280; font-weight: 600;">THÀNH TIỀN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="chiTietDichVuModal">
+                                        <!-- JavaScript load data -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Tổng tiền dưới cùng -->
+                            <div class="border-top pt-3 mt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span style="font-weight: 600; font-size: 15px;">Tổng tiền hàng</span>
+                                        <span class="ms-2 badge bg-light text-dark" id="soLuongItemModal">0</span>
+                                    </div>
+                                    <div style="font-weight: 700; font-size: 20px; color: #1f2937;" id="tongTienFooterModal">
+                                        0
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BÊN PHẢI: Chi tiết giao dịch -->
+                    <div class="col-md-5">
+                        <div class="p-3">
+                            <h6 style="font-weight: 600; font-size: 14px; color: #374151; margin-bottom: 16px;">
+                                Chi tiết giao dịch
+                            </h6>
+
+                            <!-- Tổng tiền hàng -->
+                            <div class="d-flex justify-content-between mb-2">
+                                <span style="font-size: 14px; color: #6b7280;">Tổng tiền hàng</span>
+                                <span style="font-size: 14px; font-weight: 600;" id="tongTienHangModal">0</span>
+                            </div>
+
+                            <!-- Giảm giá -->
+                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                <span style="font-size: 14px; color: #6b7280;">Giảm giá</span>
+                                <span style="font-size: 14px; font-weight: 600;">0</span>
+                            </div>
+
+                            <!-- Khách cần trả -->
+                            <div class="d-flex justify-content-between mb-3">
+                                <span style="font-weight: 600; font-size: 15px;">Khách cần trả</span>
+                                <span style="font-weight: 700; font-size: 18px; color: #A250B2;" id="khachCanTraModal">0</span>
+                            </div>
+
+                            <!-- Khách thanh toán -->
+                            <div class="mb-3">
+                                <label style="font-size: 14px; color: #374151; font-weight: 600; margin-bottom: 8px;">
+                                    Khách thanh toán (F8)
+                                </label>
+                                <input type="text" id="khachThanhToanInput" class="form-control form-control-lg"
+                                       style="text-align: right; font-size: 18px; font-weight: 700; border: 2px solid #A250B2;"
+                                       placeholder="0">
+                            </div>
+
+                            <!-- Phương thức thanh toán -->
+                            <div class="mb-3">
+                                <div class="d-flex gap-2">
+                                    <label class="payment-radio-btn flex-fill">
+                                        <input type="radio" name="phuongThucTT" value="PTTT001" checked>
+                                        <span><i class="bi bi-cash"></i> Tiền mặt</span>
+                                    </label>
+                                    <label class="payment-radio-btn flex-fill">
+                                        <input type="radio" name="phuongThucTT" value="PTTT002">
+                                        <span><i class="bi bi-bank"></i> CK</span>
+                                    </label>
+                                    <label class="payment-radio-btn flex-fill">
+                                        <input type="radio" name="phuongThucTT" value="PTTT003">
+                                        <span><i class="bi bi-credit-card"></i> Thẻ</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Quick money -->
+                            <div class="mb-3">
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <button type="button" class="btn-quick-money w-100" data-value="10000">10K</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="button" class="btn-quick-money w-100" data-value="20000">20K</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="button" class="btn-quick-money w-100" data-value="50000">50K</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="button" class="btn-quick-money w-100" data-value="100000">100K</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="button" class="btn-quick-money w-100" data-value="200000">200K</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="button" class="btn-quick-money w-100" data-value="500000">500K</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tiền thừa -->
+                            <div class="mb-3 p-3" style="background: #f9fafb; border-radius: 8px;">
+                                <div class="d-flex justify-content-between">
+                                    <span style="font-size: 14px; color: #6b7280;">Tiền thừa trả khách</span>
+                                    <span style="font-weight: 700; font-size: 16px;" id="tienThuaModal">0</span>
+                                </div>
+                            </div>
+
+                            <!-- Nút thanh toán -->
+                            <button type="button" id="btnXacNhanThanhToan" class="btn btn-thanhtoan-modal w-100 mb-2">
+                                <i class="bi bi-check-circle"></i> Thanh toán
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

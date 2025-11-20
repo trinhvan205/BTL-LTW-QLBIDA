@@ -1,0 +1,87 @@
+﻿@model List<BTL_LTW_QLBIDA.Models.Dichvu>
+
+<div class="grid-container">
+    <!-- GRID DỊCH VỤ -->
+    <div class="dichvu-grid" id="dichvuGrid">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var dv in Model)
+            {
+                var disabledClass = (dv.Soluong <= 0) ? "disabled" : "";
+
+                <div class="dichvu-item @disabledClass"
+                     data-id="@dv.Iddv"
+                     data-ten="@dv.Tendv"
+                     data-gia="@dv.Giatien"
+                     data-sl="@dv.Soluong">
+                    <div class="dichvu-icon">🍺</div>
+                    <div class="dichvu-name">@dv.Tendv</div>
+                    <div class="dichvu-price">@((dv.Giatien ?? 0).ToString("N0"))đ</div>
+                    @if (dv.Soluong <= 0)
+                    {
+                        <div style="font-size: 10px; color: #ef4444; margin-top: 4px;">Hết hàng</div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 48px; color: #ccc;"></i>
+                <p class="text-muted mt-2">Không có dịch vụ nào</p>
+            </div>
+        }
+    </div>
+
+    <!-- PAGINATION - BÊN NGOÀI GRID -->
+    <div class="pagination-controls" id="dichvuPagination" style="display: none;">
+        <button type="button" class="pagination-btn" id="dichvuPrevBtn">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <span class="pagination-info" id="dichvuPageInfo">1/1</span>
+        <button type="button" class="pagination-btn" id="dichvuNextBtn">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const itemsPerPage = 18;
+        const items = document.querySelectorAll('#dichvuGrid .dichvu-item');
+        const totalPages = Math.ceil(items.length / itemsPerPage);
+        let currentPage = 1;
+
+        const pagination = document.getElementById('dichvuPagination');
+        const pageInfo = document.getElementById('dichvuPageInfo');
+        const prevBtn = document.getElementById('dichvuPrevBtn');
+        const nextBtn = document.getElementById('dichvuNextBtn');
+
+        if (totalPages > 1) {
+            pagination.style.display = 'flex';
+        }
+
+        function showPage(page) {
+            items.forEach((item, index) => {
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                item.style.display = (index >= start && index < end) ? 'flex' : 'none';
+            });
+
+            pageInfo.textContent = `${page}/${totalPages}`;
+            prevBtn.disabled = (page === 1);
+            nextBtn.disabled = (page === totalPages);
+            currentPage = page;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) showPage(currentPage - 1);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) showPage(currentPage + 1);
+        });
+
+        showPage(1);
+    })();
+</script>

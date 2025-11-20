@@ -122,6 +122,7 @@ public partial class QlquanBilliardLtw2Context : DbContext
                 .HasColumnType("money")
                 .HasColumnName("TONGTIEN");
             entity.Property(e => e.Trangthai).HasColumnName("TRANGTHAI");
+            
 
 
             entity.HasOne(d => d.IdkhNavigation).WithMany(p => p.Hoadons)

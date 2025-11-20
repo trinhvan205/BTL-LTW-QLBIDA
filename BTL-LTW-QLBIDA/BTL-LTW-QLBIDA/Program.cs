@@ -1,6 +1,12 @@
 ﻿using BTL_LTW_QLBIDA.Models;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using BTL_LTW_QLBIDA.Services;
+using QuestPDF.Infrastructure; // ← THÊM
+
+// ← THÊM: Community License
+QuestPDF.Settings.License = LicenseType.Community;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,6 +22,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+// ← THÊM: Đăng ký PdfService
+builder.Services.AddScoped<PdfService>();
 
 var app = builder.Build();
 
