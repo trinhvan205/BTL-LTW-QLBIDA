@@ -1,0 +1,101 @@
+﻿@model BTL_LTW_QLBIDA.Models.Ban
+
+<div class="p-3 bg-light border-bottom">
+    <ul class="nav nav-tabs" id="myTab_@Model.Idban" role="tablist">
+        @* Phần Tabs giữ nguyên *@
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="info-tab-@Model.Idban" data-bs-toggle="tab" data-bs-target="#info-@Model.Idban" type="button" role="tab">Thông tin</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="history-tab-@Model.Idban" data-bs-toggle="tab" data-bs-target="#history-@Model.Idban" type="button" role="tab">Lịch sử giao dịch</button>
+        </li>
+    </ul>
+
+    <div class="tab-content bg-white border border-top-0 p-3" id="myTabContent_@Model.Idban">
+
+        @* TAB 1: THÔNG TIN *@
+        <div class="tab-pane fade show active" id="info-@Model.Idban" role="tabpanel">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label text-muted">Tên bàn:</label>
+                        <div class="col-sm-9 fw-bold col-form-label">@Model.Idban</div>
+                    </div>
+
+                    <div class="row mb-2 border-top pt-2">
+                        <label class="col-sm-3 col-form-label text-muted">Giá tiền/h:</label>
+                        <div class="col-sm-9 col-form-label">@string.Format("{0:0.########}", Model.Giatien ?? 0) VND</div>
+                    </div>
+
+                    <div class="row mb-2 border-top pt-2">
+                        <label class="col-sm-3 col-form-label text-muted">Khu vực:</label>
+                        <div class="col-sm-9 col-form-label">@(Model.IdkhuNavigation?.Tenkhu ?? "N/A")</div>
+                    </div>
+
+                    <div class="row mb-2 border-top pt-2">
+                        <label class="col-sm-3 col-form-label text-muted">Trạng thái:</label>
+                        <div class="col-sm-9 col-form-label">
+                            @(Model.Trangthai == true ? "Đang hoạt động" : "Trống")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
+
+                    @* Nút CẬP NHẬT: CHỈ HIỆN KHI BÀN KHÔNG HOẠT ĐỘNG (Trống) *@
+                    @if (Model.Trangthai == false)
+                    {
+                        <button class="btn btn-success btn-sm btn-open-edit-ban" data-id="@Model.Idban" data-bs-toggle="modal" data-bs-target="#editBanModal">
+                            <i class="bi bi-check-square"></i> Cập nhật
+                        </button>
+                    }
+
+                    @* ❌ ĐÃ XÓA: Nút Đổi trạng thái (Ngừng hoạt động / Cho phép hoạt động) ❌ *@
+
+                    @* Nút XÓA: CHỈ HIỆN KHI BÀN KHÔNG HOẠT ĐỘNG (Trống) *@
+                    @if (Model.Trangthai == false)
+                    {
+                        <button class="btn btn-danger btn-sm btn-open-delete-ban" data-id="@Model.Idban">
+                            <i class="bi bi-trash"></i> Xóa
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* TAB 2: LỊCH SỬ GIAO DỊCH (Giữ nguyên) *@
+        <div class="tab-pane fade" id="history-@Model.Idban" role="tabpanel">
+            @if (ViewBag.History is List<BTL_LTW_QLBIDA.Models.Hoadon> histories && histories.Count > 0)
+            {
+                <table class="table table-sm table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã hóa đơn</th>
+                            <th>Ngày lập</th>
+                            <th>Nhân viên</th>
+                            <th class="text-end">Tổng tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var hd in histories)
+                        {
+                            <tr>
+                                <td>@hd.Idhd</td>
+                                <td>@hd.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@hd.IdnvNavigation?.Hotennv</td>
+                                <td class="text-end">@string.Format("{0:0.########}", hd.Tongtien ?? 0)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block"></i>
+                    <span>Không tìm thấy kết quả nào phù hợp</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

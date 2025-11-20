@@ -3,6 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BTL_LTW_QLBIDA</title>
+
+    @* CSS CORE/EXTERNAL *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    @* CSS TÙY CHỈNH CHUNG *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BTL_LTW_QLBIDA.styles.css" asp-append-version="true" />
+
+    @* CSS TỪ VIEW RIÊNG (Ban.css sẽ được tải ở đây) *@
+    @await RenderSectionAsync("Styles", required: false)
     <title>@ViewData["Title"] - Quản Lý Quán Billiards</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -101,6 +113,7 @@
 </head>
 
 <body>
+    @* Không có style ở đây *@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
             <div class="container-fluid">

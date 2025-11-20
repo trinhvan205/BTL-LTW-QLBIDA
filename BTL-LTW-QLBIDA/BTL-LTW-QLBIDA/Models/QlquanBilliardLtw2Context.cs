@@ -49,6 +49,8 @@ public partial class QlquanBilliardLtw2Context : DbContext
 
             entity.ToTable("BAN");
 
+
+            // Code cũ giữ nguyên
             entity.Property(e => e.Idban)
                 .HasMaxLength(50)
                 .HasColumnName("IDBAN");
@@ -191,6 +193,11 @@ public partial class QlquanBilliardLtw2Context : DbContext
 
             entity.ToTable("KHUVUC");
 
+            // === THÊM CỘT GHICHU VÀO KHUVUC ===
+            entity.Property(e => e.Ghichu)
+                .HasColumnName("Ghichu");
+
+            // Code cũ giữ nguyên
             entity.Property(e => e.Idkhu)
                 .HasMaxLength(50)
                 .HasColumnName("IDKHU");
