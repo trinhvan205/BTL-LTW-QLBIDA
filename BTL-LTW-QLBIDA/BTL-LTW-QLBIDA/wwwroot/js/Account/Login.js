@@ -11,7 +11,7 @@ function selectFunction(chucNang) {
     document.getElementById('btn-quantri').classList.remove('active');
 
     // Thêm active class cho nút được chọn
-    if (chucNang === 'banhang') {
+    if (chucNang === 'ThuNgan') {
         document.getElementById('btn-banhang').classList.add('active');
     } else {
         document.getElementById('btn-quantri').classList.add('active');
@@ -22,4 +22,4 @@ function selectFunction(chucNang) {
 }
 
 // Khởi tạo giá trị mặc định
-document.getElementById('chucNangInput').value = 'banhang';
+document.getElementById('chucNangInput').value = 'ThuNgan';
