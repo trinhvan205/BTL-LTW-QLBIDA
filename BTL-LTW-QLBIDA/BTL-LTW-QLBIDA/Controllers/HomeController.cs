@@ -8,15 +8,16 @@ using System.Linq;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger) : Controller
+    public class HomeController : Controller
     {
         private readonly QlquanBilliardLtw2Context db;
+        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(QlquanBilliardLtw2Context context)
+        public HomeController(QlquanBilliardLtw2Context context, ILogger<HomeController> logger)
         {
             db = context;
+            _logger = logger;
         }
-        private readonly ILogger<HomeController> _logger = logger;
 
         public IActionResult Index()
         {
@@ -83,7 +84,7 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             return View(viewModel);
         }
-        
+
 
         // ============================================================
         // CẬP NHẬT LOGIC API THỐNG KÊ (NGÀY - THÁNG - NĂM)

@@ -1,4 +1,4 @@
-﻿@model BTL_LTW_QLBIDA.Models.Hoadon
+﻿@* @model BTL_LTW_QLBIDA.Models.Hoadon
 @{
     Layout = null;
 }
@@ -86,3 +86,541 @@
     </div>
 </body>
 </html>
+@model BTL_LTW_QLBIDA.Models.Hoadon
+@{
+    Layout = null;
+    var phien = Model.IdphienNavigation;
+
+    TimeSpan? thoiGianChoi = null;
+
+    if (phien?.Giobatdau != null && phien.Gioketthuc != null)
+    {
+        thoiGianChoi = phien.Gioketthuc - phien.Giobatdau;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Hóa đơn @Model.Idhd</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+
+    <style>
+        body {
+            font-size: 14px;
+            background: #f3f4f6;
+        }
+
+        .invoice-box {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        @@media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-box">
+
+        <!-- Nút in -->
+        <div class="no-print mb-3 text-end">
+            <button class="btn btn-sm btn-primary" onclick="window.print()">
+                <i class="bi bi-printer"></i> In / Lưu PDF
+            </button>
+        </div>
+
+        <h4 class="mb-3 text-center fw-bold">HÓA ĐƠN @Model.Idhd</h4>
+
+        <!-- THÔNG TIN CHUNG -->
+        <table class="table table-sm">
+            <tr>
+                <th>Khách hàng</th>
+                <td>@Model.IdkhNavigation?.Hoten</td>
+            </tr>
+            <tr>
+                <th>Nhân viên</th>
+                <td>@Model.IdnvNavigation?.Hotennv</td>
+            </tr>
+            <tr>
+                <th>Ngày lập</th>
+                <td>@Model.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</td>
+            </tr>
+            <tr>
+                <th>PT thanh toán</th>
+                <td>@Model.IdptttNavigation?.Tenpttt</td>
+            </tr>
+            <tr>
+                <th>Trạng thái</th>
+                <td>@(Model.Trangthai == true ? "Hoàn thành" : "Đang xử lý")</td>
+            </tr>
+            <tr>
+                <th>Bàn</th>
+                <td>@phien?.IdbanNavigation?.Idban</td>
+            </tr>
+            <tr>
+                <th>Giờ bắt đầu</th>
+                <td>@phien?.Giobatdau?.ToString("HH:mm dd/MM")</td>
+            </tr>
+            <tr>
+                <th>Giờ kết thúc</th>
+                <td>@phien?.Gioketthuc?.ToString("HH:mm dd/MM")</td>
+            </tr>
+            <tr>
+                <th>Thời gian chơi</th>
+                <td>
+                    @if (thoiGianChoi == null)
+                    {
+                        <span>—</span>
+                    }
+                    else
+                    {
+                        <span>@($"{(int)thoiGianChoi?.TotalHours}h {thoiGianChoi?.Minutes}p")</span>
+                    }
+                </td>
+            </tr>
+        </table>
+
+        <!-- DỊCH VỤ -->
+        <h6 class="fw-bold mt-4">Chi tiết dịch vụ</h6>
+
+        <table class="table table-bordered table-sm mt-2">
+            <thead>
+                <tr class="table-secondary">
+                    <th>#</th>
+                    <th>Tên DV</th>
+                    <th class="text-end">Đơn giá</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-end">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = 1;
+                    decimal tongDv = 0;
+                }
+
+                @foreach (var dv in Model.Hoadondvs)
+                {
+                    var gia = dv.IddvNavigation?.Giatien ?? 0;
+                    var sl = dv.Soluong ?? 0;
+                    var thanhTien = gia * sl;
+                    tongDv += thanhTien;
+
+                    <tr>
+                        <td>@i</td>
+                        <td>@dv.IddvNavigation?.Tendv</td>
+                        <td class="text-end">@gia.ToString("N0")</td>
+                        <td class="text-center">@sl</td>
+                        <td class="text-end">@thanhTien.ToString("N0")</td>
+                    </tr>
+
+                    i++;
+                }
+            </tbody>
+        </table>
+
+        <!-- TỔNG TIỀN -->
+        <div class="text-end mt-3">
+            <h5 class="fw-bold">
+                Tổng: @((Model.Tongtien ?? tongDv).ToString("N0")) VNĐ
+            </h5>
+        </div>
+
+    </div>
+</body>
+</html>
+@model BTL_LTW_QLBIDA.Models.Hoadon
+@{
+    Layout = null;
+
+    var phien = Model.IdphienNavigation;
+    TimeSpan thoiGianChoi = TimeSpan.Zero;
+
+    if (phien?.Giobatdau != null && phien.Gioketthuc != null)
+    {
+        thoiGianChoi = (phien.Gioketthuc ?? DateTime.Now) - phien.Giobatdau.Value;
+    }
+
+    // số giờ tính tiền (decimal)
+    decimal soGio = (decimal)thoiGianChoi.TotalHours;
+
+    // đơn giá giờ
+    decimal donGiaGio = phien?.IdbanNavigation?.Giatien ?? 0;
+
+    // tiền giờ chơi
+    decimal tienGio = Math.Round(soGio * donGiaGio, 0);
+
+    // tiền dịch vụ
+    decimal tienDv = Model.Hoadondvs.Sum(x => (x.IddvNavigation?.Giatien ?? 0) * (x.Soluong ?? 0));
+
+    // tổng
+    decimal tongTien = tienGio + tienDv;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Xem trước hóa đơn</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+
+    <style>
+        body {
+            background: #f3f4f6;
+            font-size: 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        .invoice-box {
+            max-width: 750px;
+            margin: 25px auto;
+            background: white;
+            padding: 35px 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.12);
+        }
+
+        .header-title {
+            text-align: center;
+            font-weight: 900;
+            font-size: 22px;
+            color: #6a1b9a;
+        }
+
+        .sub-info {
+            text-align: center;
+            font-size: 14px;
+            margin-top: -5px;
+            color: #444;
+        }
+
+        .table-header {
+            background: #8e24aa;
+            color: white;
+            font-weight: 600;
+        }
+
+        .total-money {
+            font-size: 20px;
+            font-weight: 700;
+            color: #8e24aa;
+        }
+
+        @@media print {
+            body {
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .invoice-box {
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="invoice-box">
+
+        <!-- Nút in -->
+        <div class="no-print text-end mb-3">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="bi bi-printer"></i> In / Lưu PDF
+            </button>
+        </div>
+
+        <!-- Header -->
+        <div class="header-title">QUÁN BIDA XYZ</div>
+        <div class="sub-info">123 Đường ABC, Hà Nội • Hotline: 0353703997</div>
+
+        <hr />
+
+        <!-- THÔNG TIN HÓA ĐƠN -->
+        <div class="row mt-3">
+            <div class="col-6">
+                <p><b>Hóa đơn:</b> @Model.Idhd</p>
+                <p><b>Bàn:</b> @phien?.IdbanNavigation?.Idban</p>
+                <p><b>Thu ngân:</b> @Model.IdnvNavigation?.Hotennv</p>
+            </div>
+            <div class="col-6 text-end">
+                <p><b>Ngày:</b> @Model.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</p>
+                <p><b>Thời gian chơi:</b> @($"{(int)thoiGianChoi.TotalHours}h {thoiGianChoi.Minutes}p")</p>
+            </div>
+        </div>
+
+        <!-- BẢNG NỘI DUNG -->
+        <table class="table table-bordered mt-3">
+            <thead class="table-header">
+                <tr>
+                    <th>TÊN</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-end">ĐƠN GIÁ</th>
+                    <th class="text-end">THÀNH TIỀN</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <!-- TIỀN GIỜ -->
+                <tr>
+                    <td>Tiền giờ chơi</td>
+                    <td class="text-center">@soGio.ToString("0.##")</td>
+                    <td class="text-end">@donGiaGio.ToString("N0")đ/giờ</td>
+                    <td class="text-end fw-bold">@tienGio.ToString("N0")đ</td>
+                </tr>
+
+                <!-- Dịch vụ -->
+                @foreach (var dv in Model.Hoadondvs)
+                {
+                    var dg = dv.IddvNavigation?.Giatien ?? 0;
+                    var sl = dv.Soluong ?? 0;
+                    var tt = dg * sl;
+
+                    <tr>
+                        <td>@dv.IddvNavigation?.Tendv</td>
+                        <td class="text-center">@sl</td>
+                        <td class="text-end">@dg.ToString("N0")đ</td>
+                        <td class="text-end">@tt.ToString("N0")đ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- TỔNG TIỀN -->
+        <div class="mt-3 text-end">
+            <p>Tiền giờ: <b>@tienGio.ToString("N0")đ</b></p>
+            <p>Tiền dịch vụ: <b>@tienDv.ToString("N0")đ</b></p>
+
+            <hr />
+
+            <div class="total-money">TỔNG CỘNG: @tongTien.ToString("N0")đ</div>
+        </div>
+
+    </div>
+</body>
+</html> *@
+@model BTL_LTW_QLBIDA.Models.Hoadon
+@{
+    Layout = null;
+
+    var phien = Model.IdphienNavigation;
+
+    // ===========================
+    // ⏱ TÍNH TỔNG PHÚT THỰC
+    // ===========================
+    int tongPhut = 0;
+
+    if (phien?.Giobatdau != null && phien.Gioketthuc != null)
+    {
+        tongPhut = (int)(phien.Gioketthuc.Value - phien.Giobatdau.Value).TotalMinutes;
+        if (tongPhut < 0) tongPhut = 0;
+    }
+
+    // ===========================
+    // 📌 BLOCK 15 PHÚT
+    // mỗi block = 15’
+    // ===========================
+    int soBlock = (tongPhut / 15) + 1;
+    int phutTinhTien = soBlock * 15;
+    decimal gioTinhTien = phutTinhTien / 60m;
+
+    // đơn giá bàn
+    decimal donGiaGio = phien?.IdbanNavigation?.Giatien ?? 0;
+
+    // tiền giờ
+    decimal tienGio = gioTinhTien * donGiaGio;
+
+    // ===========================
+    // 💰 TIỀN DỊCH VỤ
+    // ===========================
+    decimal tienDv = Model.Hoadondvs.Sum(x =>
+        (x.IddvNavigation?.Giatien ?? 0) * (x.Soluong ?? 0)
+    );
+
+    decimal tongTien = tienGio + tienDv;
+
+    // thời gian hiển thị
+    int hThuc = tongPhut / 60;
+    int pThuc = tongPhut % 60;
+
+    int hTinh = phutTinhTien / 60;
+    int pTinh = phutTinhTien % 60;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Hóa đơn @Model.Idhd</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+
+    <style>
+        body {
+            background: #f3f4f6;
+            font-size: 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        .invoice-box {
+            max-width: 750px;
+            margin: 25px auto;
+            background: white;
+            padding: 35px 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.12);
+        }
+
+        .header-title {
+            text-align: center;
+            font-weight: 900;
+            font-size: 22px;
+            color: #6a1b9a;
+        }
+
+        .table-header {
+            background: #8e24aa;
+            color: white;
+            font-weight: 600;
+        }
+
+        .total-money {
+            font-size: 22px;
+            font-weight: 700;
+            color: #8e24aa;
+        }
+
+        @@media print {
+            body {
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .invoice-box {
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="invoice-box">
+
+        <!-- NÚT IN -->
+        <div class="no-print text-end mb-3">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="bi bi-printer"></i> In / Lưu PDF
+            </button>
+        </div>
+
+        <!-- HEADER -->
+        <div class="header-title">QUÁN BIDA XYZ</div>
+        <div class="text-center text-secondary" style="margin-top:-5px;">
+            123 Đường ABC, Hà Nội • Hotline: 0353703997
+        </div>
+
+        <hr />
+
+        <!-- THÔNG TIN -->
+        <div class="row mt-3">
+            <div class="col-6">
+                <p><b>Hóa đơn:</b> @Model.Idhd</p>
+                <p><b>Bàn:</b> @phien?.IdbanNavigation?.Idban</p>
+                <p><b>Thu ngân:</b> @Model.IdnvNavigation?.Hotennv</p>
+            </div>
+
+            <div class="col-6 text-end">
+                <p><b>Ngày:</b> @Model.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</p>
+
+                <p>
+                    <b>Chơi thực:</b>
+                    @($"{hThuc}h {pThuc}p")
+                </p>
+
+                <p>
+                    <b>Tính tiền (block 15’):</b>
+                    @($"{hTinh}h {pTinh}p")
+                </p>
+            </div>
+        </div>
+
+        <!-- BẢNG -->
+        <table class="table table-bordered mt-3">
+            <thead class="table-header">
+                <tr>
+                    <th>TÊN</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-end">ĐƠN GIÁ</th>
+                    <th class="text-end">THÀNH TIỀN</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <!-- TIỀN GIỜ -->
+                <tr>
+                    <td>Tiền giờ chơi</td>
+                    <td class="text-center">@gioTinhTien.ToString("0.##")</td>
+                    <td class="text-end">@donGiaGio.ToString("N0")đ/giờ</td>
+                    <td class="text-end fw-bold">@tienGio.ToString("N0")đ</td>
+                </tr>
+
+                <!-- DỊCH VỤ -->
+                @foreach (var dv in Model.Hoadondvs)
+                {
+                    var dg = dv.IddvNavigation?.Giatien ?? 0;
+                    var sl = dv.Soluong ?? 0;
+                    var tt = dg * sl;
+
+                    <tr>
+                        <td>@dv.IddvNavigation?.Tendv</td>
+                        <td class="text-center">@sl</td>
+                        <td class="text-end">@dg.ToString("N0")đ</td>
+                        <td class="text-end">@tt.ToString("N0")đ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- TỔNG -->
+        <div class="mt-3 text-end">
+
+            <p>Tiền giờ: <b>@tienGio.ToString("N0")đ</b></p>
+            <p>Tiền dịch vụ: <b>@tienDv.ToString("N0")đ</b></p>
+
+            <hr />
+
+            <div class="total-money">
+                TỔNG CỘNG: @tongTien.ToString("N0")đ
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
+

@@ -16,9 +16,10 @@
                     <i class="bi bi-box-seam me-2"></i>
                     Chi tiết dịch vụ: @Model.Tendv
                 </h5>
-                <a href="/Dichvus" class="btn btn-light btn-sm">
+                <a asp-controller="Dichvus" asp-action="Index" class="btn btn-light btn-sm">
                     <i class="bi bi-arrow-left"></i> Quay lại
                 </a>
+
             </div>
         </div>
 
@@ -126,7 +127,7 @@
 <!--  SCRIPT XỬ LÝ CHI TIẾT + SỬA + XÓA -->
 <!-- =============================================================== -->
 @section Scripts {
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
         /* ============================
@@ -235,4 +236,7 @@
         });
 
     </script>
+    <!-- SweetAlert2 -->
+   
+
 }

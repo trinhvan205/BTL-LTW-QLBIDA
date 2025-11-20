@@ -6,6 +6,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SkiaSharp;
 using System.Threading.Tasks;
+using static iTextSharp.text.pdf.AcroFields;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
@@ -76,6 +77,8 @@ namespace BTL_LTW_QLBIDA.Controllers
                 .Include(h => h.IdkhNavigation)
                 .Include(h => h.IdnvNavigation)
                 .Include(h => h.IdptttNavigation)
+                .Include(h => h.IdphienNavigation).ThenInclude(p => p.IdbanNavigation)
+                .Include(h => h.Hoadondvs).ThenInclude(d => d.IddvNavigation)
                 .OrderByDescending(h => h.Ngaylap)
                 .AsQueryable();
 
@@ -101,6 +104,12 @@ namespace BTL_LTW_QLBIDA.Controllers
                 .Take(pageSize)
                 .ToList();
 
+            // 🔥 TÍNH TỔNG TIỀN CHO TỪNG HOÁ ĐƠN
+            foreach (var item in items)
+            {
+                item.Tongtien = TinhTongTien(item);
+            }
+
             bool hasMore = (page * pageSize) < total;
 
             return PartialView("_InvoiceRows", new InvoiceScrollVm
@@ -109,6 +118,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                 HasMore = hasMore
             });
         }
+
 
 
 
@@ -317,12 +327,47 @@ namespace BTL_LTW_QLBIDA.Controllers
                 .Include(h => h.IdkhNavigation)
                 .Include(h => h.IdnvNavigation)
                 .Include(h => h.IdptttNavigation)
+                .Include(h => h.IdphienNavigation)
+                    .ThenInclude(p => p.IdbanNavigation)
                 .Include(h => h.Hoadondvs).ThenInclude(d => d.IddvNavigation)
                 .FirstOrDefault(h => h.Idhd == id);
 
             if (hd == null) return NotFound();
 
-            return View(hd);
+            return View("Print", hd);
         }
+        private decimal TinhTongTien(Hoadon hd)
+        {
+            var phien = hd.IdphienNavigation;
+
+            int tongPhut = 0;
+
+            if (phien?.Giobatdau != null && phien.Gioketthuc != null)
+            {
+                tongPhut = (int)(phien.Gioketthuc.Value - phien.Giobatdau.Value).TotalMinutes;
+            }
+
+            if (tongPhut < 0) tongPhut = 0;
+
+            // block 15 phút
+            int soBlock = (tongPhut / 15) + 1;
+
+            int phutTinhTien = soBlock * 15;
+
+            decimal gioTinhTien = phutTinhTien / 60m;
+
+            decimal giaBan = phien?.IdbanNavigation?.Giatien ?? 0;
+
+            decimal tienGio = gioTinhTien * giaBan;
+
+            decimal tienDv = hd.Hoadondvs.Sum(d =>
+                (d.IddvNavigation?.Giatien ?? 0) * (d.Soluong ?? 0)
+            );
+
+            return tienGio + tienDv;
+        }
+
+
+
     }
 }
