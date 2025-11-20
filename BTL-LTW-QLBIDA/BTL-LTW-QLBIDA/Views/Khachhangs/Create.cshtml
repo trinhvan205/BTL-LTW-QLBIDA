@@ -1,0 +1,95 @@
+﻿@model BTL_LTW_QLBIDA.ViewModels.KhachHangVM
+
+@{
+    ViewData["Title"] = "Thêm khách hàng";
+}
+
+<link rel="stylesheet" href="~/css/khachhang/Create.css" />
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index">Khách hàng</a>
+                    </li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </nav>
+            <h3 class="mb-0">
+                <i class="fas fa-user-plus me-2"></i>Thêm khách hàng mới
+            </h3>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Thông tin khách hàng
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Idkh" class="form-label fw-bold">
+                                Mã khách hàng <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Idkh" class="form-control bg-light" readonly />
+                            <span asp-validation-for="Idkh" class="text-danger"></span>
+                            <small class="text-muted">Mã khách hàng được tạo tự động</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Hoten" class="form-label fw-bold">
+                                Họ và tên <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Hoten" class="form-control" placeholder="Nhập họ tên đầy đủ" />
+                            <span asp-validation-for="Hoten" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Sodt" class="form-label fw-bold">
+                                Số điện thoại <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Sodt" class="form-control" placeholder="Nhập số điện thoại" maxlength="10" />
+                            <span asp-validation-for="Sodt" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Dchi" class="form-label fw-bold">
+                                Địa chỉ
+                            </label>
+                            <textarea asp-for="Dchi" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                            <span asp-validation-for="Dchi" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="card shadow-sm mt-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i>Lưu khách hàng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

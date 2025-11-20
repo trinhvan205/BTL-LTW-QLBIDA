@@ -1,0 +1,78 @@
+﻿@model IEnumerable<BTL_LTW_QLBIDA.Models.Hoadon>
+
+<div id="invoiceMeta"
+     data-current-page="@ViewBag.CurrentPage"
+     data-total-pages="@ViewBag.TotalPages">
+</div>
+
+<table class="table table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th class="col-mahd">Mã HĐ</th>
+            <th class="col-ngaylap">Ngày lập</th>
+            <th class="col-khach">Khách hàng</th>
+            <th class="col-nhanvien">Nhân viên</th>
+            <th class="col-tongtien text-end">Tổng tiền</th>
+            <th class="col-trangthai">Trạng thái</th>
+            <th class="col-thaotac text-center text-nowrap" style="min-width: 180px;">
+                Thao tác
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var hd in Model)
+        {
+            <tr>
+                <td class="col-mahd fw-semibold">@hd.Idhd</td>
+
+                <td class="col-ngaylap">@hd.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</td>
+
+                <td class="col-khach">@hd.IdkhNavigation?.Hoten</td>
+
+                <td class="col-nhanvien">@hd.IdnvNavigation?.Hotennv</td>
+
+                <td class="col-tongtien text-end">
+                    @((hd.Tongtien ?? 0).ToString("N0")) VNĐ
+                </td>
+
+                <td class="col-trangthai">
+                    @if (hd.Trangthai == true)
+                    {
+                        <span class="badge bg-success">Hoàn thành</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Đang xử lý</span>
+                    }
+                </td>
+
+                <td class="col-thaotac text-center">
+                    <button class="btn btn-sm btn-outline-info btn-details" data-id="@hd.Idhd">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning btn-edit" data-id="@hd.Idhd">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary btn-print" data-id="@hd.Idhd">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary btn-toggle" data-id="@hd.Idhd">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger btn-delete" data-id="@hd.Idhd">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center text-muted py-3">
+                    Không có hóa đơn nào.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

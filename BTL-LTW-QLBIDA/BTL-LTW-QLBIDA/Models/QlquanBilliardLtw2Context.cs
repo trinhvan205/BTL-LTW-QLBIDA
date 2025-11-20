@@ -33,10 +33,16 @@ public partial class QlquanBilliardLtw2Context : DbContext
 
     public virtual DbSet<Phienchoi> Phienchois { get; set; }
 
-    // === ĐÃ XÓA HÀM OnConfiguring ĐỂ DÙNG CHUỖI KẾT NỐI TỪ appsettings.json ===
+    // ← THÊM MỚI
+    public virtual DbSet<Phuongthucthanhtoan> Phuongthucthanhtoans { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-FVPHDOD\\SQLEXPRESS;Database= QLQuanBilliard_LTW2;Trusted_Connection=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder.Entity<Ban>(entity =>
         {
             entity.HasKey(e => e.Idban).HasName("PK__BAN__9367225E8743EC36");
@@ -105,6 +111,10 @@ public partial class QlquanBilliardLtw2Context : DbContext
             entity.Property(e => e.Idphien)
                 .HasMaxLength(50)
                 .HasColumnName("IDPHIEN");
+            // ← THÊM MỚI
+            entity.Property(e => e.Idpttt)
+                .HasMaxLength(50)
+                .HasColumnName("IDPTTT");
             entity.Property(e => e.Ngaylap)
                 .HasColumnType("datetime")
                 .HasColumnName("NGAYLAP");
@@ -112,6 +122,7 @@ public partial class QlquanBilliardLtw2Context : DbContext
                 .HasColumnType("money")
                 .HasColumnName("TONGTIEN");
             entity.Property(e => e.Trangthai).HasColumnName("TRANGTHAI");
+
 
             entity.HasOne(d => d.IdkhNavigation).WithMany(p => p.Hoadons)
                 .HasForeignKey(d => d.Idkh)
@@ -124,6 +135,11 @@ public partial class QlquanBilliardLtw2Context : DbContext
             entity.HasOne(d => d.IdphienNavigation).WithMany(p => p.Hoadons)
                 .HasForeignKey(d => d.Idphien)
                 .HasConstraintName("FK__HOADON__IDPHIEN__49C3F6B7");
+            // ← THÊM MỚI
+            entity.HasOne(d => d.IdptttNavigation)
+                .WithMany(p => p.Hoadons)
+                .HasForeignKey(d => d.Idpttt)
+                .HasConstraintName("FK_HOADON_PHUONGTHUCTHANHTOAN");
         });
 
         modelBuilder.Entity<Hoadondv>(entity =>
@@ -263,6 +279,24 @@ public partial class QlquanBilliardLtw2Context : DbContext
             entity.HasOne(d => d.IdbanNavigation).WithMany(p => p.Phienchois)
                 .HasForeignKey(d => d.Idban)
                 .HasConstraintName("FK__PHIENCHOI__IDBAN__440B1D61");
+        });
+
+        // ← THÊM MỚI: Cấu hình bảng PHUONGTHUCTHANHTOAN
+        modelBuilder.Entity<Phuongthucthanhtoan>(entity =>
+        {
+            entity.HasKey(e => e.Idpttt);
+            entity.ToTable("PHUONGTHUCTHANHTOAN");
+
+            entity.Property(e => e.Idpttt)
+                .HasMaxLength(50)
+                .HasColumnName("IDPTTT");
+
+            entity.Property(e => e.Tenpttt)
+                .HasMaxLength(50)
+                .HasColumnName("TENPTTT");
+
+            entity.Property(e => e.Hienthi)
+                .HasColumnName("HIENTHI");
         });
 
         OnModelCreatingPartial(modelBuilder);

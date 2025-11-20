@@ -1,0 +1,333 @@
+﻿/* --- IMPORT FONT --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+/* --- BIẾN MÀU SẮC (Để dễ hình dung phối màu) --- */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Tím xanh */
+    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); /* Xanh lá neon */
+    --warning-gradient: linear-gradient(135deg, #f7971e 0%, #ffd200 100%); /* Vàng cam */
+    --purple-glow: 0 4px 20px rgba(118, 75, 162, 0.15);
+    --bg-color: #f3f4fd; /* Nền tím rất nhạt */
+    --text-dark: #2d3436;
+}
+
+/* --- THIẾT LẬP CHUNG --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color); /* Đổi nền sang tông tím nhạt */
+    color: #4a4a4a;
+}
+
+.dashboard-wrapper {
+    margin-top: 1.5rem;
+    padding: 0 1rem;
+}
+
+.dashboard-page-title {
+    font-weight: 800;
+    margin-bottom: 0;
+    /* Sửa lỗi hiển thị: Dùng màu đặc thay vì gradient text */
+    color: #6a11cb;
+    /* Tạo điểm nhấn bằng bóng chữ (text-shadow) thay vì màu nền */
+    text-shadow: 2px 2px 0px rgba(118, 75, 162, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.5px; /* Tăng khoảng cách chữ một chút cho thoáng */
+}
+
+/* --- BỘ LỌC THỜI GIAN --- */
+.filter-time-select {
+    display: inline-block;
+    width: auto;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    border-radius: 20px; /* Bo tròn hẳn */
+    border: 2px solid #e0d4fc;
+    color: #6f42c1;
+    font-weight: 600;
+    background-color: #fff;
+    transition: all 0.3s;
+}
+
+    .filter-time-select:focus, .filter-time-select:hover {
+        border-color: #6f42c1;
+        box-shadow: 0 0 10px rgba(111, 66, 193, 0.2);
+        outline: none;
+    }
+
+/* --- THẺ CHỈ SỐ KPI (CARD) --- */
+.kpi-card {
+    height: 100%;
+    padding: 1rem 0.5rem;
+    border: none;
+    border-radius: 20px; /* Bo góc lớn hơn */
+    background: #fff;
+    box-shadow: var(--purple-glow); /* Đổ bóng màu tím nhẹ */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy */
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+    /* Thêm viền màu gradient ở trên đầu thay vì bên trái */
+    .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: #ccc; /* Màu fallback */
+    }
+
+.kpi-border-primary::before {
+    background: var(--primary-gradient);
+}
+
+.kpi-border-success::before {
+    background: var(--success-gradient);
+}
+
+.kpi-border-warning::before {
+    background: var(--warning-gradient);
+}
+
+/* Hiệu ứng Hover: Nổi lên và sáng hơn */
+.kpi-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(118, 75, 162, 0.25);
+}
+
+/* Typography trong KPI */
+.text-xs {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+}
+/* Màu chữ tiêu đề KPI */
+.text-primary {
+    color: #667eea !important;
+}
+
+.text-success {
+    color: #11998e !important;
+}
+
+.text-warning {
+    color: #f7971e !important;
+}
+
+.h5 {
+    font-size: 1.5rem;
+    font-weight: 800 !important;
+    color: var(--text-dark) !important;
+    margin-top: 0.25rem;
+}
+
+/* ICON KPI - Làm cho nó rực rỡ hơn */
+.kpi-icon {
+    font-size: 2em;
+    /* Tạo hình nền tròn mờ sau icon */
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f0f2fa;
+    color: #b0b3c5;
+    transition: all 0.4s ease;
+}
+
+/* Khi hover vào card, Icon sẽ đổi màu theo theme */
+.kpi-border-primary:hover .kpi-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    transform: rotate(15deg) scale(1.1);
+}
+
+.kpi-border-success:hover .kpi-icon {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: #fff;
+    transform: rotate(15deg) scale(1.1);
+}
+
+.kpi-border-warning:hover .kpi-icon {
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+    color: #fff;
+    transform: rotate(15deg) scale(1.1);
+}
+
+
+/* --- KHUNG CHỨA BIỂU ĐỒ (Chart Card) --- */
+.card.shadow {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+    overflow: hidden; /* Để header gradient không bị tràn */
+}
+
+.card-header {
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1.5rem;
+}
+
+    /* Tiêu đề Card biểu đồ có gạch chân gradient nhỏ */
+    .card-header h6 {
+        display: inline-block;
+        position: relative;
+        padding-bottom: 5px;
+    }
+
+        .card-header h6::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            border-radius: 3px;
+        }
+
+.text-primary.m-0::after {
+    background: var(--primary-gradient);
+}
+
+.text-success.m-0::after {
+    background: var(--success-gradient);
+}
+
+.text-info.m-0::after {
+    background: linear-gradient(135deg, #36b9cc, #2575fc);
+}
+
+.text-secondary.m-0::after {
+    background: linear-gradient(135deg, #858796, #60616f);
+}
+
+.chart-container-main, .chart-container-pie {
+    position: relative;
+    width: 100%;
+}
+
+.chart-container-main {
+    height: 350px;
+}
+
+.chart-container-pie {
+    height: 320px;
+    padding: 1rem;
+}
+
+/* --- BẢNG HOẠT ĐỘNG GẦN ĐÂY --- */
+.recent-activity-scroll {
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+    /* Custom Scrollbar màu Tím */
+    .recent-activity-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .recent-activity-scroll::-webkit-scrollbar-track {
+        background: #f4f0fa;
+        border-radius: 10px;
+    }
+
+    .recent-activity-scroll::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, #a18cd1 0%, #fbc2eb 100%);
+        border-radius: 10px;
+    }
+
+.recent-activity-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+    .recent-activity-table th,
+    .recent-activity-table td {
+        padding: 1.2rem 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #eee;
+        font-size: 0.9rem;
+    }
+
+    /* Header Bảng: Màu Tím Gradient rực rỡ */
+    .recent-activity-table thead th {
+        background-image: var(--primary-gradient);
+        color: #fff;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+        border: none;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Hiệu ứng dòng chẵn lẻ và hover */
+    .recent-activity-table tbody tr:nth-child(even) {
+        background-color: #fcfbfe;
+    }
+
+    .recent-activity-table tbody tr:hover {
+        background-color: #f3f0fd; /* Màu tím rất nhạt khi hover */
+        transform: scale(1.005); /* Phóng to cực nhẹ */
+        transition: all 0.2s;
+        box-shadow: 0 2px 10px rgba(118, 75, 162, 0.1);
+        position: relative;
+        z-index: 2;
+    }
+
+    .recent-activity-table th:last-child, .recent-activity-table td:last-child {
+        border-right: none;
+    }
+
+    .recent-activity-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Badge trạng thái trong bảng */
+    .recent-activity-table td span.font-weight-bold {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.8em;
+        color: #fff !important;
+        /* Mặc định màu tím, bạn có thể viết thêm logic JS để đổi class màu */
+        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+/* --- BADGE TRẠNG THÁI (Thêm vào cuối file CSS) --- */
+
+/* Định dạng chung cho cả 2 trạng thái */
+.status-playing, .status-finished {
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.75rem; /* Chữ nhỏ gọn */
+    font-weight: 700;
+    color: #fff; /* Chữ trắng cho nổi */
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Đổ bóng nhẹ */
+    text-transform: uppercase; /* Viết hoa cho sang */
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* 1. Trạng thái: ĐÃ THANH TOÁN (Giữ tông Tím mộng mơ) */
+.status-finished {
+    background: linear-gradient(135deg, #b721ff 0%, #21d4fd 100%);
+    /* Hoặc dùng màu tím hồng cũ: background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); */
+}
+
+/* 2. Trạng thái: ĐANG CHƠI (Dùng tông Xanh Lá Neon hoặc Cam để nổi bật hẳn) */
+.status-playing {
+    /* Màu Xanh Lá Neon pha Xanh Dương (Rất nổi trên nền tím nhạt) */
+    background: linear-gradient(135deg, #fcb045 0%, #fd1d1d 100%);
+}

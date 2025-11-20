@@ -1,0 +1,97 @@
+﻿@model BTL_LTW_QLBIDA.Models.Hoadon
+
+<div class="modal-header bg-warning text-dark">
+    <h5 class="modal-title">
+        <i class="bi bi-pencil-square me-2"></i>
+        Sửa hóa đơn @Model.Idhd
+    </h5>
+    <button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <form id="editForm">
+        <input type="hidden" name="Idhd" value="@Model.Idhd" />
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">
+                <i class="bi bi-person-fill me-1"></i> Khách hàng
+            </label>
+            <select name="Idkh" class="form-select">
+                @foreach (var kh in ViewBag.Khachhangs)
+                {
+                    <option value="@kh.Value" selected="@(kh.Value == $"{Model.Idkh}" ? "selected" : null)">
+                        @kh.Text
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">
+                <i class="bi bi-person-badge-fill me-1"></i> Nhân viên lập hóa đơn
+            </label>
+            <select name="Idnv" class="form-select">
+                @foreach (var nv in ViewBag.Nhanviens)
+                {
+                    <option value="@nv.Value" selected="@(nv.Value == $"{Model.Idnv}" ? "selected" : null)">
+                        @nv.Text
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">
+                <i class="bi bi-credit-card-2-front-fill me-1"></i>
+                Phương thức thanh toán
+            </label>
+            <select name="Idpttt" class="form-select">
+                @foreach (var p in ViewBag.Pttt)
+                {
+                    <option value="@p.Value" selected="@(p.Value == $"{Model.Idpttt}" ? "selected" : null)">
+                        @p.Text
+                    </option>
+                }
+            </select>
+        </div>
+
+        @* <div class="mb-3">
+            <label class="form-label fw-bold">
+                <i class="bi bi-flag-fill me-1"></i> Trạng thái hóa đơn
+            </label>
+
+            <select name="Trangthai" class="form-select">
+                <option value="false" selected="@(Model.Trangthai == false ? "selected" : null)">
+                    Đang xử lý
+                </option>
+                <option value="true" selected="@(Model.Trangthai == true ? "selected" : null)">
+                    Hoàn thành
+                </option>
+            </select>
+
+            <div class="mt-2">
+                @if (Model.Trangthai == true)
+                {
+                    <span class="badge bg-success px-3 py-2">
+                        <i class="bi bi-check-circle-fill"></i> Hoàn thành
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark px-3 py-2">
+                        <i class="bi bi-hourglass-split"></i> Đang xử lý
+                    </span>
+                }
+            </div>
+        </div> *@
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="bi bi-x-circle"></i> Hủy
+    </button>
+    <button class="btn btn-warning" id="btnSaveEdit">
+        <i class="bi bi-check-circle"></i> Lưu thay đổi
+    </button>
+</div>

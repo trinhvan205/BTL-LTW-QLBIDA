@@ -16,8 +16,8 @@ public partial class Dichvu
     public int? Soluong { get; set; }
 
     public bool? Hienthi { get; set; }
-
-    public virtual ICollection<Hoadondv> Hoadondvs { get; set; } = new List<Hoadondv>();
+    public string? Imgpath { get; set; }
+    public virtual ICollection<Hoadondv> Hoadondvs { get; set; } = [];
 
     public virtual Loaidichvu? IdloaiNavigation { get; set; }
 }
