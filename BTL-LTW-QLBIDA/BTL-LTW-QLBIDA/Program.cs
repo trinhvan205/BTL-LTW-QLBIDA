@@ -1,5 +1,10 @@
-using BTL_LTW_QLBIDA.Models;
+﻿using BTL_LTW_QLBIDA.Models;
+using BTL_LTW_QLBIDA.Services;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure; // ← THÊM
+
+// ← THÊM: Community License
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<QlquanBilliardLtw2Context>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ← THÊM: Đăng ký PdfService
+builder.Services.AddScoped<PdfService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

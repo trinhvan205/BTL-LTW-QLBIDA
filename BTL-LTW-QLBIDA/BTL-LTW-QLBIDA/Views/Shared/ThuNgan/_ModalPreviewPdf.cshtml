@@ -1,0 +1,59 @@
+﻿<!-- MODAL PREVIEW PDF -->
+<div class="modal fade" id="modalPreviewPdf" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header" style="background: linear-gradient(90deg, #82408E 0%, #A250B2 100%); color: white;">
+                <h5 class="modal-title">
+                    <i class="bi bi-file-pdf"></i> Xem trước hóa đơn
+                </h5>
+            </div>
+
+            <!-- Body - PDF Viewer -->
+            <div class="modal-body p-0" style="background: #f3f4f6;">
+                <iframe id="pdfPreviewFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer" style="background: white; border-top: 2px solid #e5e7eb; padding: 16px 24px;">
+                <button type="button" class="btn btn-secondary btn-lg" id="btnHuyIn">
+                    <i class="bi bi-x-circle"></i> Không lưu PDF (ESC)
+                </button>
+                <button type="button" class="btn btn-success btn-lg" id="btnXacNhanIn">
+                    <i class="bi bi-printer"></i> Lưu & In PDF (Enter)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #modalPreviewPdf .modal-dialog {
+        margin: 0;
+    }
+
+    #modalPreviewPdf .modal-content {
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    #modalPreviewPdf .modal-body {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    #modalPreviewPdf .btn-lg {
+        padding: 12px 32px;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    #modalPreviewPdf .btn-success {
+        background: #16a34a;
+        border: none;
+    }
+
+        #modalPreviewPdf .btn-success:hover {
+            background: #15803d;
+        }
+</style>

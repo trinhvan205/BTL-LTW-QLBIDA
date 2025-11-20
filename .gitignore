@@ -108,3 +108,4 @@ appsettings.Development.json
 
 #vanh thêm
 wwwroot/invoices/*.pdf
+wwwroot/invoices/temp/*.pdf

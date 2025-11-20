@@ -2,16 +2,19 @@
 using BTL_LTW_QLBIDA.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BTL_LTW_QLBIDA.Services; // ← THÊM
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
     public class ThuNganController : Controller
     {
         private readonly QlquanBilliardLtw2Context _context;
+        private readonly PdfService _pdfService; // ← THÊM
 
-        public ThuNganController(QlquanBilliardLtw2Context context)
+        public ThuNganController(QlquanBilliardLtw2Context context, PdfService pdfService) // ← THÊM
         {
             _context = context;
+            _pdfService = pdfService; // ← THÊM
         }
 
         // GET: ThuNgan - Màn hình chính
@@ -259,7 +262,7 @@ namespace BTL_LTW_QLBIDA.Controllers
             }
         }
 
-        // POST: ThuNgan/ThanhToan - Thanh toán hóa đơn
+        // POST: ThuNgan/ThanhToan - Thanh toán hóa đơn & tạo PDF tạm
         [HttpPost]
         public IActionResult ThanhToan(string idHoaDon, string phuongThucThanhToan = "PTTT001")
         {
@@ -270,6 +273,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                         .ThenInclude(p => p.IdbanNavigation)
                     .Include(h => h.Hoadondvs)
                         .ThenInclude(hd => hd.IddvNavigation)
+                    .Include(h => h.IdnvNavigation) // ← THÊM: Để lấy tên nhân viên cho PDF
                     .FirstOrDefault(h => h.Idhd == idHoaDon);
 
                 if (hoaDon == null)
@@ -295,24 +299,74 @@ namespace BTL_LTW_QLBIDA.Controllers
 
                 decimal tongTien = tienGio + tienDichVu;
 
-                // Cập nhật hóa đơn
+                // ← THANH TOÁN & ĐÓNG BÀN LUÔN
                 hoaDon.Tongtien = tongTien;
                 hoaDon.Trangthai = true;
-                hoaDon.Idpttt = phuongThucThanhToan; // ← THÊM: Lưu phương thức thanh toán
-
-                // Kết thúc phiên chơi
+                hoaDon.Idpttt = phuongThucThanhToan;
                 phien.Gioketthuc = DateTime.Now;
-
-                // Đổi trạng thái bàn
                 ban.Trangthai = false;
 
                 _context.SaveChanges();
 
+                // ← Tạo PDF TẠM để preview
+                string pdfUrlTemp = _pdfService.TaoHoaDonPdfTemp(hoaDon, ban);
+
                 return Json(new
                 {
                     success = true,
-                    message = "Thanh toán thành công",
-                    tongTien = tongTien
+                    message = "Thanh toán thành công!",
+                    tongTien = tongTien,
+                    pdfUrl = pdfUrlTemp, // ← PDF tạm
+                    idHoaDon = idHoaDon  // ← Trả về ID để dùng sau
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // POST: ThuNgan/XacNhanIn - Lưu PDF chính thức
+        [HttpPost]
+        public IActionResult XacNhanIn(string idHoaDon)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idHoaDon))
+                    return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+
+                // Lưu PDF chính thức (copy từ temp sang invoices)
+                string pdfUrl = _pdfService.LuuHoaDonPdfChinhThuc(idHoaDon);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Đã lưu hóa đơn PDF",
+                    pdfUrl = pdfUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // POST: ThuNgan/HuyIn - Xóa PDF tạm (không lưu)
+        [HttpPost]
+        public IActionResult HuyIn(string idHoaDon)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idHoaDon))
+                    return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+
+                // Xóa PDF tạm
+                _pdfService.XoaPdfTemp(idHoaDon);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Đã hủy lưu PDF"
                 });
             }
             catch (Exception ex)

@@ -487,6 +487,11 @@ function thanhToan(idHd, idBan) {
             if (response.success) {
                 showToast(`✅ Thanh toán thành công!\nTổng tiền: ${response.tongTien.toLocaleString('vi-VN')}đ`);
 
+                // ← THÊM: Mở PDF trong tab mới
+                if (response.pdfUrl) {
+                    window.open(response.pdfUrl, '_blank');
+                }
+
                 if (timeUpdateInterval) {
                     clearInterval(timeUpdateInterval);
                     timeUpdateInterval = null;
@@ -549,8 +554,10 @@ $(window).on('beforeunload', function () {
 
 
 // ===========================
-// XỬ LÝ MODAL THANH TOÁN
+// XỬ LÝ MODAL THANH TOÁN & PREVIEW PDF
 // ===========================
+
+let currentHoaDonId = null; // Lưu ID hóa đơn đang preview
 
 // Khi click nút thanh toán, mở modal
 $(document).on('click', '.btn-thanhtoan', function () {
@@ -586,19 +593,37 @@ function loadModalThanhToan(idHd, idBan) {
     let soLuongItem = 0;
 
     // Tiền giờ
+    // Tiền giờ - Tính số lượng giờ và đơn giá
     const thoiGianChoi = $('#thoiGianDisplay').text() || '0 giờ 0 phút';
+    const giaTienBan = parseFloat($('#giaTienBan').val()) || 0; // Lấy giá bàn
+
+    // Tính số giờ (số lượng)
+    let soGioDisplay = 0;
+    const gioBatDau = $('#gioBatDau').val();
+    if (gioBatDau) {
+        const startTime = new Date(gioBatDau);
+        const now = new Date();
+        const diffMs = now - startTime;
+        const totalMinutes = Math.floor(diffMs / 60000);
+
+        // Tính block 15 phút
+        const blocks = Math.floor(totalMinutes / 15) + 1;
+        const phutTinhTien = blocks * 15;
+        soGioDisplay = phutTinhTien / 60; // Chuyển sang giờ (VD: 15p = 0.25, 60p = 1)
+    }
+
     htmlChiTiet += `
-        <tr>
-            <td>
-                <div style="font-weight: 500;">${stt}. Tiền giờ chơi</div>
-                <div style="font-size: 11px; color: #6b7280;">
-                    <i class="bi bi-clock"></i> ${thoiGianChoi}
-                </div>
-            </td>
-            <td class="text-center">1</td>
-            <td class="text-end">${tienGio.toLocaleString('vi-VN')}</td>
-            <td class="text-end"><strong>${tienGio.toLocaleString('vi-VN')}</strong></td>
-        </tr>
+    <tr>
+        <td>
+            <div style="font-weight: 500;">${stt}. Tiền giờ chơi</div>
+            <div style="font-size: 11px; color: #6b7280;">
+                <i class="bi bi-clock"></i> ${thoiGianChoi}
+            </div>
+        </td>
+        <td class="text-center">${soGioDisplay.toFixed(2)}</td>
+        <td class="text-end">${giaTienBan.toLocaleString('vi-VN')}đ/giờ</td>
+        <td class="text-end"><strong>${tienGio.toLocaleString('vi-VN')}đ</strong></td>
+    </tr>
     `;
     stt++;
     soLuongItem++;
@@ -640,7 +665,6 @@ function loadModalThanhToan(idHd, idBan) {
     $('#btnXacNhanThanhToan').data('hd', idHd).data('ban', idBan);
 }
 
-
 // Xử lý quick money buttons
 $(document).on('click', '.btn-quick-money', function () {
     const value = parseInt($(this).data('value'));
@@ -656,7 +680,6 @@ $(document).on('input', '#khachThanhToanInput', function () {
     updateTienThua();
 });
 
-
 // Tính tiền thừa
 function updateTienThua() {
     const tongTien = parseFloat($('#tongTienDisplay').text().replace(/[^\d]/g, '')) || 0;
@@ -666,29 +689,28 @@ function updateTienThua() {
     if (tienThua >= 0) {
         $('#tienThuaModal').text(tienThua.toLocaleString('vi-VN') + 'đ');
     } else {
-        $('#tienThuaModal').text('Chưa đủ');
+        $('#tienThuaModal').html('<span style="color: #ef4444;">Chưa đủ</span>');
     }
 }
 
-// Xác nhận thanh toán
+// Xác nhận thanh toán → Thanh toán & Hiện preview PDF
 $(document).on('click', '#btnXacNhanThanhToan', function () {
     const idHd = $(this).data('hd');
     const idBan = $(this).data('ban');
-    const phuongThuc = $('input[name="phuongThucTT"]:checked').val();
+    const phuongThuc = $('input[name="phuongThucTT"]:checked').val() || 'PTTT001';
     const khachTra = $('#khachThanhToanInput').data('raw-value') || 0;
-    const tongTien = parseFloat($('#tongTienDisplay').text().replace(/[^\d]/g, ''));
+    const tongTien = parseFloat($('#tongTienDisplay').text().replace(/[^\d]/g, '')) || 0;
 
     if (khachTra < tongTien) {
         showToast('❌ Số tiền khách trả không đủ!');
         return;
     }
 
-    thanhToan(idHd, idBan, phuongThuc);
-    $('#modalThanhToan').modal('hide');
+    // Gọi thanh toán (đã đóng bàn + tạo PDF tạm)
+    thanhToanVaPreview(idHd, idBan, phuongThuc);
 });
 
-// Cập nhật hàm thanhToan để nhận parameter phương thức
-function thanhToan(idHd, idBan, phuongThuc = 'PTTT001') {
+function thanhToanVaPreview(idHd, idBan, phuongThuc) {
     $.ajax({
         url: '/ThuNgan/ThanhToan',
         type: 'POST',
@@ -698,24 +720,20 @@ function thanhToan(idHd, idBan, phuongThuc = 'PTTT001') {
         },
         success: function (response) {
             if (response.success) {
-                showToast(`✅ Thanh toán thành công!\nTổng tiền: ${response.tongTien.toLocaleString('vi-VN')}đ`);
+                // Bàn đã đóng rồi!
+                showToast(`✅ ${response.message}\nTổng tiền: ${response.tongTien.toLocaleString('vi-VN')}đ`);
 
-                if (timeUpdateInterval) {
-                    clearInterval(timeUpdateInterval);
-                    timeUpdateInterval = null;
-                }
+                // Đóng modal thanh toán
+                $('#modalThanhToan').modal('hide');
 
-                banDangChon = null;
-                $('#tenBanHienTai').text('Chưa chọn bàn');
-                loadDanhSachBan();
-                $('#hoaDonArea').html(`
-                    <div class="empty-state">
-                        <i class="bi bi-cart-x"></i>
-                        <p>Vui lòng chọn bàn</p>
-                    </div>
-                `);
+                // Lưu ID
+                currentHoaDonId = response.idHoaDon;
 
-                $('#btnShowBan').click();
+                // Hiển thị PDF trong iframe
+                $('#pdfPreviewFrame').attr('src', response.pdfUrl);
+
+                // Mở modal preview
+                $('#modalPreviewPdf').modal('show');
             } else {
                 showToast('❌ ' + response.message);
             }
@@ -726,6 +744,127 @@ function thanhToan(idHd, idBan, phuongThuc = 'PTTT001') {
         }
     });
 }
+
+// Click "Lưu & In PDF" → Lưu PDF + Mở để in
+$(document).on('click', '#btnXacNhanIn', function () {
+    if (!currentHoaDonId) {
+        showToast('❌ Không tìm thấy hóa đơn!');
+        return;
+    }
+
+    $.ajax({
+        url: '/ThuNgan/XacNhanIn',
+        type: 'POST',
+        data: { idHoaDon: currentHoaDonId },
+        success: function (response) {
+            if (response.success) {
+                showToast('✅ Đã lưu hóa đơn PDF');
+
+                // Đóng modal preview
+                $('#modalPreviewPdf').modal('hide');
+
+                // Mở PDF để in
+                window.open(response.pdfUrl, '_blank');
+
+                // Reset
+                resetAfterPayment();
+            } else {
+                showToast('❌ ' + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Xác nhận in error:', error);
+            showToast('❌ Lỗi khi lưu PDF!');
+        }
+    });
+});
+
+// Click "Không lưu PDF" → Xóa PDF tạm
+$(document).on('click', '#btnHuyIn', function () {
+    if (!currentHoaDonId) {
+        $('#modalPreviewPdf').modal('hide');
+        resetAfterPayment();
+        return;
+    }
+
+    $.ajax({
+        url: '/ThuNgan/HuyIn',
+        type: 'POST',
+        data: { idHoaDon: currentHoaDonId },
+        success: function (response) {
+            showToast('ℹ️ Đã thanh toán nhưng không lưu PDF');
+
+            // Đóng modal preview
+            $('#modalPreviewPdf').modal('hide');
+
+            // Reset (bàn đã đóng rồi)
+            resetAfterPayment();
+        },
+        error: function (xhr, status, error) {
+            console.error('Hủy in error:', error);
+            showToast('❌ Lỗi khi hủy lưu PDF!');
+        }
+    });
+});
+
+// Reset sau khi thanh toán
+function resetAfterPayment() {
+    if (timeUpdateInterval) {
+        clearInterval(timeUpdateInterval);
+        timeUpdateInterval = null;
+    }
+
+    currentHoaDonId = null;
+    banDangChon = null;
+    $('#tenBanHienTai').text('Chưa chọn bàn');
+    loadDanhSachBan();
+    $('#hoaDonArea').html(`
+        <div class="empty-state">
+            <i class="bi bi-cart-x"></i>
+            <p>Vui lòng chọn bàn</p>
+        </div>
+    `);
+
+    $('#btnShowBan').click();
+}
+
+// Keyboard shortcuts cho modal preview
+$('#modalPreviewPdf').on('keydown', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        $('#btnXacNhanIn').click();
+    }
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        $('#btnHuyIn').click();
+    }
+});
+
+// Keyboard shortcuts cho modal thanh toán
+$('#modalThanhToan').on('keydown', function (e) {
+    // Enter - Xác nhận thanh toán
+    if (e.key === 'Enter' && !$(e.target).is('button')) {
+        e.preventDefault();
+        $('#btnXacNhanThanhToan').click();
+    }
+
+    // F8 - Focus vào input số tiền
+    if (e.key === 'F8') {
+        e.preventDefault();
+        $('#khachThanhToanInput').focus().select();
+    }
+});
+
+// Auto focus khi mở modal thanh toán
+$('#modalThanhToan').on('shown.bs.modal', function () {
+    $('#khachThanhToanInput').focus().select();
+});
+
+// Cleanup khi đóng modal preview
+$('#modalPreviewPdf').on('hidden.bs.modal', function () {
+    $('#pdfPreviewFrame').attr('src', '');
+    currentHoaDonId = null;
+});
 
 
 // ===========================

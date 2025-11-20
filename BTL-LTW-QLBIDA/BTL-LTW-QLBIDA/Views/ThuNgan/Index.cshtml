@@ -143,6 +143,9 @@
 <!-- Modal thanh toán - Chỉ load 1 lần -->
 @await Html.PartialAsync("~/Views/Shared/ThuNgan/_ModalThanhToan.cshtml")
 
+<!-- ← THÊM: Modal preview PDF -->
+@await Html.PartialAsync("~/Views/Shared/ThuNgan/_ModalPreviewPdf.cshtml")
+
 @section Scripts {
     <script src="~/js/thungan.js"></script>
 }
