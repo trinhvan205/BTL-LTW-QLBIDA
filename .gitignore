@@ -105,3 +105,6 @@ __pycache__/
 ehthumbs.db
 Desktop.ini
 appsettings.Development.json
+
+#vanh thêm
+wwwroot/invoices/*.pdf

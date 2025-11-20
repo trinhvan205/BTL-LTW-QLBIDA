@@ -110,9 +110,9 @@ $(document).ready(function () {
             return;
         }
 
-        if (confirm('💳 Xác nhận thanh toán hóa đơn này?')) {
-            thanhToan(idHd, idBan);
-        }
+        // Mở modal thanh toán (không confirm)
+        loadModalThanhToan(idHd, idBan);
+        $('#modalThanhToan').modal('show');
     });
 
     // ← THAY ĐỔI: Auto refresh 2 phút (vì đã có đồng hồ chạy mỗi giây)
@@ -471,16 +471,22 @@ function capNhatSoLuong(idHd, idDv, soLuong) {
 // ===========================
 // HÀM THANH TOÁN
 // ===========================
+// HÀM THANH TOÁN
 function thanhToan(idHd, idBan) {
+    // ← LẤY phương thức thanh toán
+    const phuongThuc = $('#phuongThucThanhToan').val() || 'PTTT001';
+
     $.ajax({
         url: '/ThuNgan/ThanhToan',
         type: 'POST',
-        data: { idHoaDon: idHd },
+        data: {
+            idHoaDon: idHd,
+            phuongThucThanhToan: phuongThuc // ← THÊM
+        },
         success: function (response) {
             if (response.success) {
                 showToast(`✅ Thanh toán thành công!\nTổng tiền: ${response.tongTien.toLocaleString('vi-VN')}đ`);
 
-                // ← THÊM: Dừng đồng hồ khi thanh toán
                 if (timeUpdateInterval) {
                     clearInterval(timeUpdateInterval);
                     timeUpdateInterval = null;
@@ -539,4 +545,241 @@ $(window).on('beforeunload', function () {
     if (timeUpdateInterval) {
         clearInterval(timeUpdateInterval);
     }
+});
+
+
+// ===========================
+// XỬ LÝ MODAL THANH TOÁN
+// ===========================
+
+// Khi click nút thanh toán, mở modal
+$(document).on('click', '.btn-thanhtoan', function () {
+    let idHd = $(this).data('hd');
+    let idBan = $(this).data('ban');
+
+    if (!idHd) {
+        showToast('❌ Không tìm thấy hóa đơn!');
+        return;
+    }
+
+    // Load dữ liệu vào modal
+    loadModalThanhToan(idHd, idBan);
+
+    // Hiển thị modal
+    $('#modalThanhToan').modal('show');
+});
+
+function loadModalThanhToan(idHd, idBan) {
+    const tenBan = $('#tenBanHienTai').text() || idBan;
+    const tongTien = parseFloat($('#tongTienDisplay').text().replace(/[^\d]/g, '')) || 0;
+    const tienGio = parseFloat($('#tienGioDisplay').text().replace(/[^\d]/g, '')) || 0;
+    const tienDichVu = parseFloat($('#tienDichVuHidden').val()) || 0;
+
+    // Cập nhật header
+    $('#maHoaDonModal').text(idHd);
+    $('#tenBanModal').text(tenBan);
+    $('#thoiGianModal').text(new Date().toLocaleString('vi-VN'));
+
+    // Load chi tiết
+    let htmlChiTiet = '';
+    let stt = 1;
+    let soLuongItem = 0;
+
+    // Tiền giờ
+    const thoiGianChoi = $('#thoiGianDisplay').text() || '0 giờ 0 phút';
+    htmlChiTiet += `
+        <tr>
+            <td>
+                <div style="font-weight: 500;">${stt}. Tiền giờ chơi</div>
+                <div style="font-size: 11px; color: #6b7280;">
+                    <i class="bi bi-clock"></i> ${thoiGianChoi}
+                </div>
+            </td>
+            <td class="text-center">1</td>
+            <td class="text-end">${tienGio.toLocaleString('vi-VN')}</td>
+            <td class="text-end"><strong>${tienGio.toLocaleString('vi-VN')}</strong></td>
+        </tr>
+    `;
+    stt++;
+    soLuongItem++;
+
+    // Dịch vụ
+    $('.dichvu-row').each(function () {
+        const tenDv = $(this).find('.dichvu-name-hd').text().trim();
+        const giaDv = $(this).find('.dichvu-price-hd').text().replace(/[^\d]/g, '');
+        const soLuong = $(this).find('.item-quantity').text().trim();
+        const thanhTien = $(this).find('.dichvu-total').text().replace(/[^\d]/g, '');
+
+        if (tenDv && soLuong) {
+            htmlChiTiet += `
+                <tr>
+                    <td><div style="font-weight: 500;">${stt}. ${tenDv}</div></td>
+                    <td class="text-center">${soLuong}</td>
+                    <td class="text-end">${parseInt(giaDv).toLocaleString('vi-VN')}</td>
+                    <td class="text-end"><strong>${parseInt(thanhTien).toLocaleString('vi-VN')}</strong></td>
+                </tr>
+            `;
+            stt++;
+            soLuongItem++;
+        }
+    });
+
+    $('#chiTietDichVuModal').html(htmlChiTiet);
+
+    // Cập nhật tổng tiền
+    $('#soLuongItemModal').text(soLuongItem);
+    $('#tongTienFooterModal').text(tongTien.toLocaleString('vi-VN'));
+    $('#tongTienHangModal').text(tongTien.toLocaleString('vi-VN'));
+    $('#khachCanTraModal').text(tongTien.toLocaleString('vi-VN'));
+
+    // Set input
+    $('#khachThanhToanInput').val(tongTien.toLocaleString('vi-VN')).data('raw-value', tongTien);
+
+    updateTienThua();
+
+    $('#btnXacNhanThanhToan').data('hd', idHd).data('ban', idBan);
+}
+
+
+// Xử lý quick money buttons
+$(document).on('click', '.btn-quick-money', function () {
+    const value = parseInt($(this).data('value'));
+    $('#khachThanhToanInput').val(value.toLocaleString('vi-VN')).data('raw-value', value);
+    updateTienThua();
+});
+
+// Xử lý input tiền khách thanh toán
+$(document).on('input', '#khachThanhToanInput', function () {
+    const value = $(this).val().replace(/[^\d]/g, '');
+    const numberValue = parseInt(value) || 0;
+    $(this).val(numberValue.toLocaleString('vi-VN')).data('raw-value', numberValue);
+    updateTienThua();
+});
+
+
+// Tính tiền thừa
+function updateTienThua() {
+    const tongTien = parseFloat($('#tongTienDisplay').text().replace(/[^\d]/g, '')) || 0;
+    const khachTra = $('#khachThanhToanInput').data('raw-value') || 0;
+    const tienThua = khachTra - tongTien;
+
+    if (tienThua >= 0) {
+        $('#tienThuaModal').text(tienThua.toLocaleString('vi-VN') + 'đ');
+    } else {
+        $('#tienThuaModal').text('Chưa đủ');
+    }
+}
+
+// Xác nhận thanh toán
+$(document).on('click', '#btnXacNhanThanhToan', function () {
+    const idHd = $(this).data('hd');
+    const idBan = $(this).data('ban');
+    const phuongThuc = $('input[name="phuongThucTT"]:checked').val();
+    const khachTra = $('#khachThanhToanInput').data('raw-value') || 0;
+    const tongTien = parseFloat($('#tongTienDisplay').text().replace(/[^\d]/g, ''));
+
+    if (khachTra < tongTien) {
+        showToast('❌ Số tiền khách trả không đủ!');
+        return;
+    }
+
+    thanhToan(idHd, idBan, phuongThuc);
+    $('#modalThanhToan').modal('hide');
+});
+
+// Cập nhật hàm thanhToan để nhận parameter phương thức
+function thanhToan(idHd, idBan, phuongThuc = 'PTTT001') {
+    $.ajax({
+        url: '/ThuNgan/ThanhToan',
+        type: 'POST',
+        data: {
+            idHoaDon: idHd,
+            phuongThucThanhToan: phuongThuc
+        },
+        success: function (response) {
+            if (response.success) {
+                showToast(`✅ Thanh toán thành công!\nTổng tiền: ${response.tongTien.toLocaleString('vi-VN')}đ`);
+
+                if (timeUpdateInterval) {
+                    clearInterval(timeUpdateInterval);
+                    timeUpdateInterval = null;
+                }
+
+                banDangChon = null;
+                $('#tenBanHienTai').text('Chưa chọn bàn');
+                loadDanhSachBan();
+                $('#hoaDonArea').html(`
+                    <div class="empty-state">
+                        <i class="bi bi-cart-x"></i>
+                        <p>Vui lòng chọn bàn</p>
+                    </div>
+                `);
+
+                $('#btnShowBan').click();
+            } else {
+                showToast('❌ ' + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Thanh toán error:', error);
+            showToast('❌ Lỗi khi thanh toán!');
+        }
+    });
+}
+
+
+// ===========================
+// XỬ LÝ KHI ĐÓNG MODAL (HỦY THANH TOÁN)
+// ===========================
+
+// Khi modal đóng (bấm X hoặc Hủy), tiếp tục đếm giờ
+$('#modalThanhToan').on('hidden.bs.modal', function () {
+    console.log('Modal đã đóng - Tiếp tục tính giờ');
+    // Đồng hồ vẫn chạy bình thường (không cần làm gì)
+    // Vì timeUpdateInterval vẫn đang chạy
+});
+
+// Khi modal mở, tạm dừng đồng hồ (tùy chọn)
+$('#modalThanhToan').on('shown.bs.modal', function () {
+    console.log('Modal thanh toán đã mở');
+    // Focus vào input số tiền
+    $('#khachThanhToanInput').focus().select();
+});
+
+
+// ===========================
+// KEYBOARD SHORTCUTS CHO MODAL THANH TOÁN
+// ===========================
+
+// Xử lý phím tắt trong modal
+$('#modalThanhToan').on('keydown', function (e) {
+    // Enter - Xác nhận thanh toán
+    if (e.key === 'Enter' && !$(e.target).is('button')) {
+        e.preventDefault();
+        $('#btnXacNhanThanhToan').click();
+    }
+
+    // ESC - Hủy (đã có sẵn trong Bootstrap)
+    // F8 - Focus vào input số tiền
+    if (e.key === 'F8') {
+        e.preventDefault();
+        $('#khachThanhToanInput').focus().select();
+    }
+});
+
+// Xử lý phím số khi modal mở
+$('#modalThanhToan').on('shown.bs.modal', function () {
+    // Bắt phím số từ 0-9 để nhập nhanh
+    $(document).on('keypress.modal', function (e) {
+        if (e.key >= '0' && e.key <= '9') {
+            if (!$('#khachThanhToanInput').is(':focus')) {
+                $('#khachThanhToanInput').focus();
+            }
+        }
+    });
+});
+
+// Cleanup khi đóng modal
+$('#modalThanhToan').on('hidden.bs.modal', function () {
+    $(document).off('keypress.modal');
 });

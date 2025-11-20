@@ -19,11 +19,15 @@ public partial class Hoadon
 
     public bool? Trangthai { get; set; }
 
+    // ← THÊM MỚI
+    public string? Idpttt { get; set; }
+
+    // Navigation properties
     public virtual ICollection<Hoadondv> Hoadondvs { get; set; } = new List<Hoadondv>();
-
     public virtual Khachhang? IdkhNavigation { get; set; }
-
     public virtual Nhanvien? IdnvNavigation { get; set; }
-
     public virtual Phienchoi? IdphienNavigation { get; set; }
+
+    // ← THÊM MỚI
+    public virtual Phuongthucthanhtoan? IdptttNavigation { get; set; }
 }

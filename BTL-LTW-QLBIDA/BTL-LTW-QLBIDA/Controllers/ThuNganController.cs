@@ -1,4 +1,5 @@
-﻿using BTL_LTW_QLBIDA.Models;
+﻿using BTL_LTW_QLBIDA.Helpers; // ← THÊM
+using BTL_LTW_QLBIDA.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,11 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             // ← THÊM: Load danh sách loại dịch vụ
             ViewBag.LoaiDichVus = _context.Loaidichvus.ToList();
+
+            // ← THÊM: Load phương thức thanh toán
+            ViewBag.PhuongThucThanhToans = _context.Phuongthucthanhtoans
+                .Where(p => p.Hienthi == true)
+                .ToList();
             return View();
         }
 
@@ -104,47 +110,53 @@ namespace BTL_LTW_QLBIDA.Controllers
             return PartialView("~/Views/Shared/ThuNgan/_HoaDonChiTiet.cshtml", ban);
         }
 
-        // POST: ThuNgan/BatDauChoi - Bắt đầu chơi (mở bàn)
+        // POST: ThuNgan/BatDauChoi
         [HttpPost]
         public IActionResult BatDauChoi(string idBan)
         {
             try
             {
-                var ban = _context.Bans.Find(idBan);
+                var ban = _context.Bans.FirstOrDefault(b => b.Idban == idBan);
                 if (ban == null)
                     return Json(new { success = false, message = "Không tìm thấy bàn" });
 
                 if (ban.Trangthai == true)
                     return Json(new { success = false, message = "Bàn đang được sử dụng" });
 
-                // Tạo phiên chơi mới
+                // ← GỌI hàm static để tạo mã
+                string maPhienChoi = MaHoaDonHelper.TaoMaPhienChoi(_context);
+
                 var phienChoi = new Phienchoi
                 {
-                    Idphien = "P" + DateTime.Now.Ticks,
+                    Idphien = maPhienChoi,
                     Idban = idBan,
                     Giobatdau = DateTime.Now,
                     Gioketthuc = null
                 };
                 _context.Phienchois.Add(phienChoi);
 
-                // Tạo hóa đơn mới
+                // ← GỌI hàm static để tạo mã
+                string maHoaDon = MaHoaDonHelper.TaoMaHoaDon(_context);
+
+                //string? idNhanVien = HttpContext.Session.GetString("UserId");
+                string? idNhanVien = "NV001"; // ← Thay bằng ID nhân viên thật
+
                 var hoaDon = new Hoadon
                 {
-                    Idhd = "HD" + DateTime.Now.Ticks,
-                    Idphien = phienChoi.Idphien,
-                    Idnv = "NV001", // TODO: Lấy từ session đăng nhập
+                    Idhd = maHoaDon,
+                    Idphien = maPhienChoi,
+                    Idnv = idNhanVien,
                     Ngaylap = DateTime.Now,
                     Tongtien = 0,
-                    Trangthai = false
+                    Trangthai = false,
+                    Idpttt = "PTTT001"
                 };
                 _context.Hoadons.Add(hoaDon);
 
-                // Đổi trạng thái bàn
                 ban.Trangthai = true;
-
                 _context.SaveChanges();
 
-                return Json(new { success = true, message = "Bắt đầu chơi thành công" });
+                return Json(new { success = true, message = "Đã bắt đầu tính giờ" });
             }
             catch (Exception ex)
             {
@@ -249,7 +261,7 @@ namespace BTL_LTW_QLBIDA.Controllers
 
         // POST: ThuNgan/ThanhToan - Thanh toán hóa đơn
         [HttpPost]
-        public IActionResult ThanhToan(string idHoaDon)
+        public IActionResult ThanhToan(string idHoaDon, string phuongThucThanhToan = "PTTT001")
         {
             try
             {
@@ -263,15 +275,12 @@ namespace BTL_LTW_QLBIDA.Controllers
                 if (hoaDon == null)
                     return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
 
-                // Tính tổng tiền
                 var phien = hoaDon.IdphienNavigation;
                 var ban = phien.IdbanNavigation;
 
                 // Tính tiền giờ
                 TimeSpan gioChoi = DateTime.Now - phien.Giobatdau.GetValueOrDefault();
                 int tongPhut = (int)gioChoi.TotalMinutes;
-
-                // ← TÍNH THEO BLOCK 15 PHÚT (Chỉ cần > 0 thì +1 block)
                 int soBlock15Phut = (tongPhut / 15) + 1;
                 int phutTinhTien = soBlock15Phut * 15;
                 decimal gioTinhTien = phutTinhTien / 60.0m;
@@ -288,12 +297,13 @@ namespace BTL_LTW_QLBIDA.Controllers
 
                 // Cập nhật hóa đơn
                 hoaDon.Tongtien = tongTien;
-                hoaDon.Trangthai = true; // Đã thanh toán
+                hoaDon.Trangthai = true;
+                hoaDon.Idpttt = phuongThucThanhToan; // ← THÊM: Lưu phương thức thanh toán
 
                 // Kết thúc phiên chơi
                 phien.Gioketthuc = DateTime.Now;
 
-                // Đổi trạng thái bàn về trống
+                // Đổi trạng thái bàn
                 ban.Trangthai = false;
 
                 _context.SaveChanges();

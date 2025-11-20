@@ -139,6 +139,10 @@
     </div>
 </div>
 
+
+<!-- Modal thanh toán - Chỉ load 1 lần -->
+@await Html.PartialAsync("~/Views/Shared/ThuNgan/_ModalThanhToan.cshtml")
+
 @section Scripts {
     <script src="~/js/thungan.js"></script>
 }
