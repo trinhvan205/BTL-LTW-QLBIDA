@@ -1,0 +1,88 @@
+﻿@model BTL_LTW_QLBIDA.Models.Hoadon
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Hóa đơn @Model.Idhd</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-size: 14px;
+        }
+
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        @@media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <div class="no-print mb-3 text-end">
+            <button class="btn btn-sm btn-primary" onclick="window.print()">
+                In / Lưu PDF
+            </button>
+        </div>
+
+        <h4 class="mb-3">HÓA ĐƠN @Model.Idhd</h4>
+
+        <table class="table table-sm">
+            <tr><th>Khách hàng</th><td>@Model.IdkhNavigation?.Hoten</td></tr>
+            <tr><th>Nhân viên</th><td>@Model.IdnvNavigation?.Hotennv</td></tr>
+            <tr><th>Ngày lập</th><td>@Model.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</td></tr>
+            <tr><th>PT thanh toán</th><td>@Model.IdptttNavigation?.Tenpttt</td></tr>
+            <tr><th>Trạng thái</th><td>@(Model.Trangthai == true ? "Hoàn thành" : "Đang xử lý")</td></tr>
+        </table>
+
+        <h6>Dịch vụ</h6>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên DV</th>
+                    <th class="text-end">Đơn giá</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-end">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = 1;
+                    decimal tong = 0;
+                }
+                @foreach (var dv in Model.Hoadondvs)
+                {
+                    var g = dv.IddvNavigation?.Giatien ?? 0;
+                    var sl = dv.Soluong ?? 0;
+                    var tt = g * sl;
+                    tong += tt;
+
+                    <tr>
+                        <td>@i</td>
+                        <td>@dv.IddvNavigation?.Tendv</td>
+                        <td class="text-end">@g.ToString("N0")</td>
+                        <td class="text-center">@sl</td>
+                        <td class="text-end">@tt.ToString("N0")</td>
+                    </tr>
+                    i++;
+                }
+            </tbody>
+        </table>
+
+        <div class="text-end">
+            <h5 class="fw-bold">Tổng: @((Model.Tongtien ?? tong).ToString("N0")) VNĐ</h5>
+        </div>
+    </div>
+</body>
+</html>
