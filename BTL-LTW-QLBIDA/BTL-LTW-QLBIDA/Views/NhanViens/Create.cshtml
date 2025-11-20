@@ -1,0 +1,194 @@
+﻿@model BTL_LTW_QLBIDA.Models.Nhanvien
+
+@{
+    ViewData["Title"] = "Thêm nhân viên";
+}
+
+<link href="~/css/NhanVien/Create.css" rel="stylesheet" />
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index">Nhân viên</a>
+                    </li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </nav>
+            <h3 class="mb-0">
+                <i class="fas fa-user-plus me-2"></i>Thêm nhân viên mới
+            </h3>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div class="row">
+            <!-- Cột trái - Thông tin cơ bản -->
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Thông tin cơ bản
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Idnv" class="form-label fw-bold">
+                                Mã nhân viên <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Idnv" class="form-control bg-light" readonly />
+                            <span asp-validation-for="Idnv" class="text-danger"></span>
+                            <small class="text-muted">Mã nhân viên được tạo tự động</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Hotennv" class="form-label fw-bold">
+                                Họ và tên <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Hotennv" class="form-control" placeholder="Nhập họ tên đầy đủ" />
+                            <span asp-validation-for="Hotennv" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Ngaysinh" class="form-label fw-bold">
+                                Ngày sinh
+                            </label>
+                            <input asp-for="Ngaysinh" type="date" class="form-control" />
+                            <span asp-validation-for="Ngaysinh" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Giới tính
+                            </label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" asp-for="Gioitinh" value="false" id="gioitinhNam" checked>
+                                    <label class="form-check-label" for="gioitinhNam">
+                                        <i class="fas fa-mars text-primary me-1"></i>Nam
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" asp-for="Gioitinh" value="true" id="gioitinhNu">
+                                    <label class="form-check-label" for="gioitinhNu">
+                                        <i class="fas fa-venus text-danger me-1"></i>Nữ
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Cccd" class="form-label fw-bold">
+                                Số CCCD
+                            </label>
+                            <input asp-for="Cccd" class="form-control" placeholder="Nhập số CCCD (12 số)" maxlength="15" />
+                            <span asp-validation-for="Cccd" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Sodt" class="form-label fw-bold">
+                                Số điện thoại
+                            </label>
+                            <input asp-for="Sodt" class="form-control" placeholder="Nhập số điện thoại" maxlength="20" />
+                            <span asp-validation-for="Sodt" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải - Tài khoản & Phân quyền -->
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-lock me-2"></i>Tài khoản đăng nhập
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <small>Nếu không tạo tài khoản, nhân viên sẽ không thể đăng nhập hệ thống</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Tendangnhap" class="form-label fw-bold">
+                                Tên đăng nhập
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input asp-for="Tendangnhap" class="form-control" placeholder="Để trống nếu không tạo tài khoản" />
+                            </div>
+                            <span asp-validation-for="Tendangnhap" class="text-danger"></span>
+                            <small class="text-muted">Tên đăng nhập phải là duy nhất</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Matkhau" class="form-label fw-bold">
+                                Mật khẩu
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                                <input asp-for="Matkhau" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                            </div>
+                            <span asp-validation-for="Matkhau" class="text-danger"></span>
+                            <small class="text-muted">Mật khẩu nên có ít nhất 6 ký tự</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Phân quyền
+                            </label>
+                            <div class="card border">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="true" name="Quyenadmin" id="quyenAdmin">
+                                        <input type="hidden" name="Quyenadmin" value="false" />
+                                        <label class="form-check-label" for="quyenAdmin">
+                                            <i class="fas fa-crown text-danger me-1"></i>
+                                            <strong>Quyền Quản trị viên</strong>
+                                        </label>
+                                        <div class="text-muted small mt-1">
+                                            Admin có thể truy cập tất cả chức năng quản lý hệ thống
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Lưu ý:</strong> Chỉ cấp quyền Admin cho người đáng tin cậy!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i>Lưu nhân viên
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

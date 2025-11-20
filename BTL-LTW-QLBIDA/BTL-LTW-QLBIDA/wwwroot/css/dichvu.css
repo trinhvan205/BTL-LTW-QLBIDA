@@ -1,0 +1,195 @@
+﻿/* ============================================================
+   🎯 1. GLOBAL PAGE STYLE
+============================================================ */
+body {
+    background-color: #f5f6fa;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+/* ============================================================
+   🎯 2. SIDEBAR FILTER
+============================================================ */
+.dv-sidebar-card {
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+    .dv-sidebar-card h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #2f855a;
+    }
+
+    /* Form filter label */
+    .dv-sidebar-card label {
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+/* Reset button */
+#clearFilter {
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* ============================================================
+   🎯 3. TABLE LIST (MAIN)
+============================================================ */
+.table-dv {
+    font-size: 0.88rem;
+}
+
+    .table-dv thead th {
+        background: #2f855a;
+        color: #ffffff;
+        font-weight: 600;
+        border: none;
+    }
+
+    .table-dv tbody tr:hover {
+        background-color: #f0fff4 !important; /* xanh mint */
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    /* ẢNH TRONG BẢNG */
+    .table-dv img {
+        border-radius: 6px;
+        transition: 0.2s;
+    }
+
+        .table-dv img:hover {
+            transform: scale(1.15);
+        }
+
+/* ============================================================
+   🎯 4. DETAIL PANEL (BÊN PHẢI)
+============================================================ */
+.dv-detail-card {
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 15px;
+    min-height: 250px;
+}
+
+    .dv-detail-card table {
+        font-size: 0.9rem;
+    }
+
+    .dv-detail-card th {
+        width: 120px;
+        color: #555;
+    }
+
+/* ============================================================
+   🎯 5. SWITCH STATUS
+============================================================ */
+.form-switch .form-check-input.status-toggle {
+    width: 2.8rem;
+    height: 1.3rem;
+    cursor: pointer;
+    border-color: #d1d1d1;
+}
+
+    .form-switch .form-check-input.status-toggle:checked {
+        background-color: #38a169;
+        border-color: #38a169;
+    }
+
+/* ============================================================
+   🎯 6. MODAL FORM (ADD + EDIT)
+============================================================ */
+#preview_add_img, #editPreview {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
+    object-fit: cover;
+    background: #f8fafc;
+    transition: 0.25s ease-in-out;
+}
+
+    #preview_add_img:hover, #editPreview:hover {
+        transform: scale(1.05);
+    }
+
+/* Input file custom */
+input[type="file"] {
+    font-size: 0.85rem;
+}
+
+/* ============================================================
+   🎯 7. INFINITE SCROLL "Loading..."
+============================================================ */
+#dvLoading {
+    font-size: 0.85rem;
+    color: #4a5568;
+}
+
+/* ============================================================
+   🎯 8. BADGES (Loại dịch vụ)
+============================================================ */
+.badge-food {
+    background: #ffe08a;
+    color: #7a5901;
+}
+
+.badge-drink {
+    background: #bee3f8;
+    color: #1a5276;
+}
+
+.badge-smoke {
+    background: #444;
+    color: #fff;
+}
+
+.badge-combo {
+    background: #e53e3e;
+    color: #fff;
+}
+
+/* ============================================================
+   🎯 9. BUTTONS
+============================================================ */
+.btn-edit,
+.btn-delete,
+.btn-detail,
+.btn-toggle {
+    border-radius: 4px !important;
+    padding: 4px 7px !important;
+}
+
+/* ============================================================
+   🎯 10. SCROLLBAR CUSTOM (TABLE)
+============================================================ */
+#dichvuTable::-webkit-scrollbar {
+    width: 6px;
+}
+
+#dichvuTable::-webkit-scrollbar-thumb {
+    background: #a0aec0;
+    border-radius: 6px;
+}
+
+    #dichvuTable::-webkit-scrollbar-thumb:hover {
+        background: #718096;
+    }
+.dv-detail-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    min-height: 300px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.active-row {
+    background-color: #e6f7ff !important;
+    border-left: 4px solid #1890ff;
+}

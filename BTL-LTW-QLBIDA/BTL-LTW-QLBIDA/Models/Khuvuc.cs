@@ -9,5 +9,5 @@ public partial class Khuvuc
 
     public string? Tenkhu { get; set; }
 
-    public virtual ICollection<Ban> Bans { get; set; } = new List<Ban>();
+    public virtual ICollection<Ban> Bans { get; set; } = [];
 }

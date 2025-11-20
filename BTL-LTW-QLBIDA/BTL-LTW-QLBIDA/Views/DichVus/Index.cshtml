@@ -1,0 +1,181 @@
+﻿@using BTL_LTW_QLBIDA.Models
+@{
+    ViewData["Title"] = "Quản lý Dịch vụ";
+    var listLoai = ViewBag.ListLoai as List<Loaidichvu>;
+}
+
+<link rel="stylesheet" href="~/css/dichvu.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<div class="container-fluid">
+    <div class="row mt-3">
+
+        <!-- SIDEBAR FILTER -->
+        <div class="col-md-3 mb-3">
+            <div class="card dv-sidebar-card p-3 shadow-sm border-0">
+                <h5 class="fw-bold text-secondary mb-3">
+                    <i class="bi bi-funnel me-1"></i> Bộ lọc & tìm kiếm
+                </h5>
+
+                <form id="dvFilterForm">
+
+                    <label class="form-label small fw-semibold">Tên dịch vụ</label>
+                    <input type="text" name="keyword" class="form-control form-control-sm mb-2" placeholder="Nhập tên..." />
+
+                    <label class="form-label small fw-semibold">Loại dịch vụ</label>
+                    <select name="loaiId" class="form-select form-select-sm mb-2">
+                        <option value="">Tất cả</option>
+                        @foreach (var l in listLoai)
+                        {
+                            <option value="@l.Idloai">@l.Tenloai</option>
+                        }
+                    </select>
+
+                    <label class="form-label small fw-semibold">Trạng thái</label>
+                    <select name="status" class="form-select form-select-sm mb-2">
+                        <option value="">Tất cả</option>
+                        <option value="true">Đang kinh doanh</option>
+                        <option value="false">Ngưng bán</option>
+                    </select>
+
+                    <label class="form-label small fw-semibold">Giá từ</label>
+                    <input type="number" name="minPrice" class="form-control form-control-sm mb-2" min="0" />
+
+                    <label class="form-label small fw-semibold">Giá đến</label>
+                    <input type="number" name="maxPrice" class="form-control form-control-sm mb-3" min="0" />
+
+                    <button type="submit" class="btn btn-success btn-sm w-100 mb-2">
+                        <i class="bi bi-search"></i> Lọc
+                    </button>
+
+                    <button type="button" id="clearFilter" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="bi bi-arrow-counterclockwise"></i> Xóa lọc
+                    </button>
+                </form>
+
+                <hr class="my-3" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="small text-secondary fw-semibold">Quản lý loại dịch vụ</span>
+                    <button class="btn btn-sm btn-link text-success p-0" data-bs-toggle="modal" data-bs-target="#addLoaiModal">
+                        <i class="bi bi-plus-circle-fill fs-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE LIST -->
+        <div class="col-md-6 mb-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-2 rounded shadow-sm">
+                <h5 class="fw-bold text-secondary m-0 ps-2">
+                    <i class="bi bi-list-ul me-1"></i> Danh sách dịch vụ
+                </h5>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success btn-sm shadow-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addModal"
+                            id="openAddModal">
+                        <i class="bi bi-plus-circle"></i> Thêm mới
+                    </button>
+
+                    <button id="btnDvExportExcel" class="btn btn-outline-success btn-sm shadow-sm">
+                        <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                    </button>
+                </div>
+            </div>
+
+            <div id="dichvuTable"
+                 class="bg-white rounded shadow-sm p-0"
+                 style="min-height: 400px; max-height: 500px; overflow-y: auto;">
+
+                <table class="table table-dv table-hover">
+                    <thead>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Dịch vụ</th>
+                            <th>Giá</th>
+                            <th>Tồn</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="dichvuTableBody">
+                        <!-- AJAX load -->
+                    </tbody>
+                </table>
+
+                <!-- Loading -->
+                <div id="dvLoading" class="text-center text-muted py-2 d-none">
+                    <div class="spinner-border spinner-border-sm text-success me-2"></div>
+                    Đang tải thêm...
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAIL PANEL -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 dv-detail-card">
+                <div class="card-body" id="dichvuDetail">
+                    <div class="text-center text-muted mt-5">
+                        <i class="bi bi-hand-index-thumb fs-1"></i>
+                        <p>Chọn dịch vụ để xem chi tiết</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal thêm loại -->
+<div class="modal fade" id="addLoaiModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">➕ Thêm Loại Dịch Vụ Mới</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input id="tenLoaiMoi" class="form-control" placeholder="Nhập tên loại..." />
+                <div id="loaiError" class="alert alert-danger d-none mt-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button id="btnSaveLoai" class="btn btn-success">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal ADD -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            @Html.Partial("Create")
+        </div>
+    </div>
+</div>
+
+<!-- Modal EDIT -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div id="editModalBody"></div>
+        </div>
+    </div>
+</div>
+<!-- MODAL CHI TIẾT DỊCH VỤ (DÙNG CHUNG) -->
+<div class="modal fade" id="dvDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="dvDetailModalContent">
+            <!-- AJAX load vào đây -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/dichvu.js"></script>
+}

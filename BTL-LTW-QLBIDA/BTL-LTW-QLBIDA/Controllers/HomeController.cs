@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(ILogger<HomeController> logger) : Controller
     {
         private readonly QlquanBilliardLtw2Context db;
 
@@ -16,6 +16,7 @@ namespace BTL_LTW_QLBIDA.Controllers
         {
             db = context;
         }
+        private readonly ILogger<HomeController> _logger = logger;
 
         public IActionResult Index()
         {

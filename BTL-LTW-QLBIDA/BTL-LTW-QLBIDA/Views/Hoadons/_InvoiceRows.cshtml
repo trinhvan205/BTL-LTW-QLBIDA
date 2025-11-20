@@ -1,0 +1,83 @@
+﻿@model BTL_LTW_QLBIDA.Models.ViewModels.InvoiceScrollVm
+
+@foreach (var item in Model.Items)
+{
+    <tr class="invoice-row align-middle">
+
+        @* Checkbox đã bị loại bỏ theo yêu cầu *@
+
+        <td class="fw-semibold">
+            <i class="bi bi-hash text-secondary"></i> @item.Idhd
+        </td>
+
+        <td>
+            <i class="bi bi-calendar-event text-primary me-1"></i>
+            @item.Ngaylap?.ToString("dd/MM/yyyy HH:mm")
+        </td>
+
+        <td>
+            <i class="bi bi-person-circle text-success me-1"></i>
+            @item.IdkhNavigation?.Hoten
+        </td>
+
+        <td>
+            <i class="bi bi-person-badge-fill text-info me-1"></i>
+            @item.IdnvNavigation?.Hotennv
+        </td>
+
+        <td class="text-end fw-bold text-primary">
+            @((item.Tongtien ?? 0).ToString("N0")) VNĐ
+        </td>
+
+        <td>
+            @if (item.Trangthai == true)
+            {
+                <span class="badge bg-success px-3 py-2">
+                    <i class="bi bi-check-circle-fill"></i> Hoàn thành
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark px-3 py-2">
+                    <i class="bi bi-hourglass-split"></i> Đang xử lý
+                </span>
+            }
+        </td>
+
+        <td class="text-center">
+            <button class="btn btn-light border btn-sm btn-details" data-id="@item.Idhd">
+                <i class="bi bi-eye text-primary"></i>
+            </button>
+
+            <button class="btn btn-light border btn-sm btn-edit" data-id="@item.Idhd">
+                <i class="bi bi-pencil text-warning"></i>
+            </button>
+
+            <button class="btn btn-light border btn-sm btn-print" data-id="@item.Idhd">
+                <i class="bi bi-printer text-secondary"></i>
+            </button>
+
+            <button class="btn btn-light border btn-sm btn-toggle" data-id="@item.Idhd">
+                <i class="bi bi-arrow-repeat text-info"></i>
+            </button>
+
+            <button class="btn btn-light border btn-sm btn-delete"
+                    data-id="@item.Idhd"
+                    @(item.Trangthai == false ? "disabled" : "")>
+                <i class="bi bi-trash text-danger"></i>
+            </button>
+
+        </td>
+    </tr>
+}
+
+@if (!Model.HasMore)
+{
+    <tr class="no-more">
+        <td colspan="7" class="text-center text-muted py-3">
+            <i class="bi bi-check2-circle me-2"></i>
+            Đã hết dữ liệu
+        </td>
+    </tr>
+}
+
