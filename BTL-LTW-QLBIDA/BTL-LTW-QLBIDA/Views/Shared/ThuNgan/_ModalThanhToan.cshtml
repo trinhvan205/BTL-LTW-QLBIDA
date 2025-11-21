@@ -2,6 +2,7 @@
 <div class="modal fade" id="modalThanhToan" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
+
             <!-- Header -->
             <div class="modal-header">
                 <div>
@@ -11,6 +12,15 @@
                     </h5>
                     <div style="font-size: 13px; opacity: 0.9;">
                         <i class="bi bi-clock"></i> <span id="thoiGianModal"></span>
+                    </div>
+
+                    <!-- ✅ THÊM: Thông tin nhân viên và khách hàng -->
+                    <div style="font-size: 12px; opacity: 0.85; margin-top: 4px;">
+                        <i class="bi bi-person-badge"></i> NV: <strong id="tenNhanVienModal">Nhân viên</strong>
+                        <span class="ms-3">
+                            <i class="bi bi-person-circle"></i> KH: <strong id="tenKhachHangModal">Khách lẻ</strong>
+                            <span id="sdtKhachHangModal" style="color: #9ca3af;"></span>
+                        </span>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

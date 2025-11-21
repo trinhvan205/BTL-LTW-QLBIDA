@@ -155,13 +155,27 @@ namespace BTL_LTW_QLBIDA.Services
                     {
                         col.Item().Text($"Hóa đơn: {hoaDon.Idhd}").Bold();
                         col.Item().Text($"Bàn: {ban.Idban}");
-                        col.Item().Text($"Thu ngân: {hoaDon.IdnvNavigation?.Hotennv ?? "N/A"}");
+
+                        // ✅ THÊM: Nhân viên
+                        string tenNhanVien = hoaDon.IdnvNavigation?.Hotennv ?? "Nhân viên";
+                        col.Item().Text($"Thu ngân: {tenNhanVien}");
+
+                        // ✅ THÊM: Khách hàng
+                        string tenKhachHang = hoaDon.IdkhNavigation?.Hoten ?? "Khách lẻ";
+                        col.Item().Text($"Khách hàng: {tenKhachHang}");
                     });
 
                     row.RelativeItem().Column(col =>
                     {
                         col.Item().AlignRight().Text($"Ngày: {hoaDon.Ngaylap:dd/MM/yyyy HH:mm}");
                         col.Item().AlignRight().Text($"Thời gian chơi: {(int)thoiGianChoi.TotalHours}h {thoiGianChoi.Minutes}p");
+
+                        // ✅ THÊM: SĐT khách hàng (nếu có)
+                        string sdtKhachHang = hoaDon.IdkhNavigation?.Sodt ?? "";
+                        if (!string.IsNullOrEmpty(sdtKhachHang))
+                        {
+                            col.Item().AlignRight().Text($"SĐT: {sdtKhachHang}");
+                        }
                     });
                 });
 
