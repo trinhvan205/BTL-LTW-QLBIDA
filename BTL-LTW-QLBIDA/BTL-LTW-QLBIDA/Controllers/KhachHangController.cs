@@ -35,8 +35,11 @@ namespace BTL_LTW_QLBIDA.Controllers
         }
 
         // API: Lấy danh sách khách hàng với filter
+        // File: KhachHangController.cs
+
+        // SỬA: Thêm tham số page (mặc định 1) và pageSize (mặc định 10)
         [HttpGet]
-        public async Task<IActionResult> GetKhachhangs(string? searchString, string? sortBy)
+        public async Task<IActionResult> GetKhachhangs(string? searchString, string? sortBy, int page = 1, int pageSize = 10)
         {
             if (HttpContext.Session.GetString("TenDangNhap") == null)
             {
@@ -44,11 +47,10 @@ namespace BTL_LTW_QLBIDA.Controllers
             }
 
             var khachhangs = _context.Khachhangs
-                .Include(kh => kh.Hoadons)   // FIX 1: Include để tránh null
+                .Include(kh => kh.Hoadons)
                 .AsQueryable();
-            //var khachhangs = _context.Khachhangs.AsQueryable();
 
-            // Tìm kiếm
+            // 1. Tìm kiếm (Filter)
             if (!string.IsNullOrEmpty(searchString))
             {
                 khachhangs = khachhangs.Where(kh =>
@@ -57,20 +59,34 @@ namespace BTL_LTW_QLBIDA.Controllers
                     kh.Sodt!.Contains(searchString));
             }
 
-            // ✅ TẢI VỀ MEMORY TRƯỚC KHI SẮP XẾP
+            // 2. Tải về Memory và Sắp xếp (Sort)
             var khachhangList = await khachhangs.ToListAsync();
 
-            // ✅ SẮP XẾP THEO YÊU CẦU
             khachhangList = sortBy switch
             {
                 "id_asc" => khachhangList.OrderBy(kh => int.Parse(kh.Idkh.Substring(4))).ToList(),
                 "id_desc" => khachhangList.OrderByDescending(kh => int.Parse(kh.Idkh.Substring(4))).ToList(),
                 "name_asc" => khachhangList.OrderBy(kh => kh.Hoten).ToList(),
                 "name_desc" => khachhangList.OrderByDescending(kh => kh.Hoten).ToList(),
-                _ => khachhangList.OrderBy(kh => int.Parse(kh.Idkh.Substring(4))).ToList() // ✅ Mặc định: theo mã KH tăng dần
+                _ => khachhangList.OrderBy(kh => int.Parse(kh.Idkh.Substring(4))).ToList() // Mặc định
             };
 
-            var result = khachhangList
+            // ⭐ 3. PHÂN TRANG (PAGINATION)
+            var totalItems = khachhangList.Count;
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Đảm bảo trang hiện tại hợp lệ
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            // Lấy dữ liệu theo trang bằng Skip và Take
+            var paginatedKhachhangs = khachhangList
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // 4. Tạo kết quả trả về
+            var items = paginatedKhachhangs
                 .Select(kh => new
                 {
                     idkh = kh.Idkh,
@@ -82,9 +98,20 @@ namespace BTL_LTW_QLBIDA.Controllers
                 })
                 .ToList();
 
-            return Json(new { success = true, data = result });
+            // ⭐ Trả về dữ liệu cùng với thông tin phân trang
+            return Json(new
+            {
+                success = true,
+                data = new
+                {
+                    items = items, // Danh sách khách hàng trên trang hiện tại
+                    totalItems = totalItems, // Tổng số khách hàng
+                    currentPage = page,
+                    totalPages = totalPages,
+                    pageSize = pageSize
+                }
+            });
         }
-
         // GET: Khachhangs/Details/5
         public async Task<IActionResult> Details(string id)
         {

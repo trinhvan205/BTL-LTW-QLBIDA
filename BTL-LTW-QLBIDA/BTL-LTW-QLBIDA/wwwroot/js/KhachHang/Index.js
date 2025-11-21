@@ -1,5 +1,7 @@
 ﻿// ==================== VARIABLES ====================
 let searchTimeout;
+let currentPage = 1; // ⭐ KHẮC PHỤC 1: Thêm biến trang hiện tại
+const pageSize = 10;
 
 // ==================== UTILITY FUNCTIONS ====================
 
@@ -37,6 +39,7 @@ $(document).ready(function () {
 
     // 2. Tìm kiếm với debounce
     $('#searchInput').on('keyup', function () {
+        currentPage = 1; // ⭐ Reset về trang 1 khi tìm kiếm
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(function () {
             loadKhachhangs();
@@ -45,6 +48,7 @@ $(document).ready(function () {
 
     // 3. Sắp xếp
     $('input[name="sortBy"]').on('change', function () {
+        currentPage = 1; // ⭐ Reset về trang 1 khi sắp xếp
         loadKhachhangs();
     });
 
@@ -85,19 +89,30 @@ function loadKhachhangs() {
     $('#loadingSpinner').show();
     $('#khachhangTable').hide();
     $('#emptyState').hide();
+    $('#paginationContainer').empty(); // ⭐ NEW: Xóa phân trang cũ
 
     $.ajax({
         url: '/Khachhangs/GetKhachhangs',
         type: 'GET',
         data: {
             searchString: searchString,
-            sortBy: sortBy
+            sortBy: sortBy,
+            page: currentPage, // ⭐ NEW: Gửi trang hiện tại
+            pageSize: pageSize // ⭐ NEW: Gửi kích thước trang
         },
         success: function (response) {
             if (response.success) {
-                renderTable(response.data);
+                // ⭐ NEW: Lấy dữ liệu và metadata phân trang
+                const data = response.data.items;
+                const totalPages = response.data.totalPages;
+                const totalItems = response.data.totalItems;
+                const page = response.data.currentPage;
+
+                currentPage = page; // Cập nhật lại currentPage
+
+                renderTable(data, totalItems);
+                renderPagination(page, totalPages); // ⭐ NEW: Render phân trang
             } else {
-                // SỬA: Thay alert() bằng showAutoCloseAlert()
                 showAutoCloseAlert('Có lỗi xảy ra: ' + response.message, 'danger');
             }
         },
@@ -111,17 +126,20 @@ function loadKhachhangs() {
     });
 }
 
-// ==================== RENDER TABLE FUNCTION ====================
-function renderTable(data) {
+/// ==================== RENDER TABLE FUNCTION (Đã Sửa) ====================
+function renderTable(data, totalItems) { // ✅ THÊM THAM SỐ totalItems
     const tbody = $('#khachhangTableBody');
     tbody.empty();
 
     // Update total count
-    $('#totalCount').text(data.length);
+    $('#totalCount').text(totalItems); // ✅ Giờ totalItems đã có giá trị
+    $('#currentPageCount').text(data.length);
 
-    if (data.length === 0) {
+    // Kiểm tra Empty State
+    if (data.length === 0 && totalItems === 0) {
         $('#emptyState').show();
         $('#khachhangTable').hide();
+        $('#paginationContainer').empty(); // Ẩn phân trang khi không có dữ liệu
         return;
     }
 
@@ -162,5 +180,74 @@ function renderTable(data) {
             </tr>
         `;
         tbody.append(row);
+    });
+}
+
+// File: Index.js - Thêm vào cuối file
+
+// ==================== NEW: RENDER PAGINATION FUNCTION ====================
+function renderPagination(page, totalPages) {
+    const paginationContainer = $('#paginationContainer');
+    paginationContainer.empty();
+
+    if (totalPages <= 1) {
+        return;
+    }
+
+    let paginationHtml = `<ul class="pagination pagination-sm justify-content-end mb-0">`;
+
+    // Nút Previous
+    paginationHtml += `
+        <li class="page-item ${page === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${page - 1}">Trước</a>
+        </li>
+    `;
+
+    // Hiển thị các nút số trang (tối đa 5 trang gần trang hiện tại)
+    let startPage = Math.max(1, page - 2);
+    let endPage = Math.min(totalPages, page + 2);
+
+    if (startPage > 1) {
+        paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+        if (startPage > 2) {
+            paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHtml += `
+            <li class="page-item ${i === page ? 'active' : ''}">
+                <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>
+        `;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+    }
+
+    // Nút Next
+    paginationHtml += `
+        <li class="page-item ${page === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${page + 1}">Sau</a>
+        </li>
+    `;
+
+    paginationHtml += `</ul>`;
+
+    paginationContainer.html(paginationHtml);
+
+    // Xử lý sự kiện click cho các nút phân trang
+    paginationContainer.find('.page-link').on('click', function (e) {
+        e.preventDefault();
+        const newPage = parseInt($(this).data('page'));
+
+        if (newPage > 0 && newPage <= totalPages && newPage !== currentPage) {
+            currentPage = newPage;
+            loadKhachhangs();
+        }
     });
 }
