@@ -13,11 +13,12 @@
 =========================== */
 .thungan-container {
     display: flex;
-    height: calc(100vh - 80px); /* ← GIẢM từ 100px xuống 80px */
+    height: 100%; /* ← ĐỔI: Chiếm 100% của main */
     gap: 12px;
     background: #47234E;
     padding: 12px;
     box-sizing: border-box;
+    overflow: hidden; /* ← THÊM */
 }
 
 /* BÊN TRÁI - 60% */

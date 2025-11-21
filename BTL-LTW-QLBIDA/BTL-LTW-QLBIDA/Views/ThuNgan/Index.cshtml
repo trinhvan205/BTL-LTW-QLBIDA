@@ -5,7 +5,171 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/thungan.css" />
+    <style>
+        /* ===========================
+                   CHỈ ÁP DỤNG KHI CÓ CLASS .page-thungan-fullscreen
+                =========================== */
+        html.page-thungan-fullscreen {
+            overflow: hidden !important;
+            height: 100%;
+        }
+
+        body.page-thungan-fullscreen {
+            overflow: hidden !important;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+            /* Main fullscreen */
+            body.page-thungan-fullscreen main {
+                height: calc(100vh - 60px);
+                overflow: hidden;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            body.page-thungan-fullscreen .thungan-container {
+                height: 100%;
+            }
+
+        /* ===========================
+                   RESPONSIVE WARNING
+                =========================== */
+        #responsiveWarning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .warning-content {
+            text-align: center;
+            color: white;
+            max-width: 500px;
+        }
+
+        .warning-icon {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border-radius: 30px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .warning-stars {
+            font-size: 30px;
+            margin: 20px 0;
+            letter-spacing: 5px;
+        }
+
+        .warning-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .warning-message {
+            font-size: 16px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        /* Responsive - Hiện cảnh báo khi < 1152px */
+        @@media (max-width: 1152px) {
+            body.page-thungan-fullscreen #responsiveWarning {
+                display: flex !important;
+            }
+
+            body.page-thungan-fullscreen .thungan-container {
+                display: none !important;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .warning-icon {
+                width: 120px;
+                height: 120px;
+            }
+
+            .warning-stars {
+                font-size: 24px;
+            }
+
+            .warning-title {
+                font-size: 20px;
+            }
+
+            .warning-message {
+                font-size: 14px;
+            }
+        }
+    </style>
 }
+
+
+<!-- ===========================
+     CẢNH BÁO MÀN HÌNH NHỎ
+=========================== -->
+<div id="responsiveWarning">
+    <div class="warning-content">
+        <div class="warning-icon">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Chef Hat -->
+                <ellipse cx="100" cy="140" rx="50" ry="15" fill="#E8F4F8" />
+                <rect x="60" y="80" width="80" height="60" rx="5" fill="#FFFFFF" />
+                <ellipse cx="100" cy="70" rx="45" ry="40" fill="#FFFFFF" />
+
+                <!-- Face -->
+                <circle cx="100" cy="120" r="35" fill="#FFD4A3" />
+
+                <!-- Hair -->
+                <path d="M 70 95 Q 70 85, 80 85 Q 85 80, 90 85 Q 95 80, 100 85 Q 105 80, 110 85 Q 115 80, 120 85 Q 125 85, 130 95" fill="#8B4513" />
+
+                <!-- Eyes -->
+                <circle cx="90" cy="115" r="3" fill="#000" />
+                <circle cx="110" cy="115" r="3" fill="#000" />
+
+                <!-- Smile -->
+                <path d="M 85 125 Q 100 135, 115 125" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round" />
+
+                <!-- Plate with Coffee -->
+                <ellipse cx="145" cy="135" rx="20" ry="8" fill="#E0E0E0" />
+                <rect x="140" y="120" width="10" height="15" rx="2" fill="#8B4513" />
+                <ellipse cx="145" cy="120" rx="6" ry="3" fill="#5D4037" />
+
+                <!-- Steam -->
+                <path d="M 140 110 Q 135 105, 140 100" stroke="#AAA" stroke-width="1.5" fill="none" opacity="0.6" />
+                <path d="M 145 108 Q 140 103, 145 98" stroke="#AAA" stroke-width="1.5" fill="none" opacity="0.6" />
+                <path d="M 150 110 Q 155 105, 150 100" stroke="#AAA" stroke-width="1.5" fill="none" opacity="0.6" />
+            </svg>
+        </div>
+
+        <div class="warning-stars">⭐⭐⭐⭐⭐</div>
+
+        <h1 class="warning-title">
+            Sử dụng App Anh Dũng Hiển Nghĩa Trình<br>
+            Nhân viên Nhà hàng
+        </h1>
+
+        <p class="warning-message">
+            Để thực hiện thao tác bán hàng linh hoạt hơn<br>
+            và dễ dàng hơn trên thiết bị này
+        </p>
+    </div>
+</div>
 
 <div class="thungan-container">
     <!-- BÊN TRÁI: Danh sách bàn / Thực đơn -->
@@ -217,4 +381,20 @@
 
 @section Scripts {
     <script src="~/js/thungan.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // ✅ Thêm class vào html và body khi vào trang Thu Ngân
+            $('html').addClass('page-thungan-fullscreen');
+            $('body').addClass('page-thungan-fullscreen');
+
+            console.log('✅ Đã thêm class fullscreen cho trang Thu Ngân');
+        });
+
+        // ✅ Xóa class khi rời khỏi trang (tùy chọn)
+        $(window).on('beforeunload', function() {
+            $('html').removeClass('page-thungan-fullscreen');
+            $('body').removeClass('page-thungan-fullscreen');
+        });
+    </script>
 }
