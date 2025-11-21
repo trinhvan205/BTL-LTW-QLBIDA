@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\invoices\" />
+    <Folder Include="wwwroot\video\" />
   </ItemGroup>
 
   <ItemGroup>
