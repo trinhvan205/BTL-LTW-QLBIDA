@@ -268,7 +268,7 @@ namespace BTL_LTW_QLBIDA.Controllers
         //        _context.Add(nhanvienvm);
         //        await _context.SaveChangesAsync();
 
-        //        TempData["SuccessMessage"] = "Thêm nhân viên thành công!";
+        //        ["SuccessMessage"] = "Thêm nhân viên thành công!";
         //        return RedirectToAction(nameof(Index));
         //    }
 

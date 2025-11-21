@@ -28,7 +28,6 @@ builder.Services.AddScoped<PdfService>();
 
 var app = builder.Build();
 
-ExcelPackage.License.SetNonCommercialPersonal("TrinhVan205");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

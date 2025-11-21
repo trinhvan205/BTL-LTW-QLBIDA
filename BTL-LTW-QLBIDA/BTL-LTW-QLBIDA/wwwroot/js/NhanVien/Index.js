@@ -1,6 +1,29 @@
 ﻿// ==================== VARIABLES ====================
 let searchTimeout;
 
+// ==================== UTILITY FUNCTIONS ====================
+
+// ✅ HÀM MỚI: Hiển thị thông báo alert tự động tắt (Dùng cho lỗi AJAX)
+function showAutoCloseAlert(message, type = 'danger', duration = 2000) { // 2000ms = 2 giây
+    const container = $('#apiAlertContainer');
+    container.empty(); // Xóa thông báo cũ
+
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+
+    const alertElement = $(alertHtml).appendTo(container);
+
+    // Tự động đóng sau 2 giây
+    setTimeout(function () {
+        alertElement.alert('close');
+    }, duration);
+}
+
+
 // ==================== DOCUMENT READY ====================
 $(document).ready(function () {
     // Load data khi trang vừa load
@@ -30,6 +53,18 @@ $(document).ready(function () {
     $('#checkAll').on('change', function () {
         $('tbody input[type="checkbox"]').prop('checked', this.checked);
     });
+
+    // ✅ LOGIC MỚI: Tự động đóng alert cho thông báo TempData (ID: AutoCloseAlert)
+    const TEMP_DATA_TIMEOUT = 2000; // 2 giây
+
+    var tempDataAlert = $('#AutoCloseAlert');
+
+    if (tempDataAlert.length) {
+        setTimeout(function () {
+            // Sử dụng hàm đóng alert của Bootstrap
+            tempDataAlert.alert('close');
+        }, TEMP_DATA_TIMEOUT);
+    }
 });
 
 // ==================== LOAD DATA FUNCTION ====================
@@ -37,13 +72,16 @@ function loadNhanviens() {
     const searchString = $('#searchInput').val();
     const trangThai = $('input[name="trangThai"]:checked').val();
 
+    // Xóa alert AJAX cũ trước khi gọi API mới
+    $('#apiAlertContainer').empty();
+
     // Show loading
     $('#loadingSpinner').show();
     $('#nhanvienTable').hide();
     $('#emptyState').hide();
 
     $.ajax({
-        url: '/Nhanviens/GetNhanviens', // ✅ Dùng URL tuyệt đối
+        url: '/Nhanviens/GetNhanviens',
         type: 'GET',
         data: {
             searchString: searchString,
@@ -53,11 +91,13 @@ function loadNhanviens() {
             if (response.success) {
                 renderTable(response.data);
             } else {
-                alert('Có lỗi xảy ra: ' + response.message);
+                // ✅ SỬA: Thay alert() bằng showAutoCloseAlert()
+                showAutoCloseAlert('Có lỗi xảy ra: ' + response.message, 'danger');
             }
         },
         error: function () {
-            alert('Không thể tải dữ liệu. Vui lòng thử lại!');
+            // ✅ SỬA: Thay alert() bằng showAutoCloseAlert()
+            showAutoCloseAlert('Không thể tải dữ liệu. Vui lòng thử lại!', 'danger');
         },
         complete: function () {
             $('#loadingSpinner').hide();

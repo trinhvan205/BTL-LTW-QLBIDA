@@ -13,11 +13,12 @@
 =========================== */
 .thungan-container {
     display: flex;
-    height: calc(100vh - 80px); /* ← GIẢM từ 100px xuống 80px */
+    height: 100%; /* ← ĐỔI: Chiếm 100% của main */
     gap: 12px;
     background: #47234E;
     padding: 12px;
     box-sizing: border-box;
+    overflow: hidden; /* ← THÊM */
 }
 
 /* BÊN TRÁI - 60% */
@@ -249,7 +250,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     background: #f9fafb;
-    height: 140px; /* ← TĂNG */
+    height: 130px; /* ← TĂNG */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1126,7 +1127,7 @@
     grid-template-columns: repeat(6, 1fr);
     gap: 10px;
     align-content: start;
-    grid-auto-rows: 140px; /* ← TĂNG lên 150px */
+    grid-auto-rows: 130px; /* ← TĂNG lên 150px */
     padding-bottom: 8px;
 }
 
@@ -1556,3 +1557,34 @@
     #modalThemKhachHang .btn-primary:hover {
         background: #82408E;
     }
+
+
+
+
+
+/* ===========================
+   MODAL XÁC NHẬN THANH TOÁN
+=========================== */
+#modalXacNhanThanhToan .modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+#modalXacNhanThanhToan .modal-header {
+    border-radius: 16px 16px 0 0;
+    padding: 16px 20px;
+}
+
+#modalXacNhanThanhToan .btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s;
+}
+
+#modalXacNhanThanhToan .btn-primary:hover {
+    background: #8a3d96 !important;
+    border-color: #8a3d96 !important;
+}
+
+
+/*cai địt content mẹ cay thật*/

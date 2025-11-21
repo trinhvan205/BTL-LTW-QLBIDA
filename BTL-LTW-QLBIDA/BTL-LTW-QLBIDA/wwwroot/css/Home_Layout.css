@@ -47,16 +47,134 @@ footer {
         footer a:hover {
             text-decoration: underline;
         }
+/* ==========================================
+   FOOTER STYLES (Đã chỉnh màu sáng hơn)
+   ========================================== */
 
+/* Import Font chữ viết tay cho Logo (nếu chưa có) */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+.footer-section {
+    background-color: #26272b; /* Giữ nguyên nền tối */
+    color: #e6e6e6; /* QUAN TRỌNG: Đổi màu chữ sang xám rất sáng (gần như trắng) */
+    padding: 60px 0;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+/* 1. Style cho Logo */
+.footer-logo {
+    font-family: 'Great Vibes', cursive;
+    color: #ffffff; /* Logo màu trắng tinh */
+    font-size: 3rem;
+    margin-bottom: 20px;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(255,255,255,0.1); /* Thêm chút bóng sáng nhẹ */
+}
+
+.footer-text {
+    margin-bottom: 20px;
+    max-width: 300px;
+    opacity: 0.9; /* Độ trong suốt nhẹ để dịu mắt nhưng vẫn rất rõ */
+}
+
+/* Link "Our Team" */
+.footer-link {
+    color: #ffffff; /* Đổi thành màu trắng */
+    text-decoration: none;
+    border-bottom: 1px dashed #ffffff; /* Đường kẻ màu trắng */
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+    .footer-link:hover {
+        color: var(--primary-color); /* Khi di chuột vào sẽ đổi màu chủ đạo */
+        border-bottom-color: var(--primary-color);
+    }
+
+/* 2. Style cho Heading */
+.footer-heading {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: bold; /* Tăng độ đậm để rõ hơn */
+    margin-bottom: 30px;
+    font-style: italic;
+    font-family: serif;
+    letter-spacing: 0.5px;
+}
+
+/* 3. Style cho danh sách liên hệ */
+.contact-info li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    color: #e6e6e6; /* Màu chữ sáng */
+}
+
+.contact-info i {
+    font-size: 16px;
+    margin-right: 15px;
+    margin-top: 5px;
+    width: 20px;
+    text-align: center;
+    color: #ffffff; /* Đổi icon thành màu trắng tinh cho nổi bật */
+}
+
+/* 4. Style cho Social Icons */
+.social-icons {
+    display: flex;
+    gap: 15px;
+}
+
+    .social-icons a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: #444444; /* Tăng độ sáng nền icon lên một chút (từ #333 lên #444) */
+        color: #ffffff; /* Icon bên trong màu trắng */
+        text-decoration: none;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+    }
+
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            transform: translateY(-3px); /* Hiệu ứng nảy lên nhẹ khi di chuột */
+        }
+
+/* Responsive */
+@media (max-width: 767px) {
+    .footer-section {
+        text-align: center;
+    }
+
+    .footer-text {
+        margin: 0 auto 20px auto;
+    }
+
+    .contact-info li {
+        justify-content: center;
+    }
+
+    .social-icons {
+        justify-content: center;
+    }
+}
 /* ==========================================
    NAVBAR STYLES
    ========================================== */
 .navbar {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 0.3rem 1rem; /* Giảm padding dọc */
-    min-height: 40px; /* Giới hạn chiều cao tối thiểu */
-    max-height: 50px;
+    padding: 0.5rem 1rem; /* Giảm padding dọc */
+    min-height: 50px; /* Giới hạn chiều cao tối thiểu */
+    height: auto;
+    position: relative;
+    z-index: 1030;
 }
 
 .navbar-brand {
@@ -101,7 +219,7 @@ footer {
     padding: 0.25rem 0.5rem !important; /* Override p-0 */
     display: flex !important;
     align-items: center !important;
-    height: 90%; /* Đảm bảo chiều cao đủ */
+    height: auto;
     align-self: center; /* Căn giữa theo chiều dọc */
     margin-top: auto; /* Căn giữa tự động */
     margin-bottom: auto; /* Căn giữa tự động */
@@ -194,6 +312,9 @@ align-items: center; /* Căn giữa tất cả nav items */
     margin-top: 0.3rem;
 }
 
+.nav-link, .navbar-brand, .user-info {
+    white-space: nowrap; /* Ngăn không cho chữ bị rớt dòng */
+}
 
 
 /* ==========================================
@@ -470,4 +591,78 @@ align-items: center; /* Căn giữa tất cả nav items */
         display: flex;
         align-items: center;
     }
+}
+
+
+/* Đảm bảo nút 3 gạch luôn bấm được (nằm trên cùng) */
+.navbar-toggler {
+    z-index: 1031;
+    position: relative;
+}
+/* --- BẮT ĐẦU CODE MỚI --- */
+
+/* Đảm bảo User Info không dính sát nút 3 gạch */
+.navbar-toggler {
+    margin-left: 0.5rem;
+    border: none; /* Loại bỏ viền nút 3 gạch cho thoáng */
+    padding-right: 0;
+}
+
+/* Chỉnh sửa dropdown menu của User để không bị tràn màn hình trên điện thoại */
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Khi ở trên mobile, chỉnh lại khoảng cách menu chính */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        margin-top: 10px; /* Tạo khoảng cách với hàng trên cùng */
+        background: rgba(0,0,0,0.1); /* Làm nền menu tối đi một chút để dễ nhìn */
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    /* Đảm bảo user info luôn nằm ngang */
+    .navbar-nav.flex-row .nav-link {
+        padding-right: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+}
+
+/* Tinh chỉnh User Info gọn gàng hơn */
+.user-info {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 8px 4px 4px; /* Padding mỏng */
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+    .user-info:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+/* --- KẾT THÚC CODE MỚI --- */
+/* ==========================================
+   SỬA LỖI PADDING MỤC QUẢN LÝ
+   ========================================== */
+
+/* 1. Ép tất cả các link (thường + dropdown) dùng chung 1 kiểu căn chỉnh */
+.navbar-nav .nav-link {
+    display: flex !important; /* Dùng Flexbox để icon và chữ luôn thẳng hàng */
+    align-items: center !important; /* Căn giữa theo chiều dọc */
+    padding: 0.5rem 0.8rem !important; /* CHỐT PADDING CỐ ĐỊNH CHO TẤT CẢ */
+    height: 100%; /* Đảm bảo chiều cao bằng nhau */
+}
+
+    /* 2. Xử lý riêng cho mục Quản lý (Dropdown) */
+    /* Bootstrap thường ép padding-right của dropdown khác đi, ta cần reset lại */
+    .navbar-nav .nav-link.dropdown-toggle {
+        padding-right: 0.8rem !important; /* Ép padding phải bằng với padding trái */
+        margin: 0 !important; /* Xóa mọi margin lạ nếu có */
+    }
+
+/* 3. Ẩn triệt để mũi tên tam giác của Bootstrap (nếu chưa ẩn) */
+.nav-link.dropdown-toggle::after {
+    display: none !important;
+    content: none !important;
 }

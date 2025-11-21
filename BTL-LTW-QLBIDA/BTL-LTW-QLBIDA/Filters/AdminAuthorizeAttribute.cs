@@ -15,22 +15,27 @@ namespace BTL_LTW_QLBIDA.Filters
             var tenDangNhap = session.GetString("TenDangNhap");
             var quyenAdmin = session.GetString("QuyenAdmin");
 
-            // Kiểm tra đăng nhập
+            // 1. Kiểm tra đăng nhập
             if (string.IsNullOrEmpty(tenDangNhap))
             {
                 context.Result = new RedirectToActionResult("Login", "Account", null);
                 return;
             }
 
-            // Kiểm tra quyền Admin
+            // 2. Kiểm tra quyền Admin
             if (quyenAdmin != "1")
             {
                 // Không có quyền Admin → Chuyển về trang Thu Ngân
-                var tempData = context.Controller as Controller;
-                if (tempData != null)
+
+                // ✅ Sửa lỗi cú pháp tại đây: Khai báo biến controller
+                var controller = context.Controller as Controller;
+
+                if (controller != null)
                 {
-                    tempData.TempData["ErrorMessage"] = "Bạn không có quyền truy cập trang này!";
+                    // ✅ Sửa lỗi cú pháp TempData: Dùng controller.TempData["Key"]
+                    controller.TempData["ErrorMessage"] = "Bạn không có quyền truy cập trang này!";
                 }
+
                 context.Result = new RedirectToActionResult("Index", "ThuNgan", null);
                 return;
             }
