@@ -1,0 +1,27 @@
+﻿@model BTL_LTW_QLBIDA.Models.Khachhang
+
+<div class="modal-header bg-warning text-dark">
+    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Cập nhật: @Model.Hoten</h5>
+    <button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <form id="editForm">
+        <input type="hidden" asp-for="Idkh" />
+        <div class="mb-3">
+            <label class="fw-bold">Họ và Tên <span class="text-danger">*</span></label>
+            <input asp-for="Hoten" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Số điện thoại</label>
+            <input asp-for="Sodt" class="form-control" maxlength="10" />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Địa chỉ</label>
+            <textarea asp-for="Dchi" class="form-control" rows="2"></textarea>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+    <button class="btn btn-warning" id="btnSaveEdit"><i class="bi bi-check-circle"></i> Lưu thay đổi</button>
+</div>

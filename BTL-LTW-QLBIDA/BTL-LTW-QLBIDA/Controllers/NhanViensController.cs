@@ -1,9 +1,10 @@
-﻿using System.Globalization;
-using BTL_LTW_QLBIDA.Filters;
+﻿using BTL_LTW_QLBIDA.Filters;
 using BTL_LTW_QLBIDA.Models;
-using BTL_LTW_QLBIDA.ViewModels;
+using BTL_LTW_QLBIDA.Models.ViewModels; // Nhớ using namespace chứa NhanVienScrollVm
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
@@ -17,513 +18,207 @@ namespace BTL_LTW_QLBIDA.Controllers
             _context = context;
         }
 
-        // GET: Nhanviens
-        // GET: Nhanviens
-        public async Task<IActionResult> Index(string searchString, string trangThai, string sortBy)
+        // 1. VIEW CHÍNH (CONTAINER)
+        public IActionResult Index()
         {
-            // Kiểm tra đăng nhập
-            if (HttpContext.Session.GetString("TenDangNhap") == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            // Kiểm tra quyền Admin
             if (HttpContext.Session.GetString("QuyenAdmin") != "1")
             {
                 TempData["ErrorMessage"] = "Bạn không có quyền truy cập trang này!";
                 return RedirectToAction("Index", "Home");
             }
+            return View();
+        }
 
-            // Truy vấn danh sách nhân viên
-            var nhanviens = from nv in _context.Nhanviens
-                            select nv;
+        // 2. LOAD TABLE (INFINITE SCROLL AJAX)
+        public async Task<IActionResult> LoadTable(string search, string trangthai, int page = 1)
+        {
+            int pageSize = 10; // Số dòng mỗi lần tải
+            var query = _context.Nhanviens.AsQueryable();
 
-            // Lọc theo trạng thái
-            if (!string.IsNullOrEmpty(trangThai))
+            // Filter Search
+            if (!string.IsNullOrEmpty(search))
             {
-                if (trangThai == "danglam")
-                {
-                    nhanviens = nhanviens.Where(nv => nv.Nghiviec == false);
-                }
-                else if (trangThai == "danghi")
-                {
-                    nhanviens = nhanviens.Where(nv => nv.Nghiviec == true);
-                }
+                query = query.Where(nv =>
+                    nv.Hotennv.Contains(search) ||
+                    nv.Idnv.Contains(search) ||
+                    nv.Sodt.Contains(search) ||
+                    nv.Cccd.Contains(search));
+            }
+
+            // Filter Trạng thái
+            if (!string.IsNullOrEmpty(trangthai))
+            {
+                if (trangthai == "false") // Đang làm (Nghiviec = false)
+                    query = query.Where(nv => nv.Nghiviec == false);
+                else if (trangthai == "true") // Đã nghỉ (Nghiviec = true)
+                    query = query.Where(nv => nv.Nghiviec == true);
             }
             else
             {
-                // Mặc định chỉ hiển thị nhân viên đang làm việc
-                nhanviens = nhanviens.Where(nv => nv.Nghiviec == false);
+                // Mặc định chỉ hiện đang làm nếu không chọn gì (tuỳ chọn)
+                // query = query.Where(nv => nv.Nghiviec == false);
             }
 
-            // Tìm kiếm theo tên, CCCD, SĐT
-            if (!string.IsNullOrEmpty(searchString))
+            // Sắp xếp (Sort logic cũ của bạn: Lấy phần số sau 'NV' để sort)
+            var listAll = await query.ToListAsync();
+            var sortedList = listAll.OrderBy(nv =>
             {
-                nhanviens = nhanviens.Where(nv =>
-                    nv.Hotennv!.Contains(searchString) ||
-                    nv.Cccd!.Contains(searchString) ||
-                    nv.Sodt!.Contains(searchString) ||
-                    nv.Tendangnhap!.Contains(searchString));
-            }
-
-            //// ✅ SẮP XẾP
-            //nhanviens = sortBy switch
-            //{
-            //    "id_desc" => nhanviens.OrderByDescending(nv => nv.Idnv),
-            //    "name_asc" => nhanviens.OrderBy(nv => nv.Hotennv),
-            //    "name_desc" => nhanviens.OrderByDescending(nv => nv.Hotennv),
-            //    _ => nhanviens.OrderBy(nv => nv.Idnv) // Mặc định: sắp xếp theo mã tăng dần
-            //};
-
-            // ✅ SẮP XẾP - Tải về bộ nhớ trước khi parse
-            var nhanvienList = await nhanviens.ToListAsync(); // Tải về memory trước
-
-            nhanvienList = sortBy switch
-            {
-                "id_desc" => nhanvienList.OrderByDescending(nv =>
-                    int.Parse(nv.Idnv.Substring(4))).ToList(),
-                "name_asc" => nhanvienList.OrderBy(nv => nv.Hotennv).ToList(),
-                "name_desc" => nhanvienList.OrderByDescending(nv => nv.Hotennv).ToList(),
-                _ => nhanvienList.OrderBy(nv =>
-                    int.Parse(nv.Idnv.Substring(4))).ToList() // Sắp xếp theo số
-            };
-
-            ViewBag.SearchString = searchString;
-            ViewBag.TrangThai = trangThai;
-            ViewBag.SortBy = sortBy;
-            ViewBag.TongNhanVien = nhanvienList.Count;
-
-            return View(nhanvienList);
-        }
-
-        // API: Lấy danh sách nhân viên với filter (dùng cho AJAX)
-        [HttpGet]
-        public async Task<IActionResult> GetNhanviens(string? searchString, string? trangThai)
-        {
-            if (HttpContext.Session.GetString("TenDangNhap") == null)
-            {
-                return Json(new { success = false, message = "Chưa đăng nhập" });
-            }
-
-            var nhanviens = _context.Nhanviens.AsQueryable();
-
-            // Lọc theo trạng thái
-            if (!string.IsNullOrEmpty(trangThai))
-            {
-                if (trangThai == "danglam")
+                if (nv.Idnv.Length > 2 && int.TryParse(nv.Idnv.Substring(2), out int idNum))
                 {
-                    nhanviens = nhanviens.Where(nv => nv.Nghiviec == false);
+                    return idNum; // NV001 -> 1
                 }
-                else if (trangThai == "danghi")
-                {
-                    nhanviens = nhanviens.Where(nv => nv.Nghiviec == true);
-                }
-            }
-            else
-            {
-                // Mặc định: chỉ hiển thị nhân viên đang làm
-                nhanviens = nhanviens.Where(nv => nv.Nghiviec == false);
-            }
+                return 999999;
+            }).ToList();
 
-            // Tìm kiếm
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                nhanviens = nhanviens.Where(nv =>
-                    nv.Idnv.Contains(searchString) ||
-                    nv.Hotennv!.Contains(searchString) ||
-                    nv.Cccd!.Contains(searchString) ||
-                    nv.Sodt!.Contains(searchString) ||
-                    nv.Tendangnhap!.Contains(searchString));
-            }
+            int total = sortedList.Count;
 
-            // Chỉ hiển thị nhân viên có HIENTHI = true
-            nhanviens = nhanviens.Where(nv => nv.Hienthi == true);
-
-            // Tải về memory trước khi sắp xếp
-            var nhanvienList = await nhanviens.ToListAsync();
-
-            // Sắp xếp theo số trong IDNV
-            nhanvienList = nhanvienList
-                .OrderBy(nv => int.Parse(nv.Idnv.Substring(4)))
+            var items = sortedList
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
 
-            var result = nhanvienList
-                .Select(nv => new
-                {
-                    idnv = nv.Idnv,
-                    hotennv = nv.Hotennv,
-                    gioitinh = nv.Gioitinh,
-                    sodt = nv.Sodt,
-                    cccd = nv.Cccd,
-                    tendangnhap = nv.Tendangnhap,
-                    quyenadmin = nv.Quyenadmin,
-                    nghiviec = nv.Nghiviec
-                })
-                .ToList();
+            bool hasMore = (page * pageSize) < total;
 
-            return Json(new { success = true, data = result });
-        }
-
-        // GET: Nhanviens/Details/5
-        public async Task<IActionResult> Details(string id)
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
+            return PartialView("_NhanVienRows", new NhanVienScrollVm
             {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var nhanvien = await _context.Nhanviens
-                .FirstOrDefaultAsync(m => m.Idnv == id);
-
-            if (nhanvien == null)
-            {
-                return NotFound();
-            }
-
-            return View(nhanvien);
-        }
-
-
-        // GET: Nhanviens/Create
-        public async Task<IActionResult> Create()
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            // Lấy tất cả mã NV và tìm số lớn nhất
-            var allNhanviens = await _context.Nhanviens
-                .Where(nv => nv.Idnv.StartsWith("NV"))
-                .Select(nv => nv.Idnv.Substring(2)) // Lấy phần sau "NV"
-                .ToListAsync();
-
-            int maxNumber = 0;
-
-            // Tìm số lớn nhất trong database
-            foreach (var numberStr in allNhanviens)
-            {
-                if (int.TryParse(numberStr, out int number) && number > maxNumber)
-                {
-                    maxNumber = number;
-                }
-            }
-
-            // Mã mới = số lớn nhất + 1
-            int newNumber = maxNumber + 1;
-
-            // Format: Luôn giữ NV00 + số tăng dần
-            string newIdnv = $"NV00{newNumber}";
-
-            var nhanvienvm = new NhanVienVM { Idnv = newIdnv };
-            return View(nhanvienvm);
-        }
-
-        //// POST: Nhanviens/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("Idnv,Hotennv,Ngaysinh,Gioitinh,Cccd,Sodt,Tendangnhap,Matkhau,Quyenadmin")] NhanVienVM nhanvienvm)
-        //{
-        //    if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-        //    {
-        //        return RedirectToAction("Index", "Home");
-        //    }
-
-        //    // Kiểm tra trùng IDNV
-        //    if (await _context.Nhanviens.AnyAsync(nv => nv.Idnv == nhanvienvm.Idnv))
-        //    {
-        //        ModelState.AddModelError("Idnv", "Mã nhân viên đã tồn tại!");
-        //    }
-
-        //    // Kiểm tra trùng CCCD
-        //    if (!string.IsNullOrEmpty(nhanvienvm.Cccd) &&
-        //        await _context.Nhanviens.AnyAsync(nv => nv.Cccd == nhanvienvm.Cccd))
-        //    {
-        //        ModelState.AddModelError("Cccd", "CCCD đã tồn tại!");
-        //    }
-
-        //    // Kiểm tra trùng Tên đăng nhập
-        //    if (!string.IsNullOrEmpty(nhanvienvm.Tendangnhap) &&
-        //        await _context.Nhanviens.AnyAsync(nv => nv.Tendangnhap == nhanvienvm.Tendangnhap))
-        //    {
-        //        ModelState.AddModelError("Tendangnhap", "Tên đăng nhập đã tồn tại!");
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        nhanvienvm.Hienthi = true;
-        //        nhanvienvm.Nghiviec = false;
-
-        //        // Nếu không nhập mật khẩu, để NULL
-        //        if (string.IsNullOrEmpty(nhanvienvm.Matkhau))
-        //        {
-        //            nhanvienvm.Matkhau = null;
-        //        }
-
-        //        _context.Add(nhanvienvm);
-        //        await _context.SaveChangesAsync();
-
-        //        TempData["SuccessMessage"] = "Thêm nhân viên thành công!";
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    return View(nhanvienvm);
-        //}
-
-        // POST: Nhanviens/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(NhanVienVM viewModel)
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            // Kiểm tra trùng IDNV
-            if (await _context.Nhanviens.AnyAsync(nv => nv.Idnv == viewModel.Idnv))
-            {
-                ModelState.AddModelError("Idnv", "Mã nhân viên đã tồn tại!");
-            }
-
-            // Kiểm tra trùng CCCD
-            if (!string.IsNullOrEmpty(viewModel.Cccd) &&
-                await _context.Nhanviens.AnyAsync(nv => nv.Cccd == viewModel.Cccd))
-            {
-                ModelState.AddModelError("Cccd", "CCCD đã tồn tại!");
-            }
-
-            // Kiểm tra trùng Tên đăng nhập
-            if (!string.IsNullOrEmpty(viewModel.Tendangnhap) &&
-                await _context.Nhanviens.AnyAsync(nv => nv.Tendangnhap == viewModel.Tendangnhap))
-            {
-                ModelState.AddModelError("Tendangnhap", "Tên đăng nhập đã tồn tại!");
-            }
-
-            if (ModelState.IsValid)
-            {
-                // ✅ CHUYỂN TỪ VIEWMODEL SANG MODEL
-                var nhanvien = new Nhanvien
-                {
-                    Idnv = viewModel.Idnv,
-                    Hotennv = viewModel.Hotennv,
-                    Ngaysinh = viewModel.Ngaysinh,
-                    Gioitinh = viewModel.Gioitinh ?? false, // Nếu null thì mặc định false (Nam)
-                    Cccd = viewModel.Cccd,
-                    Sodt = viewModel.Sodt,
-                    Tendangnhap = viewModel.Tendangnhap,
-                    Matkhau = string.IsNullOrEmpty(viewModel.Matkhau) ? null : viewModel.Matkhau,
-                    Quyenadmin = viewModel.Quyenadmin ?? false,
-                    Hienthi = true,
-                    Nghiviec = false
-                };
-
-                _context.Add(nhanvien);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Thêm nhân viên thành công!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(viewModel);
-        }
-
-        // GET: Nhanviens/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var nhanvien = await _context.Nhanviens.FindAsync(id);
-            if (nhanvien == null)
-            {
-                return NotFound();
-            }
-
-            return View(nhanvien);
-        }
-
-        // POST: Nhanviens/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Nhanvien nhanvien)
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (id != nhanvien.Idnv)
-            {
-                return NotFound();
-            }
-
-            // Kiểm tra trùng CCCD (trừ chính nó)
-            if (!string.IsNullOrEmpty(nhanvien.Cccd) &&
-                await _context.Nhanviens.AnyAsync(nv => nv.Cccd == nhanvien.Cccd && nv.Idnv != id))
-            {
-                ModelState.AddModelError("Cccd", "CCCD đã tồn tại!");
-            }
-
-            // Kiểm tra trùng Tên đăng nhập (trừ chính nó)
-            if (!string.IsNullOrEmpty(nhanvien.Tendangnhap) &&
-                await _context.Nhanviens.AnyAsync(nv => nv.Tendangnhap == nhanvien.Tendangnhap && nv.Idnv != id))
-            {
-                ModelState.AddModelError("Tendangnhap", "Tên đăng nhập đã tồn tại!");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // LẤY THÔNG TIN NHÂN VIÊN CŨ TỪ DATABASE
-                    var nhanvienCu = await _context.Nhanviens.FindAsync(id);
-
-                    if (nhanvienCu == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // CẬP NHẬT CÁC TRƯỜNG
-                    nhanvienCu.Hotennv = nhanvien.Hotennv;
-                    nhanvienCu.Ngaysinh = nhanvien.Ngaysinh;
-                    nhanvienCu.Gioitinh = nhanvien.Gioitinh;
-                    nhanvienCu.Cccd = nhanvien.Cccd;
-                    nhanvienCu.Sodt = nhanvien.Sodt;
-                    nhanvienCu.Tendangnhap = nhanvien.Tendangnhap;
-                    nhanvienCu.Quyenadmin = nhanvien.Quyenadmin;
-                    nhanvienCu.Hienthi = nhanvien.Hienthi;
-                    nhanvienCu.Nghiviec = nhanvien.Nghiviec;
-
-                    // NẾU KHÔNG NHẬP MẬT KHẨU MỚI, GIỮ NGUYÊN MẬT KHẨU CŨ
-                    if (!string.IsNullOrWhiteSpace(nhanvien.Matkhau))
-                    {
-                        nhanvienCu.Matkhau = nhanvien.Matkhau;
-                    }
-
-                    await _context.SaveChangesAsync();
-
-                    TempData["SuccessMessage"] = "Cập nhật nhân viên thành công!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NhanvienExists(nhanvien.Idnv))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(nhanvien);
-        }
-
-        // GET: Nhanviens/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var nhanvien = await _context.Nhanviens
-                .FirstOrDefaultAsync(m => m.Idnv == id);
-
-            if (nhanvien == null)
-            {
-                return NotFound();
-            }
-
-            // KIỂM TRA: Không cho xóa nếu nhân viên có tài khoản
-            if (!string.IsNullOrEmpty(nhanvien.Tendangnhap) || !string.IsNullOrEmpty(nhanvien.Matkhau))
-            {
-                TempData["ErrorMessage"] = "Không thể xóa nhân viên đã có tài khoản! Vui lòng chuyển sang trạng thái 'Nghỉ việc' thay vì xóa.";
-                return RedirectToAction("Details", new { id = id });
-            }
-
-            return View(nhanvien);
-        }
-
-        // POST: Nhanviens/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            var nhanvien = await _context.Nhanviens.FindAsync(id);
-            if (nhanvien != null)
-            {
-                // KIỂM TRA LẠI: Không cho xóa nếu nhân viên có tài khoản
-                if (!string.IsNullOrEmpty(nhanvien.Tendangnhap) || !string.IsNullOrEmpty(nhanvien.Matkhau))
-                {
-                    TempData["ErrorMessage"] = "Không thể xóa nhân viên đã có tài khoản! Vui lòng chuyển sang trạng thái 'Nghỉ việc' thay vì xóa.";
-                    return RedirectToAction("Details", new { id = id });
-                }
-
-                // ✅ XÓA CỨNG - Xóa hẳn khỏi database
-                _context.Nhanviens.Remove(nhanvien);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Xóa nhân viên thành công!";
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // POST: Đổi trạng thái nghỉ việc
-        [HttpPost]
-        public async Task<IActionResult> ToggleNghiViec(string id)
-        {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return Json(new { success = false, message = "Không có quyền!" });
-            }
-
-            var nhanvien = await _context.Nhanviens.FindAsync(id);
-            if (nhanvien == null)
-            {
-                return Json(new { success = false, message = "Không tìm thấy nhân viên!" });
-            }
-
-            nhanvien.Nghiviec = !nhanvien.Nghiviec;
-            await _context.SaveChangesAsync();
-
-            return Json(new
-            {
-                success = true,
-                message = nhanvien.Nghiviec ? "Đã chuyển sang nghỉ việc" : "Đã chuyển sang đang làm việc",
-                nghiviec = nhanvien.Nghiviec
+                Items = items,
+                HasMore = hasMore
             });
         }
 
-        private bool NhanvienExists(string id)
+        // 3. CREATE (MODAL)
+        // 3. CREATE (MODAL) - PHIÊN BẢN AN TOÀN
+        // GET: Nhanviens/CreatePartial
+        public async Task<IActionResult> CreatePartial()
         {
-            return _context.Nhanviens.Any(e => e.Idnv == id);
+            // BƯỚC 1: Lấy toàn bộ mã NV về trước (chỉ lấy cột ID để nhẹ)
+            // LƯU Ý: Không dùng .Substring() trong câu lệnh này để tránh lỗi 500
+            var allIdnvs = await _context.Nhanviens
+                .Where(nv => nv.Idnv.StartsWith("NV"))
+                .Select(nv => nv.Idnv)
+                .ToListAsync();
+
+            // BƯỚC 2: Xử lý tìm số lớn nhất trên RAM (C#)
+            int maxNumber = 0;
+            foreach (var id in allIdnvs)
+            {
+                // Kiểm tra độ dài > 2 (để tránh lỗi nếu có mã lạ như "NV")
+                if (id.Length > 2 && int.TryParse(id.Substring(2), out int number))
+                {
+                    if (number > maxNumber) maxNumber = number;
+                }
+            }
+
+            // BƯỚC 3: Tạo mã mới
+            // Dùng format D3 để luôn có 3 số: NV001, NV010, NV100...
+            string newIdnv = $"NV{maxNumber + 1:D3}";
+
+            // BƯỚC 4: Trả về Partial View
+            var nv = new Nhanvien { Idnv = newIdnv };
+            return PartialView("_CreateModal", nv);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAjax(Nhanvien model)
+        {
+            // Validation
+            if (await _context.Nhanviens.AnyAsync(n => n.Idnv == model.Idnv))
+                return Json(new { success = false, message = "Mã nhân viên đã tồn tại!" });
+
+            if (!string.IsNullOrEmpty(model.Cccd) && await _context.Nhanviens.AnyAsync(n => n.Cccd == model.Cccd))
+                return Json(new { success = false, message = "CCCD đã tồn tại!" });
+
+            if (!string.IsNullOrEmpty(model.Tendangnhap) && await _context.Nhanviens.AnyAsync(n => n.Tendangnhap == model.Tendangnhap))
+                return Json(new { success = false, message = "Tên đăng nhập đã tồn tại!" });
+
+            // Set default values
+            model.Hienthi = true;
+            model.Nghiviec = false;
+
+            if (string.IsNullOrEmpty(model.Matkhau)) model.Matkhau = null;
+            // Lưu ý: Nên mã hoá mật khẩu ở đây trước khi lưu (MD5/BCrypt)
+
+            _context.Add(model);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+        // 4. EDIT (MODAL)
+        public async Task<IActionResult> EditPartial(string id)
+        {
+            var nv = await _context.Nhanviens.FindAsync(id);
+            if (nv == null) return Content("<div class='p-3 text-danger'>Không tìm thấy nhân viên!</div>");
+            return PartialView("_EditModal", nv);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditAjax(Nhanvien model)
+        {
+            var nv = await _context.Nhanviens.FindAsync(model.Idnv);
+            if (nv == null) return Json(new { success = false, message = "Không tìm thấy nhân viên!" });
+
+            // Check trùng (trừ chính nó)
+            if (!string.IsNullOrEmpty(model.Cccd) && await _context.Nhanviens.AnyAsync(n => n.Cccd == model.Cccd && n.Idnv != model.Idnv))
+                return Json(new { success = false, message = "CCCD đã thuộc về người khác!" });
+
+            if (!string.IsNullOrEmpty(model.Tendangnhap) && await _context.Nhanviens.AnyAsync(n => n.Tendangnhap == model.Tendangnhap && n.Idnv != model.Idnv))
+                return Json(new { success = false, message = "Tên đăng nhập đã có người dùng!" });
+
+            // Cập nhật thông tin
+            nv.Hotennv = model.Hotennv;
+            nv.Ngaysinh = model.Ngaysinh;
+            nv.Gioitinh = model.Gioitinh;
+            nv.Sodt = model.Sodt;
+            nv.Cccd = model.Cccd;
+            nv.Quyenadmin = model.Quyenadmin;
+            nv.Tendangnhap = model.Tendangnhap;
+
+            // Logic mật khẩu: Nếu nhập mới thì đổi, không thì giữ nguyên
+            if (!string.IsNullOrEmpty(model.Matkhau))
+            {
+                nv.Matkhau = model.Matkhau; // Nên mã hoá
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        // 5. DETAILS (MODAL)
+        public async Task<IActionResult> DetailsPartial(string id)
+        {
+            var nv = await _context.Nhanviens.FindAsync(id);
+            if (nv == null) return Content("<div class='p-3 text-danger'>Không tìm thấy!</div>");
+            return PartialView("_DetailsModal", nv);
+        }
+
+        // 6. DELETE & TOGGLE
+        [HttpPost]
+        public async Task<IActionResult> DeleteAjax(string id)
+        {
+            var nv = await _context.Nhanviens.FindAsync(id);
+            if (nv == null) return Json(new { success = false, message = "Không tìm thấy!" });
+
+            // Logic an toàn: Không xoá người có tài khoản
+            if (!string.IsNullOrEmpty(nv.Tendangnhap) || !string.IsNullOrEmpty(nv.Matkhau))
+                return Json(new { success = false, message = "Không thể xóa nhân viên có tài khoản! Hãy chuyển sang 'Nghỉ việc'." });
+
+            _context.Nhanviens.Remove(nv);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatusAjax(string id)
+        {
+            var nv = await _context.Nhanviens.FindAsync(id);
+            if (nv != null)
+            {
+                nv.Nghiviec = !nv.Nghiviec; // Đảo trạng thái
+                await _context.SaveChangesAsync();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
         }
     }
 }

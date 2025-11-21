@@ -1,0 +1,46 @@
+﻿@model BTL_LTW_QLBIDA.Models.ViewModels.KhachHangScrollVm
+
+@foreach (var item in Model.Items)
+{
+    <tr>
+        <td class="fw-bold text-primary">@item.Idkh</td>
+        <td>
+            <div class="d-flex align-items-center">
+                <div class="avatar-circle bg-info text-white me-2">
+                    @(item.Hoten?.Substring(0, 1).ToUpper() ?? "K")
+                </div>
+                <span class="fw-semibold">@item.Hoten</span>
+            </div>
+        </td>
+        <td>@item.Sodt</td>
+        <td class="text-truncate" style="max-width: 150px;" title="@item.Dchi">
+            @(item.Dchi ?? "---")
+        </td>
+        <td class="text-end">
+            @if (item.Hoadons != null && item.Hoadons.Count > 0)
+            {
+                <span class="badge bg-primary rounded-pill">@item.Hoadons.Count</span>
+            }
+            else
+            {
+
+                <span class="text-muted">-</span>
+            }
+        </td>
+        <td class="text-end fw-bold text-success">
+            @(item.Hoadons?.Sum(h => h.Tongtien)?.ToString("N0") ?? "0")
+        </td>
+        <td class="text-center">
+            <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-info btn-details" data-id="@item.Idkh" title="Chi tiết"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-sm btn-outline-warning btn-edit" data-id="@item.Idkh" title="Sửa"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger btn-delete" data-id="@item.Idkh" title="Xóa"><i class="bi bi-trash"></i></button>
+            </div>
+        </td>
+    </tr>
+}
+
+@if (!Model.HasMore)
+{
+    <tr class="no-more"><td colspan="7" class="text-center text-muted py-3"><i class="bi bi-check2-circle"></i> Hết dữ liệu</td></tr>
+}

@@ -1,0 +1,26 @@
+﻿@model BTL_LTW_QLBIDA.Models.Ban
+
+<div class="modal-header bg-success text-white">
+    <h5 class="modal-title">Thêm Bàn Mới</h5>
+    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <form id="createForm">
+        <div class="mb-3">
+            <label class="fw-bold">Mã Bàn (Tự động)</label>
+            <input asp-for="Idban" class="form-control bg-light fw-bold text-primary" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Khu vực</label>
+            <select asp-for="Idkhu" class="form-select" asp-items="ViewBag.KhuVucs"></select>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Giá tiền (VNĐ/Giờ)</label>
+            <input asp-for="Giatien" class="form-control" type="number" step="1000" />
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+    <button class="btn btn-success" id="btnSaveCreate"><i class="bi bi-save"></i> Lưu Bàn</button>
+</div>

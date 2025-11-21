@@ -1,0 +1,70 @@
+﻿@model BTL_LTW_QLBIDA.Models.Khachhang
+
+<div class="modal-header bg-info text-white">
+    <h5 class="modal-title">Hồ sơ khách hàng: @Model.Hoten</h5>
+    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <div class="avatar-circle bg-primary text-white mx-auto mb-2" style="width:60px; height:60px; font-size:24px;">
+                        @(Model.Hoten?.Substring(0, 1).ToUpper())
+                    </div>
+                    <h5 class="fw-bold">@Model.Idkh</h5>
+                    <hr>
+                    <p class="text-start mb-1"><i class="bi bi-telephone me-2"></i> @(Model.Sodt ?? "---")</p>
+                    <p class="text-start mb-1"><i class="bi bi-geo-alt me-2"></i> @(Model.Dchi ?? "---")</p>
+                </div>
+            </div>
+            <div class="card bg-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span>Tổng HĐ:</span>
+                        <span class="fw-bold">@Model.Hoadons.Count</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span>Tổng chi:</span>
+                        <span class="fw-bold text-success">@(Model.Hoadons.Sum(h => h.Tongtien)?.ToString("N0") ?? "0")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <h6 class="fw-bold text-secondary border-bottom pb-2">Lịch sử giao dịch gần đây</h6>
+            <div style="max-height: 300px; overflow-y: auto;">
+                @if (Model.Hoadons.Any())
+                {
+                    <table class="table table-sm table-hover small">
+                        <thead>
+                            <tr>
+                                <th>Mã HĐ</th>
+                                <th>Ngày</th>
+                                <th class="text-end">Tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var hd in Model.Hoadons.OrderByDescending(h => h.Ngaylap).Take(10))
+                            {
+                                <tr>
+                                    <td>@hd.Idhd</td>
+                                    <td>@hd.Ngaylap?.ToString("dd/MM/yy")</td>
+                                    <td class="text-end">@hd.Tongtien?.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-center text-muted mt-4">Chưa có giao dịch nào</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+</div>

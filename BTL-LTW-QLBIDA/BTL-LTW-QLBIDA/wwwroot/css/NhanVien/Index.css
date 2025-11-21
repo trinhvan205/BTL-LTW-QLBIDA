@@ -1,113 +1,33 @@
-﻿/*
-.avatar-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.table th {
-    font-weight: 600;
-    font-size: 14px;
-    border-bottom: 2px solid #dee2e6;
-    white-space: nowrap;
-}
-
-.table td {
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-.table tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
-}
-
-.form-check-input:checked {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-#searchInput {
-    border-radius: 8px;
-}
-
-.form-check-label {
-    cursor: pointer;
-    font-size: 0.95rem;
-}
-
-*/
-/* ============================================================
-   🌈 GLOBAL – Tone tím giống hóa đơn
+﻿/* ============================================================
+   🌈 GLOBAL STYLE – Tone tím Dashboard
 ============================================================ */
 body {
     font-family: 'Inter', sans-serif !important;
-    background: #f3f4fd !important;
+    background: #f3f4fd;
     color: #2d3436;
 }
 
-/* ============================================================
-   🌈 TITLE BAR – Giống KiotViet
-============================================================ */
-h3 i {
-    color: #6a11cb !important;
-}
-
-#totalCount {
-    color: #6a11cb;
-    font-weight: 700;
+/* Card chung */
+.card {
+    border-radius: 18px;
+    border: none;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
 }
 
 /* ============================================================
-   🌈 SIDEBAR FILTER – Tím hoá đơn
-============================================================ */
-#searchInput,
-#dangLam,
-#daNghi {
-    border-radius: 8px !important;
-    border: 1px solid #d4c8ff !important;
-}
-
-    #searchInput:focus {
-        border-color: #6a11cb !important;
-        box-shadow: 0 0 0 3px rgba(106,17,203,0.2) !important;
-    }
-
-.form-check-input:checked {
-    background-color: #6a11cb !important;
-    border-color: #6a11cb !important;
-}
-
-#btnReset {
-    border-radius: 10px;
-    border: 1px solid #d7c6ff;
-    color: #6a11cb;
-}
-
-    #btnReset:hover {
-        background: #6a11cb !important;
-        color: #fff !important;
-    }
-
-/* ============================================================
-   🌈 TABLE – THIẾT KẾ NHƯ HÓA ĐƠN
+   🌈 BẢNG NHÂN VIÊN – (Adapt từ table hóa đơn)
 ============================================================ */
 
-#nhanvienTable {
+.table-nhanvien {
     border-collapse: separate !important;
-    border-spacing: 0 10px !important;
+    border-spacing: 0 10px !important; /* mỗi hàng là một card */
+    font-size: 0.9rem;
+    width: 100%;
 }
 
-    /* Header tím */
-    #nhanvienTable thead th {
+    /* HEADER */
+    .table-nhanvien thead th {
         background: #6a11cb !important;
         color: #fff !important;
         padding: 12px;
@@ -115,96 +35,290 @@ h3 i {
         font-size: 0.78rem;
         border: none !important;
         text-transform: uppercase;
-        letter-spacing: .05em;
+        letter-spacing: 0.05em;
     }
 
-    #nhanvienTable tbody tr {
+    /* Hàng dạng card */
+    .table-nhanvien tbody tr {
         background: #fff;
         border-radius: 14px;
-        box-shadow: 0 3px 12px rgba(118, 75, 162, .08);
+        box-shadow: 0 3px 12px rgba(118, 75, 162, 0.08);
         transition: 0.25s;
     }
 
-        #nhanvienTable tbody tr:hover {
-            transform: scale(1.01);
-            background: #f8f5ff;
-            box-shadow: 0 6px 18px rgba(118, 75, 162, .18);
+        .table-nhanvien tbody tr td:first-child {
+            border-top-left-radius: 14px;
+            border-bottom-left-radius: 14px;
         }
 
-    #nhanvienTable tbody td:first-child {
-        border-top-left-radius: 14px;
-        border-bottom-left-radius: 14px;
-    }
+        .table-nhanvien tbody tr td:last-child {
+            border-top-right-radius: 14px;
+            border-bottom-right-radius: 14px;
+        }
 
-    #nhanvienTable tbody td:last-child {
-        border-top-right-radius: 14px;
-        border-bottom-right-radius: 14px;
-    }
+        /* Hover */
+        .table-nhanvien tbody tr:hover {
+            transform: scale(1.01);
+            background: #f8f5ff !important;
+            box-shadow: 0 6px 18px rgba(118, 75, 162, 0.18);
+        }
 
-    #nhanvienTable td {
+    .table-nhanvien td {
         padding: 14px 16px !important;
+        color: #2d2d2d;
         vertical-align: middle;
     }
 
 /* ============================================================
-   🌈 AVATAR – kiểu hóa đơn
+   🌈 CÁC CỘT ĐẶC THÙ CỦA NHÂN VIÊN
 ============================================================ */
-.avatar-circle {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #e9ddff;
-    color: #6a11cb;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+/* Mã nhân viên - Tím đậm */
+.col-manv {
     font-weight: 700;
+    color: #6a11cb !important;
+    width: 100px;
+}
+
+/* Tên nhân viên */
+.col-hoten {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 180px;
+}
+
+/* Tài khoản */
+.col-taikhoan {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* Cột thao tác */
+.col-thaotac {
+    min-width: 160px;
+    white-space: nowrap;
+}
+
+/* Avatar tròn (Thêm mới cho đẹp) */
+.avatar-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Gradient tím xanh */
+    box-shadow: 0 3px 6px rgba(106, 17, 203, 0.2);
+    margin-right: 10px;
 }
 
 /* ============================================================
-   🌈 BADGE – Trạng thái nhân viên
+   🌈 BADGES & STATUS
 ============================================================ */
-.badge-status {
-    padding: 6px 14px;
+.badge {
+    padding: 6px 12px;
     border-radius: 18px;
-    color: #fff !important;
     font-weight: 700;
     font-size: 0.75rem;
 }
 
-.badge-active {
-    background: #1abc9c !important; /* đang làm */
+/* Đang làm - Xanh lá */
+.badge-success {
+    background: #1abc9c !important;
+    color: #fff !important;
 }
 
-.badge-off {
-    background: #d35400 !important; /* đã nghỉ */
+/* Nghỉ việc - Xám */
+.badge-secondary {
+    background: #95a5a6 !important;
+    color: #fff !important;
 }
+
+/* Admin - Đỏ cam */
+.badge-danger {
+    background: #e74c3c !important;
+    color: #fff !important;
+}
+
+/* Giới tính */
+.gender-male {
+    color: #3498db;
+    font-weight: 600;
+}
+/* Xanh dương */
+
+.gender-female {
+    color: #e91e63;
+    font-weight: 600;
+}
+/* Hồng */
 
 /* ============================================================
-   🌈 ACTION BUTTON – Giống hóa đơn
+   🌈 ACTION BUTTONS
 ============================================================ */
-.action-btn {
+.action-btn, .btn-sm {
     border-radius: 10px !important;
-    padding: 6px 8px !important;
+    padding: 6px 10px !important;
     background: #f3f0fd;
     border: 1px solid #d7c6ff;
     margin: 0 2px;
     transition: 0.2s;
 }
 
-    .action-btn:hover {
+    .action-btn:hover, .btn-sm:hover {
         transform: translateY(-3px);
         background: #ece3ff;
+        box-shadow: 0 4px 8px rgba(118, 75, 162, 0.15);
     }
 
-.action-view i {
+/* Icon màu */
+.btn-details i {
     color: #3b82f6;
 }
+/* Xanh */
+.btn-edit i {
+    color: #f39c12;
+}
+/* Vàng */
+.btn-delete i {
+    color: #e74c3c;
+}
+/* Đỏ */
+.btn-toggle i {
+    color: #8e44ad;
+}
+/* Tím */
 
-.action-edit i {
-    color: #eab308;
+/* ============================================================
+   🌈 LOADING & NO MORE
+============================================================ */
+#loadingRow td {
+    background: #f6efff !important;
+    color: #6a11cb;
+    font-weight: 600;
 }
 
-.action-delete i {
-    color: #dc2626;
+.no-more td {
+    background: #fff !important;
+    padding: 16px;
+    color: #777;
 }
+
+/* ============================================================
+   🌈 SCROLLBAR
+============================================================ */
+#tableScrollArea::-webkit-scrollbar {
+    width: 6px;
+}
+
+#tableScrollArea::-webkit-scrollbar-thumb {
+    background: #a18cd1;
+    border-radius: 10px;
+}
+
+    #tableScrollArea::-webkit-scrollbar-thumb:hover {
+        background: #764ba2;
+    }
+
+/* ============================================================
+   🌈 CARD FILTER
+============================================================ */
+#filterForm label.form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #6a11cb;
+}
+
+#filterForm input,
+#filterForm select {
+    border-radius: 8px;
+    border: 1px solid #d4c8ff;
+    transition: 0.2s;
+}
+
+    #filterForm input:focus,
+    #filterForm select:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 3px rgba(106,17,203,0.2);
+    }
+
+/* Nút LỌC & THÊM MỚI (Tím chủ đạo) */
+#filterForm .btn.btn-primary,
+#btnCreate {
+    background-color: #6a11cb !important;
+    border-color: #6a11cb !important;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(106,17,203,0.25);
+    transition: 0.2s;
+    color: #fff;
+}
+
+    #filterForm .btn.btn-primary:hover,
+    #btnCreate:hover {
+        background-color: #5a0fb0 !important;
+        border-color: #5a0fb0 !important;
+        transform: translateY(-2px);
+    }
+
+/* Nút XÓA LỌC – cam */
+#btnClearFilter {
+    border-radius: 8px !important;
+    border: 1px solid #f7971e !important;
+    color: #f7971e !important;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+    #btnClearFilter:hover {
+        background-color: #f7971e !important;
+        color: #fff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(247,151,30,0.35);
+    }
+
+/* ============================================================
+   🌈 LAYOUT FIXES (Đã đổi tên class sang nhanvien-*)
+============================================================ */
+
+/* Bọc cả layout */
+.nhanvien-row {
+    margin-top: 20px;
+}
+
+/* Filter và Content thẳng hàng */
+.nhanvien-filter {
+    padding-right: 12px !important;
+}
+
+.nhanvien-content {
+    padding-left: 12px !important;
+}
+
+/* ============================================================
+   🌈 TITLE BAR
+============================================================ */
+.page-title-bar {
+    background: #f8f9fb;
+    padding: 18px 22px;
+    border-bottom: 2px solid #e4e7ed;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+    .page-title-bar h4 {
+        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+    }
+
+    .page-title-bar i {
+        font-size: 1.4rem;
+        color: #6a11cb; /* Icon màu tím */
+    }

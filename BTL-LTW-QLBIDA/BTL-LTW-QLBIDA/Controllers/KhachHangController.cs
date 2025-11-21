@@ -1,9 +1,10 @@
 ﻿using BTL_LTW_QLBIDA.Filters;
 using BTL_LTW_QLBIDA.Models;
-using BTL_LTW_QLBIDA.ViewModels;
+using BTL_LTW_QLBIDA.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
@@ -17,311 +18,157 @@ namespace BTL_LTW_QLBIDA.Controllers
             _context = context;
         }
 
-        // GET: Khachhangs
+        // 1. VIEW CHÍNH (CONTAINER)
         public IActionResult Index()
         {
-            if (HttpContext.Session.GetString("TenDangNhap") == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
             if (HttpContext.Session.GetString("QuyenAdmin") != "1")
             {
                 TempData["ErrorMessage"] = "Bạn không có quyền truy cập!";
                 return RedirectToAction("Index", "Home");
             }
-
             return View();
         }
 
-        // API: Lấy danh sách khách hàng với filter
-        [HttpGet]
-        public async Task<IActionResult> GetKhachhangs(string? searchString, string? sortBy)
+        // 2. LOAD TABLE (INFINITE SCROLL)
+        public async Task<IActionResult> LoadTable(string search, string sortBy, int page = 1)
         {
-            if (HttpContext.Session.GetString("TenDangNhap") == null)
-            {
-                return Json(new { success = false, message = "Chưa đăng nhập" });
-            }
-
-            var khachhangs = _context.Khachhangs
-                .Include(kh => kh.Hoadons)   // FIX 1: Include để tránh null
+            int pageSize = 10;
+            var query = _context.Khachhangs
+                .Include(k => k.Hoadons) // Include để đếm số hóa đơn và tổng tiền
                 .AsQueryable();
-            //var khachhangs = _context.Khachhangs.AsQueryable();
 
             // Tìm kiếm
-            if (!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(search))
             {
-                khachhangs = khachhangs.Where(kh =>
-                    kh.Idkh.Contains(searchString) ||
-                    kh.Hoten!.Contains(searchString) ||
-                    kh.Sodt!.Contains(searchString));
+                query = query.Where(kh =>
+                    kh.Hoten.Contains(search) ||
+                    kh.Idkh.Contains(search) ||
+                    kh.Sodt.Contains(search));
             }
 
-            // ✅ TẢI VỀ MEMORY TRƯỚC KHI SẮP XẾP
-            var khachhangList = await khachhangs.ToListAsync();
+            // Tải về memory để sắp xếp an toàn
+            var listAll = await query.ToListAsync();
 
-            // ✅ SẮP XẾP THEO YÊU CẦU
-            khachhangList = sortBy switch
+            // Sắp xếp
+            listAll = sortBy switch
             {
-                "id_asc" => khachhangList.OrderBy(kh => int.Parse(kh.Idkh.Substring(4))).ToList(),
-                "id_desc" => khachhangList.OrderByDescending(kh => int.Parse(kh.Idkh.Substring(4))).ToList(),
-                "name_asc" => khachhangList.OrderBy(kh => kh.Hoten).ToList(),
-                "name_desc" => khachhangList.OrderByDescending(kh => kh.Hoten).ToList(),
-                _ => khachhangList.OrderBy(kh => int.Parse(kh.Idkh.Substring(4))).ToList() // ✅ Mặc định: theo mã KH tăng dần
+                "id_desc" => listAll.OrderByDescending(kh => ParseId(kh.Idkh)).ToList(),
+                "name_asc" => listAll.OrderBy(kh => kh.Hoten).ToList(),
+                "name_desc" => listAll.OrderByDescending(kh => kh.Hoten).ToList(),
+                _ => listAll.OrderBy(kh => ParseId(kh.Idkh)).ToList() // Mặc định: id_asc
             };
 
-            var result = khachhangList
-                .Select(kh => new
-                {
-                    idkh = kh.Idkh,
-                    hoten = kh.Hoten,
-                    sodt = kh.Sodt,
-                    dchi = kh.Dchi,
-                    tongHoaDon = kh.Hoadons.Count,
-                    tongTien = kh.Hoadons.Sum(hd => hd.Tongtien) ?? 0
-                })
-                .ToList();
+            int total = listAll.Count;
+            var items = listAll.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            bool hasMore = (page * pageSize) < total;
 
-            return Json(new { success = true, data = result });
+            return PartialView("_KhachHangRows", new KhachHangScrollVm
+            {
+                Items = items,
+                HasMore = hasMore
+            });
         }
 
-        // GET: Khachhangs/Details/5
-        public async Task<IActionResult> Details(string id)
+        // Hàm phụ trợ để parse ID (KH001 -> 1)
+        private int ParseId(string id)
         {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var khachhang = await _context.Khachhangs
-                .Include(kh => kh.Hoadons)
-                .FirstOrDefaultAsync(m => m.Idkh == id);
-
-            if (khachhang == null)
-            {
-                return NotFound();
-            }
-
-            return View(khachhang);
+            if (id.Length > 2 && int.TryParse(id.Substring(2), out int n)) return n;
+            return 999999;
         }
 
-        // GET: Khachhangs/Create
-        public async Task<IActionResult> Create()
+        // 3. CREATE (MODAL) - Logic an toàn
+        public async Task<IActionResult> CreatePartial()
         {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            // Lấy tất cả mã KH và tìm số lớn nhất
-            var allKhachhangs = await _context.Khachhangs
-                .Where(kh => kh.Idkh.StartsWith("KH"))
-                .Select(kh => kh.Idkh.Substring(2)) // Lấy phần số (bỏ "KH")
+            // Lấy list ID chỉ để sinh mã
+            var allIds = await _context.Khachhangs
+                .Where(k => k.Idkh.StartsWith("KH"))
+                .Select(k => k.Idkh)
                 .ToListAsync();
 
-            int maxNumber = 0;
-
-            // Tìm số lớn nhất trong database
-            foreach (var numberStr in allKhachhangs)
+            int max = 0;
+            foreach (var id in allIds)
             {
-                if (int.TryParse(numberStr, out int number) && number > maxNumber)
+                if (id.Length > 2 && int.TryParse(id.Substring(2), out int n))
                 {
-                    maxNumber = number;
+                    if (n > max) max = n;
                 }
             }
 
-            // Mã mới = số lớn nhất + 1
-            int newNumber = maxNumber + 1;
-
-            // Format: Luôn giữ KH00 + số tăng dần
-            string newIdkh = $"KH00{newNumber}";
-
-            var khachhangvm = new KhachHangVM { Idkh = newIdkh };
-            return View(khachhangvm);
+            string newId = $"KH{max + 1:D3}"; // KH001, KH010...
+            var kh = new Khachhang { Idkh = newId };
+            return PartialView("_CreateModal", kh);
         }
 
-        // POST: Khachhangs/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(KhachHangVM khachhangvm)
+        public async Task<IActionResult> CreateAjax(Khachhang model)
         {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            if (await _context.Khachhangs.AnyAsync(k => k.Idkh == model.Idkh))
+                return Json(new { success = false, message = "Mã khách hàng đã tồn tại!" });
 
-            // Kiểm tra trùng mã
-            if (await _context.Khachhangs.AnyAsync(kh => kh.Idkh == khachhangvm.Idkh))
-            {
-                ModelState.AddModelError("Idkh", "Mã khách hàng đã tồn tại!");
-            }
+            if (!string.IsNullOrEmpty(model.Sodt) && await _context.Khachhangs.AnyAsync(k => k.Sodt == model.Sodt))
+                return Json(new { success = false, message = "Số điện thoại đã tồn tại!" });
 
-            // Kiểm tra trùng SĐT
-            if (!string.IsNullOrEmpty(khachhangvm.Sodt) &&
-                await _context.Khachhangs.AnyAsync(kh => kh.Sodt == khachhangvm.Sodt))
-            {
-                ModelState.AddModelError("Sodt", "Số điện thoại đã tồn tại!");
-            }
-
-            if (ModelState.IsValid)
-            {
-                _context.Add(khachhangvm);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Thêm khách hàng thành công!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(khachhangvm);
+            _context.Add(model);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
         }
 
-        // GET: Khachhangs/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        // 4. EDIT (MODAL)
+        public async Task<IActionResult> EditPartial(string id)
         {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var khachhang = await _context.Khachhangs.FindAsync(id);
-            if (khachhang == null)
-            {
-                return NotFound();
-            }
-
-            return View(khachhang);
+            var kh = await _context.Khachhangs.FindAsync(id);
+            if (kh == null) return Content("<div class='p-3 text-danger'>Không tìm thấy!</div>");
+            return PartialView("_EditModal", kh);
         }
 
-        // POST: Khachhangs/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Khachhang khachhang)
+        public async Task<IActionResult> EditAjax(Khachhang model)
         {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
+            var kh = await _context.Khachhangs.FindAsync(model.Idkh);
+            if (kh == null) return Json(new { success = false, message = "Không tìm thấy!" });
+
+            // Check trùng SĐT (trừ chính nó)
+            if (!string.IsNullOrEmpty(model.Sodt) &&
+                await _context.Khachhangs.AnyAsync(k => k.Sodt == model.Sodt && k.Idkh != model.Idkh))
             {
-                return RedirectToAction("Index", "Home");
+                return Json(new { success = false, message = "Số điện thoại đã thuộc về người khác!" });
             }
 
-            if (id != khachhang.Idkh)
-            {
-                return NotFound();
-            }
+            kh.Hoten = model.Hoten;
+            kh.Sodt = model.Sodt;
+            kh.Dchi = model.Dchi;
 
-            // Kiểm tra trùng SĐT (trừ chính nó)
-            if (!string.IsNullOrEmpty(khachhang.Sodt) &&
-                await _context.Khachhangs.AnyAsync(kh => kh.Sodt == khachhang.Sodt && kh.Idkh != id))
-            {
-                ModelState.AddModelError("Sodt", "Số điện thoại đã tồn tại!");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var khachhangCu = await _context.Khachhangs.FindAsync(id);
-                    if (khachhangCu == null)
-                    {
-                        return NotFound();
-                    }
-
-                    khachhangCu.Hoten = khachhang.Hoten;
-                    khachhangCu.Sodt = khachhang.Sodt;
-                    khachhangCu.Dchi = khachhang.Dchi;
-
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Cập nhật khách hàng thành công!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!KhachhangExists(khachhang.Idkh))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(khachhang);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
         }
 
-        // GET: Khachhangs/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        // 5. DETAILS (MODAL)
+        public async Task<IActionResult> DetailsPartial(string id)
         {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            var kh = await _context.Khachhangs
+                .Include(k => k.Hoadons) // Lấy lịch sử hóa đơn
+                .FirstOrDefaultAsync(k => k.Idkh == id);
 
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var khachhang = await _context.Khachhangs
-                .Include(kh => kh.Hoadons)
-                .FirstOrDefaultAsync(m => m.Idkh == id);
-
-            if (khachhang == null)
-            {
-                return NotFound();
-            }
-
-            // Kiểm tra có hóa đơn không
-            if (khachhang.Hoadons.Any())
-            {
-                TempData["ErrorMessage"] = "Không thể xóa khách hàng đã có hóa đơn!";
-                return RedirectToAction("Details", new { id = id });
-            }
-
-            return View(khachhang);
+            if (kh == null) return Content("<div class='p-3 text-danger'>Không tìm thấy!</div>");
+            return PartialView("_DetailsModal", kh);
         }
 
-        // POST: Khachhangs/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        // 6. DELETE
+        [HttpPost]
+        public async Task<IActionResult> DeleteAjax(string id)
         {
-            if (HttpContext.Session.GetString("QuyenAdmin") != "1")
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            var kh = await _context.Khachhangs
+                .Include(k => k.Hoadons)
+                .FirstOrDefaultAsync(k => k.Idkh == id);
 
-            var khachhang = await _context.Khachhangs
-                .Include(kh => kh.Hoadons)
-                .FirstOrDefaultAsync(kh => kh.Idkh == id);
+            if (kh == null) return Json(new { success = false, message = "Không tìm thấy!" });
 
-            if (khachhang != null)
-            {
-                if (khachhang.Hoadons.Any())
-                {
-                    TempData["ErrorMessage"] = "Không thể xóa khách hàng đã có hóa đơn!";
-                    return RedirectToAction("Details", new { id = id });
-                }
+            if (kh.Hoadons.Any())
+                return Json(new { success = false, message = $"Khách này đã có {kh.Hoadons.Count} hóa đơn, không thể xóa!" });
 
-                _context.Khachhangs.Remove(khachhang);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa khách hàng thành công!";
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool KhachhangExists(string id)
-        {
-            return _context.Khachhangs.Any(e => e.Idkh == id);
+            _context.Khachhangs.Remove(kh);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
         }
     }
 }

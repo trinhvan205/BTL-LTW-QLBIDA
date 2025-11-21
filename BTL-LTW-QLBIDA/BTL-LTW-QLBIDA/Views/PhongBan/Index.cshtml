@@ -1,320 +1,45 @@
-﻿@model BTL_LTW_QLBIDA.Models.PhongBanIndexViewModel
-@{
-    ViewData["Title"] = "Quản lý Bàn";
+﻿@{
+    ViewData["Title"] = "Quản lý Bàn & Khu vực";
 }
 
-<link rel="stylesheet" href="~/css/Ban.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="~/css/ban.css" />
 
-<div class="row">
-
-    <div class="col-md-3 filter-sidebar-col">
-
-        <div class="card mb-3 sidebar-filter-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="card-title fw-bold mb-0"><i class="bi bi-geo-alt-fill me-1"></i> Khu vực</h6>
-                <div>
-                    <button type="button" class="btn btn-sm" id="btnAddKhuVuc" title="Thêm khu vực">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm" id="btnEditKhuVuc" title="Sửa khu vực">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <select id="khuVucSelect" asp-for="SelectedKhuVuc" asp-items="Model.KhuVucs" class="form-select">
-                    <option value="">-- Tất cả --</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="card mb-3 sidebar-filter-card">
-            <div class="card-header">
-                <h6 class="card-title fw-bold mb-0"><i class="bi bi-search me-1"></i> Tìm kiếm</h6>
-            </div>
-            <div class="card-body">
-                <input type="text" id="searchString" asp-for="SearchString" class="form-control" placeholder="Theo mã bàn">
-            </div>
-        </div>
-
-        <div class="card mb-3 sidebar-filter-card">
-            <a href="#collapseTrangThai" class="text-decoration-none text-dark" data-bs-toggle="collapse" aria-expanded="true" aria-controls="collapseTrangThai">
-                <div class="card-header d-flex justify-content-between align-items-center" style="cursor: pointer;">
-                    <h6 class="card-title fw-bold mb-0"><i class="bi bi-toggle-on me-1"></i> Trạng thái</h6>
-                    <i class="bi bi-chevron-up collapse-arrow"></i>
-                </div>
-            </a>
-
-            <div class="collapse show" id="collapseTrangThai">
-                <div class="card-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" asp-for="SelectedTrangThai" value="true" id="radioHoatDong">
-                        <label class="form-check-label" for="radioHoatDong">Đang hoạt động</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" asp-for="SelectedTrangThai" value="false" id="radioNgung">
-                        <label class="form-check-label" for="radioNgung">Trống </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" asp-for="SelectedTrangThai" value="" id="radioTatCa">
-                        <label class="form-check-label" for="radioTatCa">Tất cả</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mb-3 px-2">
-            <span class="fw-bold">Số bản ghi:</span>
-
-            <div class="dropdown">
-                <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="pageSizeButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    @Model.PagedBans.PageSize
-                </button>
-
-                <ul class="dropdown-menu" aria-labelledby="pageSizeButton" id="pageSizeMenu">
-                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 10 ? "active" : "")" href="#" data-value="10">10 @(Model.PagedBans.PageSize == 10 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
-                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 15 ? "active" : "")" href="#" data-value="15">15 @(Model.PagedBans.PageSize == 15 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
-                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 20 ? "active" : "")" href="#" data-value="20">20 @(Model.PagedBans.PageSize == 20 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
-                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 30 ? "active" : "")" href="#" data-value="30">30 @(Model.PagedBans.PageSize == 30 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
-                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 50 ? "active" : "")" href="#" data-value="50">50 @(Model.PagedBans.PageSize == 50 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
-                </ul>
-            </div>
-        </div>
-
+<div class="row ban-row">
+    <div class="col-md-3 mb-3 ban-filter">
+        <partial name="_Filter" />
     </div>
 
-    <div class="col-md-9 pt-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3>Bàn</h3>
-            <div>
-                <button type="button" class="btn btn-custom-add"
-                        data-bs-toggle="modal"
-                        data-bs-target="#phongBanModal"
-                        id="btnShowCreateModal">
-                    <i class="bi bi-plus-circle me-2"></i> Thêm bàn
-                </button>
-            </div>
+    <div class="col-md-9 ban-content">
+        <div class="page-title-bar mb-3 d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold text-secondary m-0">Danh sách Bàn Bida</h4>
         </div>
 
-        <div id="tableContainer">
-            @await Html.PartialAsync("_BanTablePartial", Model.PagedBans)
+        <div id="tableScrollArea" class="table-responsive shadow-sm border rounded bg-white" style="max-height: 700px; overflow-y: auto;">
+            <table class="table-ban align-middle mb-0">
+                <thead class="sticky-top" style="z-index: 2;">
+                    <tr>
+                        <th class="col-maban">Mã Bàn</th>
+                        <th>Khu vực</th>
+                        <th class="text-end">Giá tiền/h</th>
+                        <th class="text-center">Trạng thái</th>
+                        <th class="text-center col-thaotac">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="banBody">
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="phongBanModal" tabindex="-1" aria-labelledby="phongBanModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-           
-            <div class="modal-header">
-                <h5 class="modal-title" id="phongBanModalLabel">Thêm bàn</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-           
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i> Bỏ qua
-                </button>
-                <button type="button" class="btn btn-success" id="btnLuu">
-                    <i class="bi bi-save me-1"></i> Lưu
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="khuVucModal" tabindex="-1" aria-labelledby="khuVucModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="khuVucModalLabel">Thêm khu vực</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formThemKhuVuc" method="post">
-                    @Html.AntiForgeryToken()
-
-                    <div class="mb-3">
-                        <label for="inputTenKhuVuc" class="form-label">Tên khu vực <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="inputTenKhuVuc" name="tenKhuVuc" required>
-                        <div class="invalid-feedback" id="khuVucError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="inputGhiChu" class="form-label">Ghi chú</label>
-                        <textarea class="form-control" id="inputGhiChu" name="ghiChu" rows="3"></textarea>
-                    </div>
-                </form>
-            </div>
-          
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i> Bỏ qua
-                </button>
-                <button type="button" class="btn btn-primary" id="btnLuuKhuVuc">
-                    <i class="bi bi-save me-1"></i> Lưu
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editKhuVucModal" tabindex="-1" aria-labelledby="editKhuVucModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editKhuVucModalLabel">Sửa khu vực bàn</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formSuaKhuVuc" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" id="editIdKhu" name="editIdKhu" />
-
-                    <div class="mb-3">
-                        <label for="editTenKhuVuc" class="form-label">Tên khu vực <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="editTenKhuVuc" name="editTenKhuVuc" required>
-                        <div class="invalid-feedback" id="editKhuVucError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editGhiChu" class="form-label">Ghi chú</label>
-                        <textarea class="form-control" id="editGhiChu" name="editGhiChu" rows="3"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-danger" id="btnXoaKhuVuc">
-                    <i class="bi bi-trash me-1"></i> Xóa
-                </button>
-
-                <div>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i> Bỏ qua
-                    </button>
-                    <button type="button" class="btn btn-primary" id="btnLuuKhuVucMoi">
-                        <i class="bi bi-save me-1"></i> Lưu
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="deleteKhuVucModal" tabindex="-1" aria-labelledby="deleteKhuVucModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-header" style="border-bottom: none;">
-                <h5 class="modal-title" id="deleteKhuVucModalLabel">Xóa khu vực</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p id="deleteModalMessage"></p>
-                <small class="text-muted">Bạn có chắc chắn muốn tiếp tục thao tác xóa này không?</small>
-            </div>
-            <div class="modal-footer" style="border-top: none;">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
-                <button type="button" class="btn btn-danger" id="btnConfirmDeleteKhuVuc">Đồng ý</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editBanModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Sửa thông tin bàn</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formSuaBan">
-                    @Html.AntiForgeryToken()
-                    <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label fw-bold">Mã bàn<span class="text-danger">*</span></label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control bg-light" id="editIdBan" name="Idban" readonly>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label fw-bold">Khu vực</label>
-                        <div class="col-sm-8">
-                            <select class="form-select" id="editIdKhuBan" name="Idkhu" asp-items="Model.KhuVucs"></select>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label fw-bold">Giá tiền/giờ</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="editGiaTien" name="Giatien"
-                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '');" />
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-top-0">
-                <button type="button" class="btn btn-success" id="btnLuuSuaBan"><i class="bi bi-save"></i> Lưu</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Bỏ qua</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="deleteBanModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Xóa bàn</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn xóa bàn <strong id="deleteBanName"></strong>?</p>
-            </div>
-            <div class="modal-footer border-top-0">
-                <button type="button" class="btn btn-danger" id="btnConfirmDeleteBan"><i class="bi bi-trash"></i> Đồng ý</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Bỏ qua</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-    <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body d-flex align-items-center">
-                <i id="toastIcon" class="bi me-2 fs-5"></i> <span id="toastMessage"></span>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
+<div class="modal fade" id="ajaxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" id="ajaxModalContent"></div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <script>
-        var Urls = {
-            FilterBan: '@Url.Action("FilterBan", "PhongBan")',
-            CreateBan: '@Url.Action("Create", "PhongBan")',
-            CreateKhuVuc: '@Url.Action("CreateKhuVuc", "PhongBan")',
-            GetBanForEdit: '@Url.Action("GetBanForEdit", "PhongBan")',
-            UpdateBan: '@Url.Action("UpdateBan", "PhongBan")',
-            DeleteBan: '@Url.Action("DeleteBan", "PhongBan")',
-            ToggleStatusBan: '@Url.Action("ToggleStatusBan", "PhongBan")',
-            GetKhuVucDetails: '@Url.Action("GetKhuVucDetails", "PhongBan")',
-            UpdateKhuVuc: '@Url.Action("UpdateKhuVuc", "PhongBan")',
-            DeleteKhuVuc: '@Url.Action("DeleteKhuVuc", "PhongBan")',
-            GetBanDetail: '@Url.Action("GetBanDetail", "PhongBan")'
-        };
-    </script>
-
-    <script src="~/js/Ban.js"></script>
+    <script src="~/js/ban.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }

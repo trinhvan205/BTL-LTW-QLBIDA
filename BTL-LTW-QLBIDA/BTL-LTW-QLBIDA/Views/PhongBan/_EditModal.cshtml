@@ -1,0 +1,26 @@
+﻿@model BTL_LTW_QLBIDA.Models.Ban
+
+<div class="modal-header bg-warning text-dark">
+    <h5 class="modal-title">Cập nhật bàn: @Model.Idban</h5>
+    <button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <form id="editForm">
+        <input type="hidden" asp-for="Idban" />
+        <div class="mb-3">
+            <label class="fw-bold">Khu vực</label>
+            <select asp-for="Idkhu" class="form-select" asp-items="ViewBag.KhuVucs"></select>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Giá tiền (VNĐ/Giờ)</label>
+            <input asp-for="Giatien" class="form-control" type="number" step="1000" />
+        </div>
+        <div class="alert alert-info small mb-0">
+            <i class="bi bi-info-circle"></i> Chỉ có thể sửa khi bàn đang trống.
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+    <button class="btn btn-warning" id="btnSaveEdit">Lưu thay đổi</button>
+</div>

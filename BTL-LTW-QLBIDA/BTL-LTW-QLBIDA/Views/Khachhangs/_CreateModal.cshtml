@@ -1,0 +1,30 @@
+﻿@model BTL_LTW_QLBIDA.Models.Khachhang
+
+<div class="modal-header bg-success text-white">
+    <h5 class="modal-title"><i class="bi bi-person-plus-fill me-2"></i>Thêm khách hàng mới</h5>
+    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <form id="createForm">
+        <div class="mb-3">
+            <label class="fw-bold">Mã Khách hàng</label>
+            <input asp-for="Idkh" class="form-control bg-light fw-bold text-primary" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Họ và Tên <span class="text-danger">*</span></label>
+            <input asp-for="Hoten" class="form-control" required placeholder="Nhập tên..." />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Số điện thoại</label>
+            <input asp-for="Sodt" class="form-control" maxlength="10" placeholder="09..." />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Địa chỉ</label>
+            <textarea asp-for="Dchi" class="form-control" rows="2"></textarea>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+    <button class="btn btn-success" id="btnSaveCreate"><i class="bi bi-save"></i> Lưu</button>
+</div>

@@ -1,293 +1,122 @@
-﻿/* ====================================================================== */
-/* CSS TÙY CHỈNH CHO TRANG QUẢN LÝ BÀN (BAN.CSS) */
-/* Đồng bộ màu tím đậm: #8971B7 */
-/* ====================================================================== */
-
-/* --- 0. TÙY CHỈNH NỀN TRANG (BODY) --- */
-
+﻿/* Đồng bộ style với NhanVien/KhachHang */
 body {
-    background-color: #F8F9FA;
+    font-family: 'Inter', sans-serif !important;
+    background: #f3f4fd;
+    color: #2d3436;
 }
 
-/* --- 1. KHỐI LỌC (FILTER CARDS) VÀ KHOẢNG CÁCH --- */
-
-/* Đẩy cột lọc xuống 15px để tách biệt với menu/header */
-.filter-sidebar-col {
-    margin-top: 15px;
-}
-
-/* Áp dụng bo góc tròn triệt để, đổ bóng và viền cho toàn bộ thẻ card */
-.sidebar-filter-card {
-    border-radius: 12px !important;
-    overflow: hidden !important;
-    border: 1px solid #7a63a3;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1rem;
-}
-
-    /* Tiêu đề card (Card Header) - Nền Tím */
-    .sidebar-filter-card .card-header {
-        background-color: #8971B7 !important;
-        color: white;
-        font-weight: bold;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 0.75rem 1rem;
-        border-radius: 12px 12px 0 0 !important;
-    }
-
-        .sidebar-filter-card .card-header h6 {
-            color: white !important;
-            margin-bottom: 0;
-        }
-
-    /* Thân card (Card Body) - Nền Trắng */
-    .sidebar-filter-card .card-body {
-        background-color: #ffffff !important;
-        color: #333;
-        padding: 1rem;
-        border-radius: 0 0 12px 12px !important;
-    }
-
-    /* Đảm bảo các label và dropdown text trong khối lọc là đen/xám */
-    .sidebar-filter-card .form-check-label {
-        color: #333;
-        cursor: pointer;
-    }
-
-    /* Input và Select */
-    .sidebar-filter-card .form-control,
-    .sidebar-filter-card .form-select {
-        background-color: #ffffff;
-        color: #333;
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-    }
-
-        .sidebar-filter-card .form-control:focus,
-        .sidebar-filter-card .form-select:focus {
-            border-color: #5d489b;
-            box-shadow: 0 0 0 0.25rem rgba(137, 113, 183, 0.25);
-        }
-
-    /* Radio buttons */
-    .sidebar-filter-card .form-check-input {
-        border-color: #8971B7;
-        background-color: #F8F9FA;
-    }
-
-        .sidebar-filter-card .form-check-input:checked {
-            background-color: #8971B7;
-            border-color: #8971B7;
-        }
-
-            .sidebar-filter-card .form-check-input:checked[type="radio"] {
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23ffffff'/%3e%3c/svg%3e");
-            }
-
-    /* Mũi tên collapse */
-    .sidebar-filter-card .collapse-arrow {
-        transition: transform 0.2s ease-in-out;
-        color: white;
-    }
-
-/* --- 2. DROPDOWN SỐ BẢN GHI (PAGE SIZE) và NÚT ICON --- */
-
-#pageSizeButton {
-    background-color: #F8F9FA !important;
-    border-color: #8971B7 !important;
-    border-radius: 6px;
-    color: #333;
-    font-weight: 500;
-}
-
-#pageSizeMenu .dropdown-item:active,
-#pageSizeMenu .dropdown-item.active {
-    background-color: #8971B7 !important;
-    color: white !important;
-}
-
-#pageSizeMenu .dropdown-item:hover {
-    background-color: #A090C8 !important;
-    color: white !important;
-}
-
-#btnAddKhuVuc, #btnEditKhuVuc {
-    color: white;
-    padding: 0.25rem 0.5rem;
-}
-
-    #btnAddKhuVuc:hover, #btnEditKhuVuc:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
-    }
-
-
-/* ====================================================================== */
-/* --- 3. KIỂU DÁNG BẢNG KHUNG (GRID TABLE) --- */
-/* ====================================================================== */
-
-.table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    border-radius: 6px;
-    border: 1px solid #8971B7; /* Viền ngoài màu tím đậm */
-    overflow: hidden;
-    margin-top: 0;
-}
-
-    /* Tiêu đề bảng (thead) */
-    .table .thead-custom {
-        background-color: #8971B7;
-        color: white;
-    }
-
-    /* Nội dung bảng (tbody) */
-    .table tbody tr {
-        background-color: white;
-    }
-
-    /* Ô (td/th) */
-    .table tbody td,
-    .table thead th {
-        border: 1px solid #dee2e6;
-        vertical-align: middle;
-        padding: 0.75rem;
-    }
-
-    .table thead th {
-        border-bottom: 1px solid #8971B7 !important;
-    }
-
-    /* Dòng chi tiết */
-    .table tbody tr.detail-row td {
-        border: none !important;
-        padding: 0;
-    }
-
-/* --- CỘT HÀNH ĐỘNG (Dù không dùng cột này) --- */
-.action-buttons-cell {
-    width: 100px;
-    text-align: center;
-}
-
-    .action-buttons-cell .btn {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.85rem;
-    }
-
-/* ====================================================================== */
-/* --- 4. TÙY CHỈNH TAB CHI TIẾT (DETAIL TABS) --- */
-/* ====================================================================== */
-
-/* Đảm bảo chữ Tab có màu đậm */
-.nav-tabs .nav-link {
-    color: #333 !important;
+.card {
+    border-radius: 18px;
     border: none;
-    border-radius: 0;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
 }
 
-    /* Định nghĩa gạch chân cho Tab active */
-    .nav-tabs .nav-link.active {
-        color: #333 !important;
-        background-color: transparent !important;
-        border-bottom: 2px solid #8971B7 !important; /* Gạch chân màu tím */
+.ban-row {
+    margin-top: 20px;
+}
+
+.ban-filter {
+    padding-right: 12px !important;
+}
+
+.ban-content {
+    padding-left: 12px !important;
+}
+
+.table-ban {
+    border-collapse: separate !important;
+    border-spacing: 0 10px !important;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+    .table-ban thead th {
+        background: #6a11cb !important;
+        color: #fff !important;
+        padding: 12px;
+        font-weight: 700;
+        border: none !important;
+        text-transform: uppercase;
     }
 
-/* Loại bỏ viền trắng mặc định */
-.nav-tabs {
-    border-bottom: 1px solid #dee2e6;
-}
-
-/* ====================================================================== */
-/* --- 5. TÙY CHỈNH THANH PHÂN TRANG (PAGINATION) --- */
-/* ====================================================================== */
-
-/* Link phân trang */
-.pagination-sm .page-link {
-    color: #8971B7; /* Màu chữ link mặc định là Tím */
-    border-color: #8971B7; /* Viền link mặc định là Tím */
-    border-radius: 4px;
-    margin-right: 2px;
-}
-
-    /* Hover */
-    .pagination-sm .page-link:hover {
-        color: white;
-        background-color: #A090C8;
-        border-color: #A090C8;
+    .table-ban tbody tr {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(118, 75, 162, 0.08);
+        transition: 0.25s;
     }
 
-/* Disabled */
-.pagination-sm .page-item.disabled .page-link {
-    color: #ced4da;
-    border-color: #ced4da;
-    background-color: #f8f9fa;
-    pointer-events: none;
-}
+        .table-ban tbody tr:hover {
+            transform: scale(1.01);
+            background: #f8f5ff !important;
+        }
 
-/* Active */
-.pagination-sm .page-item.active .page-link {
-    z-index: 1;
-    color: white;
-    background-color: #8971B7;
-    border-color: #8971B7;
-    box-shadow: 0 2px 4px rgba(137, 113, 183, 0.4);
-}
-
-/* Loại bỏ viền thừa */
-.pagination-sm .page-item:not(:first-child) .page-link {
-    border-left-width: 1px;
-}
-
-/* ====================================================================== */
-/* --- TÙY CHỈNH BẢNG LỊCH SỬ GIAO DỊCH (TRONG DETAIL TAB) --- */
-/* ====================================================================== */
-
-/* Target bảng nằm trong Tab Content */
-.tab-content .table {
-    border: 1px solid #8971B7; /* Viền ngoài cùng màu Tím đậm */
-}
-
-    /* Áp dụng màu tím cho đường kẻ nội bộ (các ô) */
-    .tab-content .table td,
-    .tab-content .table th {
-        border: 1px solid #A090C8; /* Màu tím nhạt hơn cho đường kẻ chia ô */
+    .table-ban td {
+        padding: 14px 16px !important;
+        vertical-align: middle;
     }
 
-    /* Đảm bảo tiêu đề bảng (thead) không có viền dưới màu xám thừa */
-    .tab-content .table .thead-light th {
-        border-bottom: 1px solid #8971B7 !important; /* Viền dưới tiêu đề màu Tím đậm */
+    .table-ban tbody tr td:first-child {
+        border-top-left-radius: 14px;
+        border-bottom-left-radius: 14px;
     }
 
-
-/* ====================================================================== */
-/* --- NÚT THÊM BÀN (Add Ban Button) --- */
-/* ====================================================================== */
-.btn-custom-add {
-    background-color: #8971B7 !important; /* Màu tím đậm */
-    border-color: #8971B7 !important; /* Viền cùng màu */
-    color: white !important; /* Chữ trắng */
-    border-radius: 8px !important; /* Bo góc 8px */
-    padding: 8px 20px !important; /* Tăng padding để nút lớn hơn */
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 4px 6px rgba(137, 113, 183, 0.3);
-}
-
-    .btn-custom-add:hover {
-        background-color: #7a63a3 !important; /* Tím đậm hơn khi hover */
-        border-color: #7a63a3 !important;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 8px rgba(137, 113, 183, 0.4);
+    .table-ban tbody tr td:last-child {
+        border-top-right-radius: 14px;
+        border-bottom-right-radius: 14px;
     }
 
-
-/* ====================================================================== */
-/* --- BO GÓC CHUNG CHO CÁC NÚT TRONG MODAL FOOTER --- */
-/* ====================================================================== */
-.modal-footer .btn {
-    border-radius: 8px !important; /* Bo góc 8px cho tất cả các nút trong Modal Footer */
-    font-weight: 500;
+.col-maban {
+    font-weight: 700;
+    color: #6a11cb !important;
+    width: 100px;
 }
 
+.col-thaotac {
+    min-width: 150px;
+}
+
+#filterForm label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #6a11cb;
+}
+
+#filterForm input, #filterForm select {
+    border-radius: 8px;
+    border: 1px solid #d4c8ff;
+}
+
+#filterForm .btn-primary, #btnCreate {
+    background-color: #6a11cb !important;
+    border-color: #6a11cb !important;
+    color: #fff;
+}
+
+.page-title-bar {
+    background: #f8f9fb;
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+    .page-title-bar h4 {
+        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+.action-btn, .btn-sm {
+    border-radius: 10px !important;
+    padding: 6px 10px !important;
+    background: #f3f0fd;
+    border: 1px solid #d7c6ff;
+    margin: 0 2px;
+}
+
+    .action-btn:hover, .btn-sm:hover {
+        transform: translateY(-3px);
+        background: #ece3ff;
+    }

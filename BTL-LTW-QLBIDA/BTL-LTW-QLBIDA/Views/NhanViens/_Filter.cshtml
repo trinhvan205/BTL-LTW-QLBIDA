@@ -1,0 +1,38 @@
+﻿<div class="card shadow-sm border-0 p-3 sticky-top" style="top: 20px; z-index: 1;">
+    <h5 class="fw-bold text-primary mb-3">
+        <i class="bi bi-search me-2"></i> Tìm kiếm & Lọc
+    </h5>
+
+    <form id="filterForm">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Từ khóa</label>
+            <input name="search" class="form-control" placeholder="Mã, Tên, SĐT, CCCD..." />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Trạng thái làm việc</label>
+            <select name="trangthai" class="form-select">
+                <option value="">Tất cả</option>
+                <option value="false" selected>Đang làm việc</option>
+                <option value="true">Đã nghỉ việc</option>
+            </select>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-funnel-fill me-1"></i> Lọc dữ liệu
+            </button>
+            <button type="button" id="btnClearFilter" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Đặt lại
+            </button>
+        </div>
+    </form>
+
+    <hr />
+
+    <div class="d-grid">
+        <button id="btnCreate" class="btn btn-success py-2">
+            <i class="bi bi-person-plus-fill me-1"></i> Thêm nhân viên mới
+        </button>
+    </div>
+</div>

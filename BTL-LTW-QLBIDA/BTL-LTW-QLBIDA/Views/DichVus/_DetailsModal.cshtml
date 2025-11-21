@@ -1,0 +1,24 @@
+﻿@model BTL_LTW_QLBIDA.Models.Dichvu
+<div class="modal-header bg-info text-white">
+    <h5 class="modal-title">Chi tiết: @Model.Tendv</h5>
+    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-5 text-center">
+            <img src="@Model.Imgpath" class="img-fluid rounded shadow-sm mb-3" style="max-height:200px;" onerror="this.src='/images/default-product.png'">
+            <h4 class="fw-bold">@string.Format("{0:N0}", Model.Giatien) đ</h4>
+            <span class="badge @(Model.Hienthi == true ? "bg-success" : "bg-secondary")">
+                @(Model.Hienthi == true ? "Đang kinh doanh" : "Ngưng bán")
+            </span>
+        </div>
+        <div class="col-md-7">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><b>Mã DV:</b> @Model.Iddv</li>
+                <li class="list-group-item"><b>Loại:</b> @Model.IdloaiNavigation?.Tenloai</li>
+                <li class="list-group-item"><b>Tồn kho:</b> <span class="fw-bold text-danger">@Model.Soluong</span></li>
+                <li class="list-group-item"><b>Mô tả:</b> <i>(Chưa có mô tả)</i></li>
+            </ul>
+        </div>
+    </div>
+</div>

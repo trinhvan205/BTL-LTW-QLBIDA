@@ -1,0 +1,68 @@
+﻿@model BTL_LTW_QLBIDA.Models.Nhanvien
+
+<div class="modal-header bg-info text-white">
+    <h5 class="modal-title">Chi tiết nhân viên: @Model.Idnv</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <div class="text-center mb-4">
+        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2"
+             style="width: 80px; height: 80px; font-size: 32px;">
+            @(Model.Hotennv?.Substring(0, 1).ToUpper() ?? "N")
+        </div>
+        <h4 class="mb-0">@Model.Hotennv</h4>
+        <div class="mt-2">
+            @if (Model.Nghiviec == true)
+            {
+                <span class="badge bg-secondary">Đã nghỉ việc</span>
+            }
+            else
+            {
+
+                <span class="badge bg-success">Đang làm việc</span>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header fw-bold">Thông tin cá nhân</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Ngày sinh:</strong> @(Model.Ngaysinh?.ToString("dd/MM/yyyy") ?? "---")</li>
+                    <li class="list-group-item"><strong>Giới tính:</strong> @(Model.Gioitinh == false ? "Nam" : "Nữ")</li>
+                    <li class="list-group-item"><strong>SĐT:</strong> @Model.Sodt</li>
+                    <li class="list-group-item"><strong>CCCD:</strong> @Model.Cccd</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header fw-bold text-success">Tài khoản hệ thống</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Username:</strong>
+                        @(string.IsNullOrEmpty(Model.Tendangnhap) ? "Chưa cấp" : Model.Tendangnhap)
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Quyền hạn:</strong>
+                        @if (Model.Quyenadmin == true)
+                        {
+                            <span class="text-danger fw-bold"><i class="bi bi-crown"></i> Admin</span>
+                        }
+                        else
+                        {
+
+                            <span>Nhân viên thường</span>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+</div>

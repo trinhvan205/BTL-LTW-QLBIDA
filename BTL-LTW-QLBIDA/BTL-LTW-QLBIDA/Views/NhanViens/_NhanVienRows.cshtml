@@ -1,0 +1,94 @@
+﻿@model BTL_LTW_QLBIDA.Models.ViewModels.NhanVienScrollVm
+
+@foreach (var item in Model.Items)
+{
+    <tr>
+        <td class="fw-bold text-primary">@item.Idnv</td>
+
+        <td>
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-primary text-white text-center me-2 fw-bold d-flex align-items-center justify-content-center"
+                     style="width: 35px; height: 35px; font-size: 14px;">
+                    @(item.Hotennv?.Substring(0, 1).ToUpper() ?? "N")
+                </div>
+                <div>
+                    <div class="fw-semibold">@item.Hotennv</div>
+                    <small class="text-muted" style="font-size: 0.8em;">@item.Cccd</small>
+                </div>
+            </div>
+        </td>
+
+        <td>
+            @if (item.Gioitinh == false)
+            {
+                <span class="text-primary"><i class="bi bi-gender-male"></i> Nam</span>
+            }
+            else
+            {
+
+                <span class="text-danger"><i class="bi bi-gender-female"></i> Nữ</span>
+            }
+        </td>
+
+        <td>@item.Sodt</td>
+
+        <td>
+            @if (!string.IsNullOrEmpty(item.Tendangnhap))
+            {
+                <div><i class="bi bi-person-circle text-success me-1"></i> @item.Tendangnhap</div>
+                @if (item.Quyenadmin == true)
+                {
+                    <span class="badge bg-danger mt-1"><i class="bi bi-crown-fill me-1"></i>Admin</span>
+                }
+            }
+            else
+            {
+                <span class="text-muted small fst-italic">Chưa có TK</span>
+            }
+        </td>
+
+        <td>
+            @if (item.Nghiviec == false)
+            {
+                <span class="badge bg-success">Đang làm</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Đã nghỉ</span>
+            }
+        </td>
+
+        <td class="text-center">
+            <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-info btn-details" data-id="@item.Idnv" title="Chi tiết">
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-warning btn-edit" data-id="@item.Idnv" title="Sửa">
+                    <i class="bi bi-pencil"></i>
+                </button>
+
+                @if (string.IsNullOrEmpty(item.Tendangnhap))
+                {
+                    <button class="btn btn-sm btn-outline-danger btn-delete" data-id="@item.Idnv" title="Xóa vĩnh viễn">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-sm btn-outline-secondary btn-toggle" data-id="@item.Idnv" title="Đổi trạng thái Nghỉ/Làm">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </button>
+                }
+            </div>
+        </td>
+    </tr>
+}
+
+@if (!Model.HasMore)
+{
+    <tr class="no-more">
+        <td colspan="7" class="text-center text-muted py-3">
+            <i class="bi bi-check2-circle me-1"></i> Hết dữ liệu hiển thị
+        </td>
+    </tr>
+}

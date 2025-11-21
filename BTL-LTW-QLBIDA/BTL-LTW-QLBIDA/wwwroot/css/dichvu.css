@@ -1,13 +1,9 @@
-﻿/* ============================================================
-   🌈 GLOBAL STYLE – Tone tím Dashboard
-============================================================ */
-body {
+﻿body {
     font-family: 'Inter', sans-serif !important;
     background: #f3f4fd;
     color: #2d3436;
 }
 
-/* Card mặc định */
 .card {
     border-radius: 18px;
     border: none;
@@ -15,310 +11,93 @@ body {
     box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
 }
 
-/* ============================================================
-   🌈 SIDEBAR FILTER
-============================================================ */
-.dv-sidebar-card {
-    border-radius: 18px;
-    background: #ffffff;
-    padding: 18px;
-    box-shadow: 0 4px 14px rgba(118, 75, 162, 0.15);
+.dichvu-row {
+    margin-top: 20px;
 }
 
-    .dv-sidebar-card h5 {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #6a11cb;
-    }
-
-    .dv-sidebar-card label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #4b5563;
-    }
-
-#clearFilter {
-    border-radius: 10px;
-    font-size: 0.9rem;
-    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
-    border: none;
-    color: #fff;
-    font-weight: 700;
-    box-shadow: 0 4px 12px rgba(247,151,30,0.3);
-    transition: 0.2s;
+.dichvu-filter {
+    padding-right: 12px !important;
 }
 
-    #clearFilter:hover {
-        transform: translateY(-2px);
-    }
+.dichvu-content {
+    padding-left: 12px !important;
+}
 
-/* ============================================================
-   🌈 TABLE – Danh sách dịch vụ
-============================================================ */
-
-.table-dv {
+.table-dichvu {
     border-collapse: separate !important;
     border-spacing: 0 10px !important;
-    font-size: 0.9rem;
     width: 100%;
+    font-size: 0.9rem;
 }
 
-    .table-dv thead th {
-        background: #6a11cb;
-        color: #fff;
+    .table-dichvu thead th {
+        background: #6a11cb !important;
+        color: #fff !important;
         padding: 12px;
         font-weight: 700;
-        font-size: 0.78rem;
-        border: none;
+        border: none !important;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
     }
 
-    /* Hàng dạng card */
-    .table-dv tbody tr {
+    .table-dichvu tbody tr {
         background: #fff;
         border-radius: 14px;
         box-shadow: 0 3px 12px rgba(118, 75, 162, 0.08);
         transition: 0.25s;
     }
 
-        .table-dv tbody tr td:first-child {
-            border-top-left-radius: 14px;
-            border-bottom-left-radius: 14px;
-        }
-
-        .table-dv tbody tr td:last-child {
-            border-top-right-radius: 14px;
-            border-bottom-right-radius: 14px;
-        }
-
-        .table-dv tbody tr:hover {
+        .table-dichvu tbody tr:hover {
             transform: scale(1.01);
-            box-shadow: 0 6px 18px rgba(118, 75, 162, 0.18);
             background: #f8f5ff !important;
         }
 
-    .table-dv td {
-        padding: 14px 16px !important;
-        color: #2d2d2d;
+    .table-dichvu td {
+        padding: 12px 16px !important;
+        vertical-align: middle;
     }
 
-    /* Ảnh */
-    .table-dv img {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
-        object-fit: cover;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        transition: 0.2s;
+    .table-dichvu tbody tr td:first-child {
+        border-top-left-radius: 14px;
+        border-bottom-left-radius: 14px;
     }
 
-        .table-dv img:hover {
-            transform: scale(1.12);
-        }
+    .table-dichvu tbody tr td:last-child {
+        border-top-right-radius: 14px;
+        border-bottom-right-radius: 14px;
+    }
 
-/* Giá */
-.price {
+.col-madv {
     font-weight: 700;
+    color: #6a11cb !important;
+    width: 90px;
+}
+
+.col-thaotac {
+    min-width: 140px;
+}
+
+#filterForm label {
+    font-weight: 600;
+    font-size: 0.85rem;
     color: #6a11cb;
 }
 
-/* ============================================================
-   🌈 Trạng thái
-============================================================ */
-.badge-status {
-    padding: 6px 14px;
-    border-radius: 18px;
-    font-weight: 700;
-    font-size: 0.75rem;
+#filterForm input, #filterForm select {
+    border-radius: 8px;
+    border: 1px solid #d4c8ff;
+}
+
+#filterForm .btn-primary, #btnCreate {
+    background-color: #6a11cb !important;
+    border-color: #6a11cb !important;
     color: #fff;
 }
 
-.badge-active {
-    background: #1abc9c;
-}
-
-.badge-stop {
-    background: #d35400;
-}
-
-/* ============================================================
-   🌈 BUTTON ACTIONS
-============================================================ */
-.action-btn {
-    border-radius: 10px !important;
-    padding: 6px 8px !important;
-    background: #f3f0fd;
-    border: 1px solid #d7c6ff;
-    margin: 0 2px;
-    transition: 0.2s;
-}
-
-    .action-btn:hover {
-        transform: translateY(-3px);
-        background: #ece3ff;
-    }
-
-.action-view i {
-    color: #3b82f6;
-}
-
-.action-edit i {
-    color: #eab308;
-}
-
-.action-toggle i {
-    color: #16a34a;
-}
-
-.action-delete i {
-    color: #dc2626;
-}
-
-/* ============================================================
-   🌈 SCROLLBAR
-============================================================ */
-#dichvuTable::-webkit-scrollbar {
-    width: 6px;
-}
-
-#dichvuTable::-webkit-scrollbar-thumb {
-    background: #a18cd1;
-    border-radius: 10px;
-}
-
-    #dichvuTable::-webkit-scrollbar-thumb:hover {
-        background: #764ba2;
-    }
-
-/* ============================================================
-   🌈 DETAIL PANEL
-============================================================ */
-.dv-detail-card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 18px;
-    min-height: 300px;
-    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
-}
-
-    .dv-detail-card th {
-        width: 130px;
-        color: #6a11cb;
-        font-weight: 700;
-    }
-
-/* ============================================================
-   🌈 LOADING
-============================================================ */
-#dvLoading {
-    padding: 10px;
-    color: #764ba2;
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-/* ============================================================
-   🌸 NÚT LỌC (tím mới)
-============================================================ */
-#dvFilterForm .btn.btn-success,
-#filterForm .btn.btn-success {
-    background-color: #6a11cb !important;
-    border-color: #6a11cb !important;
-    font-weight: 600;
-    box-shadow: 0 3px 10px rgba(106, 17, 203, 0.25);
-}
-
-    #dvFilterForm .btn.btn-success:hover,
-    #filterForm .btn.btn-success:hover {
-        background-color: #5a0fb0 !important;
-        border-color: #5a0fb0 !important;
-        transform: translateY(-1px);
-    }
-
-/* ============================================================
-   🌈 CARD FILTER – DỊCH VỤ
-============================================================ */
-#dvFilterForm label.form-label {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #6a11cb;
-}
-
-#dvFilterForm input,
-#dvFilterForm select {
-    border-radius: 8px;
-    border: 1px solid #d4c8ff;
-    transition: 0.2s;
-}
-
-    #dvFilterForm input:focus,
-    #dvFilterForm select:focus {
-        border-color: #6a11cb;
-        box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
-    }
-
-/* ============================================================
-   🌿 NÚT "LỌC" – màu xanh lá
-============================================================ */
-#dvFilterForm .btn-success {
-    border-radius: 8px;
-    font-weight: 600;
-    padding: 6px 10px;
-    background-color: #38a169 !important;
-    border-color: #38a169 !important;
-    box-shadow: 0 3px 10px rgba(56, 161, 105, 0.25);
-}
-
-    #dvFilterForm .btn-success:hover {
-        background-color: #2f855a !important;
-        border-color: #2f855a !important;
-        transform: translateY(-2px);
-    }
-
-/* ============================================================
-   🍊 NÚT "XÓA LỌC"
-============================================================ */
-#dvFilterForm #clearFilter {
-    border-radius: 8px;
-    font-weight: 600;
-    padding: 6px 10px;
-    border: 1px solid #f7971e !important;
-    color: #f7971e !important;
-    background: transparent !important;
-    transition: 0.2s;
-}
-
-    #dvFilterForm #clearFilter:hover {
-        background: #f7971e !important;
-        color: #fff !important;
-        transform: translateY(-2px);
-    }
-
-/* ============================================================
-   🌈 Layout giống Hóa đơn
-============================================================ */
-.dv-row {
-    margin-top: 20px !important;
-}
-
-.dv-sidebar-card {
-    margin-top: 4px;
-}
-
-.dv-content {
-    padding-left: 10px !important;
-}
-
-/* ============================================================
-   🌈 TITLE BAR – GIỐNG TRANG HÓA ĐƠN 100%
-============================================================ */
 .page-title-bar {
     background: #f8f9fb;
     padding: 18px 22px;
-    border-bottom: 2px solid #e4e7ed;
     border-radius: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
     .page-title-bar h4 {
@@ -326,11 +105,17 @@ body {
         font-size: 1.45rem;
         font-weight: 700;
         color: #2c3e50;
-        display: flex;
-        align-items: center;
     }
 
-    .page-title-bar i {
-        font-size: 1.4rem;
-        color: #6a11cb;
+.btn-sm {
+    border-radius: 10px !important;
+    padding: 6px 10px !important;
+    background: #f3f0fd;
+    border: 1px solid #d7c6ff;
+    margin: 0 2px;
+}
+
+    .btn-sm:hover {
+        transform: translateY(-3px);
+        background: #ece3ff;
     }

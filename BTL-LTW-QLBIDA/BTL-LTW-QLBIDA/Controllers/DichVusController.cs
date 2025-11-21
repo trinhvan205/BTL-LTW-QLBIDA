@@ -1,424 +1,173 @@
-﻿using System.Drawing;
-using BTL_LTW_QLBIDA.Filters;
+﻿using BTL_LTW_QLBIDA.Filters;
 using BTL_LTW_QLBIDA.Models;
 using BTL_LTW_QLBIDA.Models.ViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
     [AdminAuthorize]
-    public class DichvusController(QlquanBilliardLtw2Context context, IWebHostEnvironment env) : Controller
+    public class DichvusController : Controller
     {
-        private readonly QlquanBilliardLtw2Context _context = context;
-        private readonly IWebHostEnvironment _env = env;
+        private readonly QlquanBilliardLtw2Context _context;
+        private readonly IWebHostEnvironment _env;
 
-        // =====================================================
-        // INDEX – Hiển thị giao diện (AJAX sẽ load bảng)
-        // =====================================================
+        public DichvusController(QlquanBilliardLtw2Context context, IWebHostEnvironment env)
+        {
+            _context = context;
+            _env = env;
+        }
+
+        // 1. VIEW CHÍNH
         public async Task<IActionResult> Index()
         {
-            ViewBag.ListLoai = await _context.Loaidichvus
-                .OrderBy(l => l.Tenloai)
-                .ToListAsync();
-
+            ViewBag.LoaiDichVu = await _context.Loaidichvus.ToListAsync();
             return View();
         }
 
-        // =====================================================
-        // SINH MÃ TỰ ĐỘNG DV
-        // =====================================================
-        private async Task<string> GenerateNextIddvAsync()
+        // 2. LOAD TABLE
+        public async Task<IActionResult> LoadTable(string search, string loai, string trangthai, int page = 1)
         {
-            var last = await _context.Dichvus
+            int pageSize = 10;
+            var query = _context.Dichvus.Include(d => d.IdloaiNavigation).AsQueryable();
+
+            // Filter
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(d => d.Tendv.Contains(search) || d.Iddv.Contains(search));
+
+            if (!string.IsNullOrEmpty(loai))
+                query = query.Where(d => d.Idloai == loai);
+
+            if (!string.IsNullOrEmpty(trangthai))
+            {
+                bool isHienThi = trangthai == "true";
+                query = query.Where(d => d.Hienthi == isHienThi);
+            }
+
+            // Sắp xếp
+            var listAll = await query.OrderBy(d => d.Tendv).ToListAsync();
+
+            int total = listAll.Count;
+            var items = listAll.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            bool hasMore = (page * pageSize) < total;
+
+            return PartialView("_DichvuRows", new DichvuScrollVm { Items = items, HasMore = hasMore });
+        }
+
+        // 3. CREATE
+        public async Task<IActionResult> CreatePartial()
+        {
+            // Sinh mã tự động DV001
+            var lastId = await _context.Dichvus
                 .OrderByDescending(d => d.Iddv)
                 .Select(d => d.Iddv)
                 .FirstOrDefaultAsync();
 
-            if (string.IsNullOrEmpty(last))
-                return "DV001";
-
-            string digits = new([.. last.Where(char.IsDigit)]);
-            int number = int.TryParse(digits, out int num) ? num : 0;
-
-            return $"DV{(number + 1):D3}";
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetNextId()
-        {
-            string nextId = await GenerateNextIddvAsync();
-            return Json(nextId);
-        }
-
-        // =====================================================
-        // LOAD TABLE + FILTER + INFINITE SCROLL (AJAX)
-        // =====================================================
-        [HttpGet]
-        public async Task<IActionResult> LoadTable(
-            string? keyword,
-            string? loaiId,
-            bool? status,
-            decimal? minPrice,
-            decimal? maxPrice,
-            int page = 1)
-        {
-            const int pageSize = 10;
-
-            var query = _context.Dichvus
-                .Include(d => d.IdloaiNavigation)
-                .Select(d => new Dichvu
-                {
-                    Iddv = d.Iddv,
-                    Tendv = d.Tendv ?? "(Không tên)",      // FIX NULL
-                    Idloai = d.Idloai,
-                    Giatien = d.Giatien ?? 0,              // FIX NULL
-                    Soluong = d.Soluong ?? 0,              // FIX NULL
-                    Hienthi = d.Hienthi ?? false,          // FIX NULL
-                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
-                                ? "/images/no-image.png"   // FIX NULL
-                                : d.Imgpath,
-                    IdloaiNavigation = d.IdloaiNavigation
-                })
-                .OrderBy(d => d.Tendv)  // lúc này Tendv KHÔNG còn NULL nên không crash
-                .AsQueryable();
-
-            // Bộ lọc
-            if (!string.IsNullOrWhiteSpace(keyword))
-                query = query.Where(d => d.Tendv.Contains(keyword));
-
-            if (!string.IsNullOrWhiteSpace(loaiId))
-                query = query.Where(d => d.Idloai == loaiId);
-
-            if (status.HasValue)
-                query = query.Where(d => d.Hienthi == status.Value);
-
-            if (minPrice.HasValue)
-                query = query.Where(d => d.Giatien >= minPrice.Value);
-
-            if (maxPrice.HasValue)
-                query = query.Where(d => d.Giatien <= maxPrice.Value);
-
-            // Phân trang
-            int total = await query.CountAsync();
-
-            var items = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            bool hasMore = total > page * pageSize;
-
-            return PartialView("_DichvuRows", new DichvuScrollVm
+            int nextNum = 1;
+            if (!string.IsNullOrEmpty(lastId) && lastId.Length > 2 && int.TryParse(lastId.Substring(2), out int n))
             {
-                Items = items,
-                HasMore = hasMore
-            });
+                nextNum = n + 1;
+            }
+
+            ViewBag.LoaiDichVu = await _context.Loaidichvus.ToListAsync();
+            var dv = new Dichvu { Iddv = $"DV{nextNum:D3}", Hienthi = true };
+            return PartialView("_CreateModal", dv);
         }
 
-
-        // =====================================================
-        // XỬ LÝ ẢNH
-        // =====================================================
-        private string? SaveImage(string id, IFormFile file)
-        {
-            string ext = Path.GetExtension(file.FileName).ToLower();
-            string[] allowExt = [".jpg", ".jpeg", ".png", ".webp"];
-            if (!allowExt.Contains(ext)) return null;
-
-            string folder = Path.Combine(_env.WebRootPath, "images/dichvu");
-            Directory.CreateDirectory(folder);
-
-            // 👉 GIỮ NGUYÊN TÊN FILE NGƯỜI DÙNG TẢI LÊN
-            string fileName = file.FileName;
-
-            string path = Path.Combine(folder, fileName);
-
-            using var stream = new FileStream(path, FileMode.Create);
-            file.CopyTo(stream);
-
-            return "/images/dichvu/" + fileName;
-        }
-
-
-        private void DeleteOldImage(string? imgPath)
-        {
-            if (string.IsNullOrEmpty(imgPath)) return;
-
-            string full = Path.Combine(_env.WebRootPath, imgPath.TrimStart('/'));
-            if (System.IO.File.Exists(full))
-                System.IO.File.Delete(full);
-        }
-
-
-        // =====================================================
-        // CREATE AJAX
-        // =====================================================
         [HttpPost]
-        public async Task<IActionResult> CreateAjax(Dichvu dv, IFormFile? imageFile)
+        public async Task<IActionResult> CreateAjax(Dichvu model, IFormFile? imageFile)
         {
-            dv.Iddv = await GenerateNextIddvAsync();
+            if (await _context.Dichvus.AnyAsync(d => d.Iddv == model.Iddv))
+                return Json(new { success = false, message = "Mã dịch vụ đã tồn tại!" });
 
-            // =============================
-            // VALIDATION – không cho nhập sai
-            // =============================
-            if (string.IsNullOrWhiteSpace(dv.Tendv))
-                return Json(new { success = false, message = "Tên dịch vụ không được để trống!" });
-
-            if (string.IsNullOrEmpty(dv.Idloai))
-                return Json(new { success = false, message = "Vui lòng chọn loại dịch vụ!" });
-
-            if (dv.Giatien == null || dv.Giatien <= 0)
-                return Json(new { success = false, message = "Giá bán phải lớn hơn 0!" });
-
-            if (dv.Soluong == null || dv.Soluong < 0)
-                return Json(new { success = false, message = "Số lượng không hợp lệ!" });
-
-            // =============================
-            // FIX TRIỆT ĐỂ LỖI NULL
-            // =============================
-            dv.Giatien ??= 0;
-            dv.Soluong ??= 0;
-            dv.Hienthi ??= true;
-
-            // =============================
-            // XỬ LÝ ẢNH
-            // =============================
+            // Xử lý ảnh
             if (imageFile != null)
             {
-                string? img = SaveImage(dv.Iddv, imageFile);
-                if (img == null)
-                    return Json(new { success = false, message = "Ảnh không hợp lệ!" });
+                string uploadDir = Path.Combine(_env.WebRootPath, "images/dichvu");
+                if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
 
-                dv.Imgpath = img;
+                string fileName = $"{model.Iddv}_{DateTime.Now.Ticks}{Path.GetExtension(imageFile.FileName)}";
+                string filePath = Path.Combine(uploadDir, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+                model.Imgpath = $"/images/dichvu/{fileName}";
             }
             else
             {
-                dv.Imgpath = null;
+                model.Imgpath = "/images/default-product.png"; // Ảnh mặc định
             }
 
-            // =============================
-            // LƯU VÀO DATABASE
-            // =============================
-            _context.Add(dv);
+            _context.Add(model);
             await _context.SaveChangesAsync();
-
             return Json(new { success = true });
         }
 
+        // 4. EDIT
+        public async Task<IActionResult> EditPartial(string id)
+        {
+            var dv = await _context.Dichvus.FindAsync(id);
+            if (dv == null) return Content("Không tìm thấy!");
 
-        // =====================================================
-        // DETAIL PARTIAL
-        // =====================================================
-        public async Task<IActionResult> DetailPartial(string id)
+            ViewBag.LoaiDichVu = await _context.Loaidichvus.ToListAsync();
+            return PartialView("_EditModal", dv);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditAjax(Dichvu model, IFormFile? imageFile)
+        {
+            var dv = await _context.Dichvus.FindAsync(model.Iddv);
+            if (dv == null) return Json(new { success = false, message = "Không tìm thấy!" });
+
+            dv.Tendv = model.Tendv;
+            dv.Idloai = model.Idloai;
+            dv.Giatien = model.Giatien;
+            dv.Soluong = model.Soluong;
+            dv.Hienthi = model.Hienthi;
+
+            // Cập nhật ảnh nếu có upload mới
+            if (imageFile != null)
+            {
+                string uploadDir = Path.Combine(_env.WebRootPath, "images/dichvu");
+                string fileName = $"{model.Iddv}_{DateTime.Now.Ticks}{Path.GetExtension(imageFile.FileName)}";
+                string filePath = Path.Combine(uploadDir, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+                dv.Imgpath = $"/images/dichvu/{fileName}";
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        // 5. DETAILS
+        public async Task<IActionResult> DetailsPartial(string id)
         {
             var dv = await _context.Dichvus
                 .Include(d => d.IdloaiNavigation)
-                .Select(d => new Dichvu
-                {
-                    Iddv = d.Iddv,
-                    Tendv = d.Tendv ?? "(Không tên)",
-                    Idloai = d.Idloai,
-                    Giatien = d.Giatien ?? 0,
-                    Soluong = d.Soluong ?? 0,
-                    Hienthi = d.Hienthi ?? false,
-                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
-                        ? "/images/no-image.png"
-                        : d.Imgpath,
-                    IdloaiNavigation = d.IdloaiNavigation
-                })
                 .FirstOrDefaultAsync(d => d.Iddv == id);
-
-            if (dv == null)
-                return Content("<p class='text-danger p-3'>Không tìm thấy dịch vụ!</p>");
-
-            return PartialView("_DichvuDetailModal", dv);
+            return PartialView("_DetailsModal", dv);
         }
 
-
-        // =====================================================
-        // EDIT FORM (MODAL)
-        // =====================================================
-        [HttpGet]
-        public async Task<IActionResult> GetEditForm(string id)
-        {
-            var dv = await _context.Dichvus.FindAsync(id);
-            if (dv == null) return NotFound();
-
-            ViewBag.ListLoai = await _context.Loaidichvus.OrderBy(l => l.Tenloai).ToListAsync();
-
-            return PartialView("_DichvuEditPartial", dv);
-        }
-
-        // =====================================================
-        // UPDATE AJAX
-        // =====================================================
-        [HttpPost]
-        public async Task<IActionResult> UpdateAjax(Dichvu dv, IFormFile? imageFile)
-        {
-            var old = await _context.Dichvus.FindAsync(dv.Iddv);
-            if (old == null)
-                return Json(new { success = false, message = "Không tìm thấy dịch vụ!" });
-
-            // Ép null về giá trị an toàn
-            old.Tendv = string.IsNullOrWhiteSpace(dv.Tendv) ? "(Không tên)" : dv.Tendv;
-            old.Idloai = dv.Idloai;
-            old.Giatien = dv.Giatien ?? 0;
-            old.Soluong = dv.Soluong ?? 0;
-            old.Hienthi = dv.Hienthi ?? false;
-
-            if (imageFile != null)
-            {
-                DeleteOldImage(old.Imgpath);
-
-                string? img = SaveImage(old.Iddv, imageFile);
-                if (img == null)
-                    return Json(new { success = false, message = "Ảnh không hợp lệ!" });
-
-                old.Imgpath = img;
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true });
-        }
-
-
-        // =====================================================
-        // DELETE AJAX
-        // =====================================================
+        // 6. DELETE
         [HttpPost]
         public async Task<IActionResult> DeleteAjax(string id)
         {
             var dv = await _context.Dichvus.FindAsync(id);
-            if (dv == null)
-                return Json(new { success = false, message = "Không tìm thấy!" });
+            if (dv == null) return Json(new { success = false, message = "Lỗi ID" });
 
+            // Kiểm tra ràng buộc
             bool used = await _context.Hoadondvs.AnyAsync(h => h.Iddv == id);
-            if (used)
-                return Json(new { success = false, message = "Không thể xoá, dịch vụ đang có trong hóa đơn!" });
-
-            DeleteOldImage(dv.Imgpath);
+            if (used) return Json(new { success = false, message = "Dịch vụ đã có trong hóa đơn, không thể xóa!" });
 
             _context.Dichvus.Remove(dv);
             await _context.SaveChangesAsync();
-
             return Json(new { success = true });
         }
-
-        // =====================================================
-        // TOGGLE STATUS
-        // =====================================================
-        [HttpPost]
-        public async Task<IActionResult> ToggleStatus(string id)
-        {
-            var dv = await _context.Dichvus.FindAsync(id);
-            if (dv == null)
-                return Json(new { success = false });
-
-            // Nếu null thì coi như false
-            dv.Hienthi = !(dv.Hienthi ?? false);
-
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true, newStatus = dv.Hienthi });
-        }
-
-
-        // =====================================================
-        // EXPORT EXCEL THEO FILTER
-        // =====================================================
-        [HttpGet]
-        public async Task<IActionResult> ExportExcel(
-            string? keyword,
-            string? loaiId,
-            bool? status,
-            decimal? minPrice,
-            decimal? maxPrice)
-        {
-            var query = _context.Dichvus
-                .Include(d => d.IdloaiNavigation)
-                .OrderBy(d => d.Tendv)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(keyword))
-                query = query.Where(d => d.Tendv.Contains(keyword));
-            if (!string.IsNullOrWhiteSpace(loaiId))
-                query = query.Where(d => d.Idloai == loaiId);
-            if (status.HasValue)
-                query = query.Where(d => d.Hienthi == status.Value);
-            if (minPrice.HasValue)
-                query = query.Where(d => d.Giatien >= minPrice.Value);
-            if (maxPrice.HasValue)
-                query = query.Where(d => d.Giatien <= maxPrice.Value);
-
-            var data = await query.ToListAsync();
-
-            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using var package = new ExcelPackage();
-            var ws = package.Workbook.Worksheets.Add("DichVu");
-
-            string[] headers = ["Mã DV", "Tên DV", "Loại", "Giá", "Tồn", "Trạng thái"];
-
-            for (int i = 0; i < headers.Length; i++)
-            {
-                ws.Cells[1, i + 1].Value = headers[i];
-                ws.Cells[1, i + 1].Style.Font.Bold = true;
-                ws.Cells[1, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                ws.Cells[1, i + 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-            }
-
-            int row = 2;
-            foreach (var dv in data)
-            {
-                ws.Cells[row, 1].Value = dv.Iddv;
-                ws.Cells[row, 2].Value = dv.Tendv;
-                ws.Cells[row, 3].Value = dv.IdloaiNavigation?.Tenloai ?? "Chưa phân loại";
-                ws.Cells[row, 4].Value = (double)(dv.Giatien ?? 0);
-                ws.Cells[row, 5].Value = dv.Soluong ?? 0;
-                ws.Cells[row, 6].Value = dv.Hienthi == true ? "Đang KD" : "Ngưng";
-                row++;
-            }
-
-            ws.Cells.AutoFitColumns();
-
-            var bytes = package.GetAsByteArray();
-            string fileName = $"DichVu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-
-            return File(bytes,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName);
-        }
-        public async Task<IActionResult> Details(string id)
-        {
-            var dv = await _context.Dichvus
-                .Include(d => d.IdloaiNavigation)
-                .Select(d => new Dichvu
-                {
-                    Iddv = d.Iddv,
-                    Tendv = d.Tendv ?? "(Không tên)",
-                    Idloai = d.Idloai,
-                    Giatien = d.Giatien ?? 0,
-                    Soluong = d.Soluong ?? 0,
-                    Hienthi = d.Hienthi ?? false,
-                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
-                        ? "/images/no-image.png"
-                        : d.Imgpath,
-                    IdloaiNavigation = d.IdloaiNavigation
-                })
-                .FirstOrDefaultAsync(d => d.Iddv == id);
-
-            if (dv == null)
-                return NotFound();
-
-            return View(dv);
-        }
-
-
     }
 }

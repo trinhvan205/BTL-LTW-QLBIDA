@@ -1,0 +1,31 @@
+﻿<div class="card shadow-sm border-0 p-3 sticky-top" style="top: 20px;">
+    <h5 class="fw-bold text-primary mb-3"><i class="bi bi-search me-2"></i> Tìm kiếm & Lọc</h5>
+    <form id="filterForm">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Từ khóa</label>
+            <input name="search" class="form-control" placeholder="Tên dịch vụ..." />
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Loại dịch vụ</label>
+            <select name="loai" class="form-select" asp-items="@(new SelectList(ViewBag.LoaiDichVu, "Idloai", "Tenloai"))">
+                <option value="">-- Tất cả --</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Trạng thái</label>
+            <select name="trangthai" class="form-select">
+                <option value="">Tất cả</option>
+                <option value="true" selected>Đang kinh doanh</option>
+                <option value="false">Ngưng bán</option>
+            </select>
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-funnel-fill"></i> Lọc</button>
+            <button type="button" id="btnClearFilter" class="btn btn-outline-secondary">Đặt lại</button>
+        </div>
+    </form>
+    <hr />
+    <div class="d-grid">
+        <button id="btnCreate" class="btn btn-success py-2"><i class="bi bi-plus-circle"></i> Thêm dịch vụ</button>
+    </div>
+</div>

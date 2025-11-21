@@ -1,0 +1,75 @@
+﻿@model BTL_LTW_QLBIDA.Models.Nhanvien
+
+<div class="modal-header bg-warning text-dark">
+    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Cập nhật nhân viên: @Model.Hotennv</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <form id="editForm">
+        <input type="hidden" asp-for="Idnv" />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <h6 class="fw-bold text-primary border-bottom pb-1">Thông tin cá nhân</h6>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Họ tên</label>
+                    <input asp-for="Hotennv" class="form-control" required />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Ngày sinh</label>
+                    <input asp-for="Ngaysinh" type="date" class="form-control" />
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Giới tính</label>
+                    <select name="Gioitinh" class="form-select">
+                        <option value="false" selected="@(Model.Gioitinh != true)">Nam</option>
+                        <option value="true" selected="@(Model.Gioitinh == true)">Nữ</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">SĐT</label>
+                    <input asp-for="Sodt" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">CCCD</label>
+                    <input asp-for="Cccd" class="form-control" maxlength="12" />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h6 class="fw-bold text-success border-bottom pb-1">Tài khoản & Quyền</h6>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Tên đăng nhập</label>
+                    <input asp-for="Tendangnhap" class="form-control" placeholder="Để trống nếu không cấp TK" />
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Mật khẩu mới</label>
+                    <input name="Matkhau" type="password" class="form-control" placeholder="Để trống nếu không đổi" />
+                    <small class="text-muted" style="font-size: 0.75rem;">Chỉ nhập nếu muốn đổi mật khẩu</small>
+                </div>
+
+                <div class="card p-2 border bg-light mt-3">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="Quyenadmin" value="true" id="chkAdmin" @(Model.Quyenadmin == true ? "checked" : "")>
+                        <input type="hidden" name="Quyenadmin" value="false" />
+
+                        <label class="form-check-label" for="chkAdmin">Quyền Admin</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+    <button type="button" class="btn btn-warning" id="btnSaveEdit">
+        <i class="bi bi-check-circle me-1"></i> Lưu thay đổi
+    </button>
+</div>
