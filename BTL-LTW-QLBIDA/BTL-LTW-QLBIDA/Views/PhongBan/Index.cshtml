@@ -3,46 +3,44 @@
     ViewData["Title"] = "Quản lý Bàn";
 }
 
-@* LIÊN KẾT FILE CSS VÀ JS MỚI - Sử dụng asp-append-version để tránh lỗi cache *@
 <link rel="stylesheet" href="~/css/Ban.css" asp-append-version="true" />
 
 <div class="row">
 
-    <div class="col-md-3">
+    <div class="col-md-3 filter-sidebar-col">
 
-        @* KHU VỰC *@
         <div class="card mb-3 sidebar-filter-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="card-title fw-bold mb-0">Khu vực</h6>
-                    <div>
-                        <button type="button" class="btn btn-sm" id="btnAddKhuVuc" title="Thêm khu vực">
-                            <i class="bi bi-plus-lg"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm" id="btnEditKhuVuc" title="Sửa khu vực">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                    </div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="card-title fw-bold mb-0"><i class="bi bi-geo-alt-fill me-1"></i> Khu vực</h6>
+                <div>
+                    <button type="button" class="btn btn-sm" id="btnAddKhuVuc" title="Thêm khu vực">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm" id="btnEditKhuVuc" title="Sửa khu vực">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                 </div>
+            </div>
+            <div class="card-body">
                 <select id="khuVucSelect" asp-for="SelectedKhuVuc" asp-items="Model.KhuVucs" class="form-select">
                     <option value="">-- Tất cả --</option>
                 </select>
             </div>
         </div>
 
-        @* TÌM KIẾM *@
         <div class="card mb-3 sidebar-filter-card">
+            <div class="card-header">
+                <h6 class="card-title fw-bold mb-0"><i class="bi bi-search me-1"></i> Tìm kiếm</h6>
+            </div>
             <div class="card-body">
-                <h6 class="card-title fw-bold mb-2">Tìm kiếm</h6>
-                <input type="text" id="searchString" asp-for="SearchString" class="form-control" placeholder="Theo tên bàn">
+                <input type="text" id="searchString" asp-for="SearchString" class="form-control" placeholder="Theo mã bàn">
             </div>
         </div>
 
-        @* TRẠNG THÁI *@
         <div class="card mb-3 sidebar-filter-card">
             <a href="#collapseTrangThai" class="text-decoration-none text-dark" data-bs-toggle="collapse" aria-expanded="true" aria-controls="collapseTrangThai">
                 <div class="card-header d-flex justify-content-between align-items-center" style="cursor: pointer;">
-                    <h6 class="card-title fw-bold mb-0">Trạng thái</h6>
+                    <h6 class="card-title fw-bold mb-0"><i class="bi bi-toggle-on me-1"></i> Trạng thái</h6>
                     <i class="bi bi-chevron-up collapse-arrow"></i>
                 </div>
             </a>
@@ -65,35 +63,35 @@
             </div>
         </div>
 
-        @* SỐ BẢN GHI *@
         <div class="d-flex justify-content-between align-items-center mb-3 px-2">
             <span class="fw-bold">Số bản ghi:</span>
 
             <div class="dropdown">
                 <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="pageSizeButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    10
+                    @Model.PagedBans.PageSize
                 </button>
 
                 <ul class="dropdown-menu" aria-labelledby="pageSizeButton" id="pageSizeMenu">
-                    <li><a class="dropdown-item active" href="#" data-value="10">10 <i class="bi bi-check float-end"></i></a></li>
-                    <li><a class="dropdown-item" href="#" data-value="15">15</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="20">20</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="30">30</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="50">50</a></li>
+                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 10 ? "active" : "")" href="#" data-value="10">10 @(Model.PagedBans.PageSize == 10 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
+                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 15 ? "active" : "")" href="#" data-value="15">15 @(Model.PagedBans.PageSize == 15 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
+                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 20 ? "active" : "")" href="#" data-value="20">20 @(Model.PagedBans.PageSize == 20 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
+                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 30 ? "active" : "")" href="#" data-value="30">30 @(Model.PagedBans.PageSize == 30 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
+                    <li><a class="dropdown-item @(Model.PagedBans.PageSize == 50 ? "active" : "")" href="#" data-value="50">50 @(Model.PagedBans.PageSize == 50 ? Html.Raw("<i class=\"bi bi-check float-end\"></i>") : Html.Raw(""))</a></li>
                 </ul>
             </div>
         </div>
 
     </div>
-    <div class="col-md-9">
+
+    <div class="col-md-9 pt-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Bàn</h3>
             <div>
-                <button type="button" class="btn btn-success"
+                <button type="button" class="btn btn-custom-add"
                         data-bs-toggle="modal"
                         data-bs-target="#phongBanModal"
                         id="btnShowCreateModal">
-                    Thêm bàn
+                    <i class="bi bi-plus-circle me-2"></i> Thêm bàn
                 </button>
             </div>
         </div>
@@ -104,10 +102,10 @@
     </div>
 </div>
 
-@* MODALs giữ nguyên *@
 <div class="modal fade" id="phongBanModal" tabindex="-1" aria-labelledby="phongBanModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+           
             <div class="modal-header">
                 <h5 class="modal-title" id="phongBanModalLabel">Thêm bàn</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -119,9 +117,14 @@
                     </div>
                 </div>
             </div>
+           
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
-                <button type="button" class="btn btn-success" id="btnLuu">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Bỏ qua
+                </button>
+                <button type="button" class="btn btn-success" id="btnLuu">
+                    <i class="bi bi-save me-1"></i> Lưu
+                </button>
             </div>
         </div>
     </div>
@@ -149,9 +152,14 @@
                     </div>
                 </form>
             </div>
+          
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
-                <button type="button" class="btn btn-primary" id="btnLuuKhuVuc">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Bỏ qua
+                </button>
+                <button type="button" class="btn btn-primary" id="btnLuuKhuVuc">
+                    <i class="bi bi-save me-1"></i> Lưu
+                </button>
             </div>
         </div>
     </div>
@@ -181,11 +189,17 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-danger" id="btnXoaKhuVuc">Xóa</button>
+                <button type="button" class="btn btn-danger" id="btnXoaKhuVuc">
+                    <i class="bi bi-trash me-1"></i> Xóa
+                </button>
 
                 <div>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ qua</button>
-                    <button type="button" class="btn btn-primary" id="btnLuuKhuVucMoi">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Bỏ qua
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnLuuKhuVucMoi">
+                        <i class="bi bi-save me-1"></i> Lưu
+                    </button>
                 </div>
             </div>
         </div>
@@ -222,7 +236,7 @@
                 <form id="formSuaBan">
                     @Html.AntiForgeryToken()
                     <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label fw-bold">Tên bàn <span class="text-danger">*</span></label>
+                        <label class="col-sm-4 col-form-label fw-bold">Mã bàn<span class="text-danger">*</span></label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control bg-light" id="editIdBan" name="Idban" readonly>
                         </div>
@@ -238,7 +252,8 @@
                     <div class="mb-3 row">
                         <label class="col-sm-4 col-form-label fw-bold">Giá tiền/giờ</label>
                         <div class="col-sm-8">
-                            <input type="number" class="form-control" id="editGiaTien" name="Giatien">
+                            <input type="text" class="form-control" id="editGiaTien" name="Giatien"
+                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '');" />
                         </div>
                     </div>
                 </form>
@@ -269,8 +284,6 @@
     </div>
 </div>
 
-
-@* 🟢 CẤU TRÚC TOAST *@
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
     <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
@@ -287,7 +300,6 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    @* ĐỊNH NGHĨA BIẾN GLOBAL CHO CÁC URL CẦN THIẾT *@
     <script>
         var Urls = {
             FilterBan: '@Url.Action("FilterBan", "PhongBan")',
@@ -304,6 +316,5 @@
         };
     </script>
 
-    @* LIÊN KẾT FILE JS MỚI *@
     <script src="~/js/Ban.js"></script>
 }
