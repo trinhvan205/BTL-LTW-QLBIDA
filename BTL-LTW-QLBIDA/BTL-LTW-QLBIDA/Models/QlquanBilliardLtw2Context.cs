@@ -87,6 +87,10 @@ public partial class QlquanBilliardLtw2Context : DbContext
             entity.Property(e => e.Tendv)
                 .HasMaxLength(50)
                 .HasColumnName("TENDV");
+            // ✅ THÊM DÒNG NÀY
+            entity.Property(e => e.Imgpath)
+                .HasMaxLength(255)
+                .HasColumnName("IMGPATH");
 
             entity.HasOne(d => d.IdloaiNavigation).WithMany(p => p.Dichvus)
                 .HasForeignKey(d => d.Idloai)

@@ -32,45 +32,54 @@
 
 /* BÊN PHẢI - 40% */
 .thungan-right {
-    flex: 2; /* ← 2 phần (40%) */
+    flex: 2;
     background: white;
     display: flex;
     flex-direction: column;
     border-radius: 16px;
-    overflow: hidden;
+    overflow: visible; /* ← CHO PHÉP TRÀN RA */
+    position: relative;
+    z-index: 1; /* ← THÊM z-index thấp */
 }
 
+
 /* ===========================
-   HEADER TABS (Phòng bàn / Thực đơn)
+   HEADER TABS - TABS SÁT ĐÁY
 =========================== */
 .thungan-header {
     display: flex;
-    gap: 0; /* ← Bỏ khoảng cách để tabs dính nhau */
-    padding: 16px 16px 0 16px;
+    gap: 0;
+    padding: 0 16px;
     background: var(--primary-color);
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    box-sizing: border-box;
+    align-items: flex-end; /* ← Căn tabs xuống đáy */
+    overflow: hidden;
 }
 
 .tab-btn {
     flex: 1;
-    padding: 12px 24px;
+    height: 40px; /* ← Chiều cao tabs */
+    padding: 0 24px;
     border: none;
     border-radius: 20px 20px 0 0;
-    background: linear-gradient(90deg, #82408E 0%, #A250B2 100%); /* ← MÀU MỚI */
+    background: linear-gradient(90deg, #82408E 0%, #A250B2 100%);
     color: white;
     font-weight: 600;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.3s;
-    position: relative; /* ← THÊM */
-    margin-left: -8px; /* ← THÊM: Chồng lên nhau */
+    position: relative;
+    margin-left: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
     .tab-btn:first-child {
-        margin-left: 0; /* ← THÊM: Tab đầu không bị lùi */
-    }
-
-    .tab-btn:hover {
-        z-index: 1; /* ← THÊM: Nổi lên khi hover */
+        margin-left: 0;
     }
 
     .tab-btn:hover {
@@ -79,12 +88,11 @@
     }
 
     .tab-btn.active {
-        background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%); /* ← Gradient trắng */
-        color: #A250B2; /* ← Màu tím hồng */
-        padding-bottom: 16px;
-        margin-bottom: -4px;
-        z-index: 2; /* ← THÊM: Nổi lên trên cùng */
-        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08); /* ← THÊM: Shadow nhẹ */
+        background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+        color: #A250B2;
+        height: 44px; /* ← Tab active cao hơn một chút */
+        z-index: 2;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
     }
 
     .tab-btn i {
@@ -155,25 +163,58 @@
     flex-direction: column;
 }
 
+
 /* ===========================
-   HÓA ĐƠN BÊN PHẢI
+   HÓA ĐƠN HEADER - 56PX
 =========================== */
 .hoadon-header {
-    padding: 16px;
-    background: var(--primary-color); /* ← ĐỔI SANG TÍM */
+    padding: 0 16px;
+    background: var(--primary-color);
     color: white;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 16px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
-    border-radius: 16px 16px 0 0; /* ← Bo góc trên */
+    border-radius: 16px 16px 0 0;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    box-sizing: border-box;
+    overflow: visible; /* ← CHO PHÉP TRÀN RA */
+    position: relative;
+    z-index: 2; /* ← THÊM z-index */
 }
+
+    .hoadon-header i {
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .hoadon-header > div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
 
 .hoadon-area {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
+    position: relative;
+    z-index: 1; /* ← THÊM: z-index thấp */
+}
+
+/* Bo góc dưới cho hoadon-footer */
+.hoadon-footer {
+    margin-top: auto;
+    padding: 12px;
+    background: #f9fafb;
+    border-top: 2px solid #e5e7eb;
+    flex-shrink: 0;
+    border-radius: 0 0 16px 16px; /* ← Bo góc dưới */
 }
 
 .empty-state {
@@ -193,6 +234,9 @@
     .empty-state p {
         font-size: 16px;
     }
+
+
+
 
 /* ===========================
    GRID DANH SÁCH BÀN - CỐ ĐỊNH 6 CỘT
@@ -334,6 +378,47 @@
     margin-bottom: 6px;
 }
 
+/* ===========================
+   HÌNH ẢNH DỊCH VỤ
+=========================== */
+.dichvu-image {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 8px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    flex-shrink: 0;
+    border: 2px solid #e5e7eb;
+    transition: all 0.2s;
+}
+
+    .dichvu-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+/* Hover effect cho ảnh */
+.dichvu-item:hover .dichvu-image {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* Dịch vụ hết hàng */
+.dichvu-item.disabled .dichvu-image {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+    .dichvu-item.disabled .dichvu-image img {
+        filter: grayscale(100%);
+    }
+
 .dichvu-name {
     font-weight: 500;
     font-size: 13px;
@@ -406,6 +491,8 @@
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     overflow: hidden;
+    position: relative;
+    z-index: 1; /* ← z-index THẤP */
 }
 
 /* ===========================
@@ -1086,3 +1173,386 @@
     min-width: 35px;
     text-align: center;
 }
+
+
+
+/* ===========================
+   TÌM KIẾM KHÁCH HÀNG - DÁNG VIÊN THUỐC
+=========================== */
+.customer-search-container {
+    position: relative;
+    width: 360px;
+    z-index: 9999 !important; /* ← Z-INDEX CỰC CAO */
+}
+
+/* Box tìm kiếm (chưa chọn) */
+.customer-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px; /* ← MỎNG HƠN: 4px top/bottom, 12px left/right */
+    background: white;
+    border: 1.5px solid #e5e7eb; /* ← GIẢM border từ 2px xuống 1.5px */
+    border-radius: 20px; /* ← GIẢM từ 24px xuống 20px */
+    transition: all 0.2s;
+}
+
+    .customer-search-box:focus-within {
+        border-color: #9333ea; /* ← Màu tím sáng (purple-600) khác với header */
+        box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1); /* ← Shadow tím sáng */
+    }
+
+    .customer-search-box i.bi-search {
+        color: #9ca3af;
+        font-size: 13px; /* ← Giảm từ 14px xuống 13px */
+        flex-shrink: 0;
+    }
+
+    .customer-search-box input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 12px; /* ← Giảm từ 13px xuống 12px */
+        color: #374151;
+        background: transparent;
+        padding: 0;
+        line-height: 1;
+    }
+
+        .customer-search-box input::placeholder {
+            color: #9ca3af;
+        }
+
+.btn-add-icon {
+    width: 24px; /* ← Giảm từ 26px xuống 24px */
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 12px; /* ← THÊM: icon nhỏ hơn */
+}
+
+    .btn-add-icon:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: scale(1.1);
+    }
+
+/* Box đã chọn khách hàng */
+.customer-selected-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px; /* ← MỎng hơn: 4px top/bottom */
+    background: white;
+    border: 1.5px solid #9333ea; /* ← Giảm border từ 2px xuống 1.5px */
+    border-radius: 20px; /* ← Giảm từ 24px xuống 20px */
+}
+
+    .customer-selected-box i.bi-person-circle {
+        color: var(--primary-color);
+        font-size: 16px; /* ← Giảm từ 18px xuống 16px */
+        flex-shrink: 0;
+    }
+
+    .customer-selected-box #selectedCustomerName {
+        flex: 1;
+        font-size: 12px; /* ← Giảm từ 13px xuống 12px */
+        font-weight: 600;
+        color: #374151;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+    }
+
+
+/* Nút X - Giống nút + */
+.btn-remove-icon {
+    width: 24px; /* ← Giảm từ 26px xuống 24px */
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 12px; /* ← THÊM: icon nhỏ hơn */
+}
+
+    .btn-remove-icon:hover {
+        background: #e5e7eb; /* ← ĐỔI: Hover xám đậm thay vì đỏ */
+        color: #374151; /* ← ĐỔI: Text đậm hơn */
+        transform: scale(1.1);
+    }
+
+/* Dropdown kết quả - POSITION FIXED */
+.search-results-dropdown {
+    position: fixed !important; /* ← FIXED thay vì ABSOLUTE */
+    max-height: 350px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 999999 !important; /* ← Z-INDEX CỰC CAO */
+    display: none;
+    pointer-events: auto !important;
+}
+
+    .search-results-dropdown.show {
+        display: block !important;
+    }
+
+.search-result-item {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer !important;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto !important;
+}
+
+    .search-result-item:hover {
+        background: #f9fafb !important;
+    }
+
+    .search-results-dropdown.show {
+        display: block;
+    }
+
+.search-result-item {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+
+    .search-result-item:hover {
+        background: #f9fafb;
+    }
+
+    .search-result-item i {
+        color: var(--primary-color);
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Tên và SĐT trên 1 dòng */
+.search-result-name-phone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+    .search-result-name-phone .name {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .search-result-name-phone .separator {
+        color: #d1d5db;
+        font-weight: 600;
+    }
+
+    .search-result-name-phone .phone {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+/* Mã khách hàng ở dòng dưới */
+.search-result-id {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.search-no-result {
+    padding: 32px 24px;
+    text-align: center;
+    color: #6b7280;
+}
+
+    .search-no-result i {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+        color: #d1d5db;
+    }
+
+    .search-no-result div {
+        font-size: 14px;
+    }
+
+.btn-add-customer {
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+    .btn-add-customer:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+/* Scrollbar cho dropdown */
+.search-results-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+
+.search-results-dropdown::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+    .search-results-dropdown::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+
+
+/* ===========================
+   MODAL THÊM KHÁCH HÀNG
+=========================== */
+#modalThemKhachHang .modal-dialog {
+    max-width: 500px;
+}
+
+#modalThemKhachHang .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+#modalThemKhachHang .modal-header {
+    background: linear-gradient(90deg, #82408E 0%, #A250B2 100%);
+    color: white;
+    border-bottom: none;
+    padding: 16px 24px;
+    border-radius: 12px 12px 0 0;
+}
+
+#modalThemKhachHang .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+#modalThemKhachHang .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+    #modalThemKhachHang .btn-close:hover {
+        opacity: 1;
+    }
+
+#modalThemKhachHang .modal-body {
+    padding: 24px;
+}
+
+#modalThemKhachHang .form-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+#modalThemKhachHang .form-control,
+#modalThemKhachHang textarea.form-control {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+    #modalThemKhachHang .form-control:focus,
+    #modalThemKhachHang textarea.form-control:focus {
+        border-color: #A250B2;
+        box-shadow: 0 0 0 3px rgba(162, 80, 178, 0.1);
+        outline: none;
+    }
+
+    #modalThemKhachHang .form-control::placeholder {
+        color: #9ca3af;
+    }
+
+#modalThemKhachHang .text-danger {
+    color: #ef4444;
+}
+
+#modalThemKhachHang .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    gap: 12px;
+}
+
+#modalThemKhachHang .btn {
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+#modalThemKhachHang .btn-secondary {
+    background: #6b7280;
+    border: none;
+}
+
+    #modalThemKhachHang .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+#modalThemKhachHang .btn-primary {
+    background: #A250B2;
+    border: none;
+}
+
+    #modalThemKhachHang .btn-primary:hover {
+        background: #82408E;
+    }

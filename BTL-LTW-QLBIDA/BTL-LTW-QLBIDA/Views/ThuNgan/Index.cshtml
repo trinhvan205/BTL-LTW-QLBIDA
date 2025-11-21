@@ -126,8 +126,39 @@
     <!-- BÊN PHẢI: Hóa đơn chi tiết -->
     <div class="thungan-right">
         <div class="hoadon-header">
-            <i class="bi bi-receipt"></i>
-            <span id="tenBanHienTai">Chưa chọn bàn</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-receipt"></i>
+                    <span id="tenBanHienTai">Chưa chọn bàn</span>
+                </div>
+
+                <!-- Thanh tìm kiếm khách hàng mới -->
+                <div class="customer-search-container">
+                    <!-- State 1: Chưa chọn khách hàng - Hiện search -->
+                    <div id="customerSearchBox" class="customer-search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text"
+                               id="searchKhachHang"
+                               placeholder="Tìm khách hàng (F4)"
+                               autocomplete="off">
+                        <button type="button" class="btn-add-icon" onclick="moModalThemKhachHang('')" title="Thêm khách hàng mới">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- State 2: Đã chọn khách hàng - Hiện badge -->
+                    <div id="customerSelectedBox" class="customer-selected-box" style="display: none;">
+                        <i class="bi bi-person-circle"></i>
+                        <span id="selectedCustomerName">Nguyễn Văn A</span>
+                        <button type="button" class="btn-remove-icon" onclick="xoaKhachHang()" title="Bỏ khách hàng">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+
+                    <!-- Dropdown kết quả -->
+                    <div id="searchResults" class="search-results-dropdown"></div>
+                </div>
+            </div>
         </div>
 
         <div id="hoaDonArea" class="hoadon-area">
@@ -145,6 +176,9 @@
 
 <!-- ← THÊM: Modal preview PDF -->
 @await Html.PartialAsync("~/Views/Shared/ThuNgan/_ModalPreviewPdf.cshtml")
+
+<!-- Include Modal Thêm Khách Hàng -->
+@await Html.PartialAsync("ThuNgan/_ModalThemKhachHang")
 
 @section Scripts {
     <script src="~/js/thungan.js"></script>

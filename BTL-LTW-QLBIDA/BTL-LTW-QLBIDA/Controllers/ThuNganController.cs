@@ -376,5 +376,142 @@ namespace BTL_LTW_QLBIDA.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+
+        // ===========================
+        // TÌM KIẾM KHÁCH HÀNG
+        // ===========================
+
+        [HttpGet]
+        public IActionResult SearchKhachHang(string keyword)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(keyword))
+                {
+                    return Json(new { success = false, message = "Vui lòng nhập từ khóa" });
+                }
+
+                // Tìm kiếm theo SĐT HOẶC Họ tên
+                var khachHangs = _context.Khachhangs
+                    .Where(kh =>
+                        (kh.Sodt != null && kh.Sodt.Contains(keyword)) ||
+                        (kh.Hoten != null && kh.Hoten.Contains(keyword))
+                    )
+                    .OrderBy(kh => kh.Hoten)
+                    .Take(10)
+                    .Select(kh => new
+                    {
+                        idKh = kh.Idkh,
+                        tenKh = kh.Hoten ?? "Khách hàng",
+                        sdt = kh.Sodt ?? "",
+                        soLuotMua = kh.Hoadons.Count()
+                    })
+                    .ToList();
+
+                return Json(new { success = true, data = khachHangs });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
+
+
+        // Gán khách hàng vào hóa đơn
+        [HttpPost]
+        public IActionResult GanKhachHang(string idHoaDon, string idKhachHang)
+        {
+            try
+            {
+                // Tìm hóa đơn
+                var hoaDon = _context.Hoadons.Find(idHoaDon);
+                if (hoaDon == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+                }
+
+                // Kiểm tra khách hàng tồn tại
+                var khachHang = _context.Khachhangs.Find(idKhachHang);
+                if (khachHang == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy khách hàng" });
+                }
+
+                // Gán khách hàng vào hóa đơn
+                hoaDon.Idkh = idKhachHang;
+                _context.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Đã gán khách hàng",
+                    khachHang = new
+                    {
+                        idKh = khachHang.Idkh,
+                        tenKh = khachHang.Hoten, // ← Đổi từ Tenkh thành Hoten
+                        sdt = khachHang.Sodt     // ← Đổi từ Sdt thành Sodt
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
+
+        // Thêm khách hàng mới nhanh
+        [HttpPost]
+        public IActionResult ThemKhachHangNhanh(string tenKh, string sdt, string diaChi)
+        {
+            try
+            {
+                // Kiểm tra SĐT đã tồn tại
+                var exists = _context.Khachhangs.Any(kh => kh.Sodt == sdt);
+                if (exists)
+                {
+                    return Json(new { success = false, message = "Số điện thoại đã tồn tại!" });
+                }
+
+                // Tạo ID mới
+                var maxId = _context.Khachhangs
+                    .Select(kh => kh.Idkh)
+                    .ToList()
+                    .Select(id => int.Parse(id.Substring(2)))
+                    .DefaultIfEmpty(0)
+                    .Max();
+
+                var newId = $"KH{(maxId + 1):D3}";
+
+                // Tạo khách hàng mới
+                var khachHang = new Khachhang
+                {
+                    Idkh = newId,
+                    Hoten = tenKh,
+                    Sodt = sdt,
+                    Dchi = diaChi
+                };
+
+                _context.Khachhangs.Add(khachHang);
+                _context.SaveChanges();
+
+                // ✅ THÊM: Trả về thông tin khách hàng
+                return Json(new
+                {
+                    success = true,
+                    message = "Đã thêm khách hàng thành công!",
+                    khachHang = new
+                    {
+                        idKh = khachHang.Idkh,
+                        tenKh = khachHang.Hoten,
+                        sdt = khachHang.Sodt
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
     }
 }

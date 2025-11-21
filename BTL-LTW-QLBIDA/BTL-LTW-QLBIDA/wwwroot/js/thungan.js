@@ -3,7 +3,9 @@
 // ===========================
 let banDangChon = null;
 let viewHienTai = 'ban'; // 'ban' hoặc 'dichvu'
-let timeUpdateInterval = null; // ← THÊM: Interval cho đồng hồ
+let timeUpdateInterval = null;
+let khuVucHienTai = ''; // ← THÊM: Lưu khu vực đang chọn
+let loaiDvHienTai = ''; // ← THÊM: Lưu loại dịch vụ đang chọn
 
 // ===========================
 // KHỞI TẠO KHI TRANG LOAD
@@ -11,11 +13,13 @@ let timeUpdateInterval = null; // ← THÊM: Interval cho đồng hồ
 $(document).ready(function () {
     console.log('Thu Ngân System Ready ✓');
 
+    // ← THÊM: Khởi tạo khu vực mặc định là "Tất cả"
+    khuVucHienTai = '';
+    loaiDvHienTai = '';
+
     // Load danh sách bàn mặc định
     loadDanhSachBan();
 
-    // ← THÊM: Khôi phục bàn selected sau khi load xong
-    setTimeout(khoiPhucBanSelected, 200);
 
     // Xử lý nút chuyển tab (Phòng bàn / Thực đơn)
     $('#btnShowBan').click(function () {
@@ -27,10 +31,8 @@ $(document).ready(function () {
             $('#tabsKhuVuc').show();
             $('#tabsLoaiDv').hide();
 
-            // ← SỬA: Không truyền khuVucId để load tất cả
-            loadDanhSachBan();
-
-            // ← KHÔNG CẦN: khoiPhucBanSelected đã tự động gọi trong loadDanhSachBan
+            // ← SỬA: Load lại khu vực đã chọn trước đó
+            loadDanhSachBan(khuVucHienTai);
         }
     });
 
@@ -49,7 +51,8 @@ $(document).ready(function () {
             $('#tabsKhuVuc').hide();
             $('#tabsLoaiDv').show();
 
-            loadDanhSachDichVu();
+            // ← SỬA: Load lại loại dịch vụ đã chọn trước đó
+            loadDanhSachDichVu(loaiDvHienTai);
         }
     });
 
@@ -165,8 +168,12 @@ $(document).on('click', '.dropdown-item-inline[data-khu]', function (e) {
     $('#dropdownMoreKhuVuc').removeClass('open');
     $('#menuMoreKhuVuc').removeClass('show');
 
+    // ← THÊM: Lưu khu vực đang chọn
+    khuVucHienTai = khuVucId;
+
     loadDanhSachBan(khuVucId);
 });
+
 
 // Click tabs khu vực thông thường
 $(document).on('click', '#tabsKhuVuc .filter-btn:not(.dropdown-toggle-inline)', function () {
@@ -177,9 +184,11 @@ $(document).on('click', '#tabsKhuVuc .filter-btn:not(.dropdown-toggle-inline)', 
     $('#dropdownMoreKhuVuc').removeClass('active').html('<i class="bi bi-chevron-down"></i>');
 
     let khuVucId = $(this).data('khu');
-    loadDanhSachBan(khuVucId);
 
-    // ← KHÔNG CẦN gọi thêm, khoiPhucBanSelected đã tự động chạy
+    // ← THÊM: Lưu khu vực đang chọn
+    khuVucHienTai = khuVucId;
+
+    loadDanhSachBan(khuVucId);
 });
 
 // ===========================
@@ -218,6 +227,9 @@ $(document).on('click', '.dropdown-item-inline[data-loai]', function (e) {
     $('#dropdownMoreLoaiDv').removeClass('open');
     $('#menuMoreLoaiDv').removeClass('show');
 
+    // ← THÊM: Lưu loại dịch vụ đang chọn
+    loaiDvHienTai = loaiDvId;
+
     loadDanhSachDichVu(loaiDvId);
 });
 
@@ -230,6 +242,10 @@ $(document).on('click', '#tabsLoaiDv .filter-btn:not(.dropdown-toggle-inline)', 
     $('#dropdownMoreLoaiDv').removeClass('active').html('<i class="bi bi-chevron-down"></i>');
 
     let loaiDv = $(this).data('loai');
+
+    // ← THÊM: Lưu loại dịch vụ đang chọn
+    loaiDvHienTai = loaiDv;
+
     loadDanhSachDichVu(loaiDv);
 });
 
@@ -261,8 +277,6 @@ function loadDanhSachBan(khuVucId = '') {
         success: function (html) {
             $('#contentArea').html(html);
 
-            // ← THÊM: Sau khi load xong, khôi phục bàn selected
-            setTimeout(khoiPhucBanSelected, 200);
         },
         error: function (xhr, status, error) {
             console.error('Load bàn error:', error);
@@ -302,8 +316,6 @@ function chonBan(idBan, tenBan) {
     // Cập nhật tên bàn ở header
     $('#tenBanHienTai').text(tenBan);
 
-    // ← THÊM: Lưu vào localStorage
-    luuBanSelected(idBan);
 
     // Load hóa đơn chi tiết
     loadHoaDonChiTiet(idBan);
@@ -407,10 +419,12 @@ function batDauChoi(idBan) {
             if (response.success) {
                 showToast('✅ Đã bắt đầu tính giờ!');
 
-                // ← THÊM: Lưu lại bàn trước khi reload
-                luuBanSelected(idBan);
+                // ← SỬA: Chỉ load bàn nếu đang ở tab bàn
+                if (viewHienTai === 'ban') {
+                    loadDanhSachBan(khuVucHienTai);
+                }
 
-                loadDanhSachBan();
+                // Load hóa đơn chi tiết (luôn load)
                 if (banDangChon === idBan) {
                     loadHoaDonChiTiet(idBan);
                 }
@@ -835,9 +849,6 @@ function resetAfterPayment() {
     currentHoaDonId = null;
     banDangChon = null;
 
-    // ← THÊM: Xóa bàn selected khỏi localStorage
-    xoaBanSelected();
-
     $('#tenBanHienTai').text('Chưa chọn bàn');
     loadDanhSachBan();
     $('#hoaDonArea').html(`
@@ -948,54 +959,286 @@ $('#modalThanhToan').on('hidden.bs.modal', function () {
 
 
 // ===========================
-// GIỮ BÀN SELECTED BẰNG LOCALSTORAGE
+// TÌM KIẾM KHÁCH HÀNG - CẢI TIẾN
 // ===========================
 
-// Lưu bàn selected vào localStorage
-function luuBanSelected(idBan) {
-    localStorage.setItem('selectedBanId', idBan);
-    console.log('💾 Đã lưu bàn:', idBan);
-}
+let searchTimeout = null;
+let selectedKhachHang = null;
 
-// Khôi phục bàn selected từ localStorage HOẶC biến toàn cục
-function khoiPhucBanSelected() {
-    // Ưu tiên dùng banDangChon (biến toàn cục)
-    const banId = banDangChon || localStorage.getItem('selectedBanId');
+// Xử lý input tìm kiếm
+$(document).on('input', '#searchKhachHang', function () {
+    const keyword = $(this).val().trim();
 
-    if (banId) {
-        const banItem = $(`.ban-item[data-id="${banId}"]`);
-        if (banItem.length > 0) {
-            // Bàn tồn tại trong DOM
-            const tenBan = banItem.data('ten') || banId;
+    clearTimeout(searchTimeout);
 
-            // Highlight
-            $('.ban-item').removeClass('selected');
-            banItem.addClass('selected');
-
-            // Cập nhật biến toàn cục
-            banDangChon = banId;
-
-            // Cập nhật header
-            $('#tenBanHienTai').text(tenBan);
-
-            // Lưu localStorage (đảm bảo đồng bộ)
-            localStorage.setItem('selectedBanId', banId);
-
-            console.log('✅ Đã khôi phục bàn:', banId);
-        } else {
-            // Bàn không tồn tại trong khu vực này
-            console.log('⚠️ Bàn', banId, 'không có trong khu vực này');
-
-            // KHÔNG xóa localStorage - giữ lại để chuyển khu vực khác vẫn nhớ
-            // Chỉ xóa banDangChon tạm thời
-            // banDangChon = null; // ← BỎ dòng này để giữ nguyên
-        }
+    if (keyword.length < 2) {
+        $('#searchResults').removeClass('show');
+        return;
     }
+
+    searchTimeout = setTimeout(function () {
+        timKiemKhachHang(keyword);
+    }, 300);
+});
+
+// Focus vào search khi nhấn F4
+$(document).on('keydown', function (e) {
+    if (e.key === 'F4') {
+        e.preventDefault();
+        $('#searchKhachHang').focus();
+    }
+});
+
+// Gọi API tìm kiếm
+function timKiemKhachHang(keyword) {
+    $.ajax({
+        url: '/ThuNgan/SearchKhachHang',
+        type: 'GET',
+        data: { keyword: keyword },
+        success: function (response) {
+            if (response.success) {
+                hienThiKetQuaTimKiem(response.data, keyword);
+            }
+        },
+        error: function () {
+            showToast('❌ Lỗi khi tìm kiếm');
+        }
+    });
 }
 
-// Xóa bàn selected khỏi localStorage
-function xoaBanSelected() {
-    localStorage.removeItem('selectedBanId');
-    banDangChon = null;
-    console.log('🗑️ Đã xóa bàn selected');
+
+// Hiển thị kết quả
+function hienThiKetQuaTimKiem(data, keyword) {
+    let html = '';
+
+    if (data.length > 0) {
+        data.forEach(kh => {
+            html += `
+                <div class="search-result-item" data-id="${kh.idKh}" data-ten="${kh.tenKh}" data-sdt="${kh.sdt}">
+                    <i class="bi bi-person-circle"></i>
+                    <div class="search-result-info">
+                        <div class="search-result-name-phone">
+                            <span class="name">${kh.tenKh}</span>
+                            <span class="separator">•</span>
+                            <span class="phone">${kh.sdt}</span>
+                        </div>
+                        <div class="search-result-id">Mã: ${kh.idKh}</div>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        // ← SỬA: Chỉ hiện thông báo, không có nút
+        html = `
+            <div class="search-no-result">
+                <i class="bi bi-search"></i>
+                <div>Không tìm thấy kết quả phù hợp</div>
+            </div>
+        `;
+    }
+
+    $('#searchResults').html(html).addClass('show');
 }
+
+// Click chọn khách hàng
+$(document).on('click', '.search-result-item', function () {
+    const idKh = $(this).data('id');
+    const tenKh = $(this).data('ten');
+    const sdt = $(this).data('sdt');
+
+    chonKhachHang(idKh, tenKh, sdt);
+});
+
+// Chọn khách hàng
+function chonKhachHang(idKh, tenKh, sdt) {
+    // Lấy ID hóa đơn hiện tại
+    const idHd = $('.btn-thanhtoan').data('hd');
+
+    if (!idHd) {
+        showToast('⚠️ Vui lòng chọn bàn trước');
+        return;
+    }
+
+    $.ajax({
+        url: '/ThuNgan/GanKhachHang',
+        type: 'POST',
+        data: {
+            idHoaDon: idHd,
+            idKhachHang: idKh
+        },
+        success: function (response) {
+            if (response.success) {
+                selectedKhachHang = { idKh, tenKh, sdt };
+
+                // Chuyển sang state đã chọn
+                $('#customerSearchBox').hide();
+                $('#customerSelectedBox').show();
+                $('#selectedCustomerName').text(tenKh);
+
+                // Ẩn kết quả
+                $('#searchResults').removeClass('show');
+                $('#searchKhachHang').val('');
+
+                showToast(`✅ Đã chọn: ${tenKh}`);
+            } else {
+                showToast('❌ ' + response.message);
+            }
+        },
+        error: function () {
+            showToast('❌ Lỗi khi gán khách hàng');
+        }
+    });
+}
+
+// Xóa khách hàng đã chọn
+function xoaKhachHang() {
+    selectedKhachHang = null;
+
+    // Chuyển về state chưa chọn
+    $('#customerSelectedBox').hide();
+    $('#customerSearchBox').show();
+    $('#searchKhachHang').val('').focus();
+
+    showToast('ℹ️ Đã bỏ khách hàng');
+}
+
+// ===========================
+// MODAL THÊM KHÁCH HÀNG
+// ===========================
+
+// Mở modal thêm khách hàng mới
+function moModalThemKhachHang(keyword) {
+    // Reset form
+    $('#hoTenKhachHang').val('');
+    $('#soDienThoaiKhachHang').val('');
+    $('#diaChiKhachHang').val('');
+
+    // Nếu keyword là SĐT thì điền sẵn
+    const isPhone = /^[0-9]+$/.test(keyword);
+    if (isPhone && keyword) {
+        $('#soDienThoaiKhachHang').val(keyword);
+        // Focus vào họ tên
+        setTimeout(() => {
+            $('#hoTenKhachHang').focus();
+        }, 500);
+    } else {
+        // Focus vào họ tên
+        setTimeout(() => {
+            $('#hoTenKhachHang').focus();
+        }, 500);
+    }
+
+    // Mở modal
+    $('#modalThemKhachHang').modal('show');
+}
+
+
+// Xử lý khi click nút Lưu
+function xuLyThemKhachHang() {
+    const hoTen = $('#hoTenKhachHang').val().trim();
+    const sdt = $('#soDienThoaiKhachHang').val().trim();
+    const diaChi = $('#diaChiKhachHang').val().trim();
+
+    // Validate họ tên
+    if (!hoTen) {
+        showToast('❌ Vui lòng nhập họ tên');
+        $('#hoTenKhachHang').focus();
+        return;
+    }
+
+    // Validate SĐT
+    if (!sdt) {
+        showToast('❌ Vui lòng nhập số điện thoại');
+        $('#soDienThoaiKhachHang').focus();
+        return;
+    }
+
+    // Validate định dạng SĐT (10-11 số)
+    if (!/^[0-9]{10,11}$/.test(sdt)) {
+        showToast('❌ Số điện thoại không hợp lệ (10-11 số)');
+        $('#soDienThoaiKhachHang').focus();
+        return;
+    }
+
+    // Gọi API thêm khách hàng
+    $.ajax({
+        url: '/ThuNgan/ThemKhachHangNhanh',
+        type: 'POST',
+        data: {
+            tenKh: hoTen,
+            sdt: sdt,
+            diaChi: diaChi
+        },
+        success: function (response) {
+            if (response.success) {
+                // ✅ HIỂN THỊ TOAST THÀNH CÔNG
+                showToast('✅ ' + response.message);
+
+                // Đóng modal
+                $('#modalThemKhachHang').modal('hide');
+
+                // Tự động chọn khách hàng vừa thêm
+                if (response.khachHang) {
+                    chonKhachHang(
+                        response.khachHang.idKh,
+                        response.khachHang.tenKh,
+                        response.khachHang.sdt
+                    );
+                }
+            } else {
+                // ❌ HIỂN THỊ TOAST LỖI
+                showToast('❌ ' + response.message);
+            }
+        },
+        error: function () {
+            showToast('❌ Lỗi khi thêm khách hàng');
+        }
+    });
+}
+
+// Xử lý phím Enter trong modal
+$(document).on('shown.bs.modal', '#modalThemKhachHang', function () {
+    // Focus vào họ tên khi mở modal
+    $('#hoTenKhachHang').focus();
+});
+
+$(document).on('keypress', '#modalThemKhachHang input, #modalThemKhachHang textarea', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        xuLyThemKhachHang();
+    }
+});
+
+
+
+// Reset khi thanh toán xong
+function resetAfterPayment() {
+    if (timeUpdateInterval) {
+        clearInterval(timeUpdateInterval);
+        timeUpdateInterval = null;
+    }
+
+    currentHoaDonId = null;
+    banDangChon = null;
+
+    $('#tenBanHienTai').text('Chưa chọn bàn');
+    loadDanhSachBan();
+    $('#hoaDonArea').html(`
+        <div class="empty-state">
+            <i class="bi bi-cart-x"></i>
+            <p>Vui lòng chọn bàn</p>
+        </div>
+    `);
+
+    $('#btnShowBan').click();
+
+    // ← THÊM: Reset khách hàng
+    selectedKhachHang = null;
+    $('#customerSelectedBox').hide();
+    $('#customerSearchBox').show();
+    $('#searchKhachHang').val('');
+}
+
+
+
+

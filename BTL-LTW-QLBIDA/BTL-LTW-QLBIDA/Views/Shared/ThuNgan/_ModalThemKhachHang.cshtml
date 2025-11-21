@@ -1,0 +1,55 @@
+﻿<!-- Modal Thêm Khách Hàng -->
+<div class="modal fade" id="modalThemKhachHang" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <!-- Họ tên -->
+                    <div class="col-12">
+                        <label class="form-label">
+                            Họ tên <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="hoTenKhachHang"
+                               placeholder="Nhập họ tên khách hàng"
+                               autocomplete="off">
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="col-12">
+                        <label class="form-label">
+                            Số điện thoại <span class="text-danger">*</span>
+                        </label>
+                        <input type="tel"
+                               class="form-control"
+                               id="soDienThoaiKhachHang"
+                               placeholder="Nhập số điện thoại"
+                               autocomplete="off">
+                    </div>
+
+                    <!-- Địa chỉ -->
+                    <div class="col-12">
+                        <label class="form-label">Địa chỉ</label>
+                        <textarea class="form-control"
+                                  id="diaChiKhachHang"
+                                  rows="2"
+                                  placeholder="Nhập địa chỉ (tùy chọn)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Bỏ qua
+                </button>
+                <button type="button" class="btn btn-primary" onclick="xuLyThemKhachHang()">
+                    <i class="bi bi-check-circle"></i> Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
