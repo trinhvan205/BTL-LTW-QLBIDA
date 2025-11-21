@@ -228,3 +228,45 @@ body {
         transform: translateY(-2px);
         box-shadow: 0 4px 10px rgba(247,151,30,0.35);
     }
+/* ============================================================
+   🌈 FIX LỆCH – làm khoảng cách đồng bộ với trang Dịch vụ
+============================================================ */
+
+/* Bọc cả layout hóa đơn */
+.hoadon-row {
+    margin-top: 20px; /* giống dịch vụ */
+}
+
+/* Filter và Content thẳng hàng */
+.hoadon-filter {
+    padding-right: 12px !important;
+}
+
+.hoadon-content {
+    padding-left: 12px !important;
+}
+
+/* ============================================================
+   🌈 TITLE BAR – Giống KiotViet
+============================================================ */
+.page-title-bar {
+    background: #f8f9fb;
+    padding: 18px 22px;
+    border-bottom: 2px solid #e4e7ed;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+    .page-title-bar h4 {
+        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+    }
+
+    .page-title-bar i {
+        font-size: 1.4rem;
+        color: #6a11cb;
+    }

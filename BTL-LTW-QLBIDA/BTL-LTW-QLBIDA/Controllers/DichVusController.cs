@@ -68,7 +68,20 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             var query = _context.Dichvus
                 .Include(d => d.IdloaiNavigation)
-                .OrderBy(d => d.Tendv)
+                .Select(d => new Dichvu
+                {
+                    Iddv = d.Iddv,
+                    Tendv = d.Tendv ?? "(Không tên)",      // FIX NULL
+                    Idloai = d.Idloai,
+                    Giatien = d.Giatien ?? 0,              // FIX NULL
+                    Soluong = d.Soluong ?? 0,              // FIX NULL
+                    Hienthi = d.Hienthi ?? false,          // FIX NULL
+                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
+                                ? "/images/no-image.png"   // FIX NULL
+                                : d.Imgpath,
+                    IdloaiNavigation = d.IdloaiNavigation
+                })
+                .OrderBy(d => d.Tendv)  // lúc này Tendv KHÔNG còn NULL nên không crash
                 .AsQueryable();
 
             // Bộ lọc
@@ -104,6 +117,7 @@ namespace BTL_LTW_QLBIDA.Controllers
             });
         }
 
+
         // =====================================================
         // XỬ LÝ ẢNH
         // =====================================================
@@ -116,14 +130,17 @@ namespace BTL_LTW_QLBIDA.Controllers
             string folder = Path.Combine(_env.WebRootPath, "images/dichvu");
             Directory.CreateDirectory(folder);
 
-            string newName = $"{id}_{Guid.NewGuid()}{ext}";
-            string path = Path.Combine(folder, newName);
+            // 👉 GIỮ NGUYÊN TÊN FILE NGƯỜI DÙNG TẢI LÊN
+            string fileName = file.FileName;
+
+            string path = Path.Combine(folder, fileName);
 
             using var stream = new FileStream(path, FileMode.Create);
             file.CopyTo(stream);
 
-            return "/images/dichvu/" + newName;
+            return "/images/dichvu/" + fileName;
         }
+
 
         private void DeleteOldImage(string? imgPath)
         {
@@ -143,39 +160,74 @@ namespace BTL_LTW_QLBIDA.Controllers
         {
             dv.Iddv = await GenerateNextIddvAsync();
 
+            // =============================
+            // VALIDATION – không cho nhập sai
+            // =============================
             if (string.IsNullOrWhiteSpace(dv.Tendv))
                 return Json(new { success = false, message = "Tên dịch vụ không được để trống!" });
+
             if (string.IsNullOrEmpty(dv.Idloai))
                 return Json(new { success = false, message = "Vui lòng chọn loại dịch vụ!" });
-            if (dv.Giatien <= 0)
+
+            if (dv.Giatien == null || dv.Giatien <= 0)
                 return Json(new { success = false, message = "Giá bán phải lớn hơn 0!" });
-            if (dv.Soluong < 0)
+
+            if (dv.Soluong == null || dv.Soluong < 0)
                 return Json(new { success = false, message = "Số lượng không hợp lệ!" });
 
+            // =============================
+            // FIX TRIỆT ĐỂ LỖI NULL
+            // =============================
+            dv.Giatien ??= 0;
+            dv.Soluong ??= 0;
+            dv.Hienthi ??= true;
+
+            // =============================
+            // XỬ LÝ ẢNH
+            // =============================
             if (imageFile != null)
             {
                 string? img = SaveImage(dv.Iddv, imageFile);
                 if (img == null)
                     return Json(new { success = false, message = "Ảnh không hợp lệ!" });
+
                 dv.Imgpath = img;
             }
             else
-                dv.Imgpath = "/images/no-image.png";
+            {
+                dv.Imgpath = null;
+            }
 
+            // =============================
+            // LƯU VÀO DATABASE
+            // =============================
             _context.Add(dv);
             await _context.SaveChangesAsync();
 
             return Json(new { success = true });
         }
 
+
         // =====================================================
         // DETAIL PARTIAL
         // =====================================================
-        [HttpGet]
         public async Task<IActionResult> DetailPartial(string id)
         {
             var dv = await _context.Dichvus
                 .Include(d => d.IdloaiNavigation)
+                .Select(d => new Dichvu
+                {
+                    Iddv = d.Iddv,
+                    Tendv = d.Tendv ?? "(Không tên)",
+                    Idloai = d.Idloai,
+                    Giatien = d.Giatien ?? 0,
+                    Soluong = d.Soluong ?? 0,
+                    Hienthi = d.Hienthi ?? false,
+                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
+                        ? "/images/no-image.png"
+                        : d.Imgpath,
+                    IdloaiNavigation = d.IdloaiNavigation
+                })
                 .FirstOrDefaultAsync(d => d.Iddv == id);
 
             if (dv == null)
@@ -209,11 +261,12 @@ namespace BTL_LTW_QLBIDA.Controllers
             if (old == null)
                 return Json(new { success = false, message = "Không tìm thấy dịch vụ!" });
 
-            old.Tendv = dv.Tendv;
+            // Ép null về giá trị an toàn
+            old.Tendv = string.IsNullOrWhiteSpace(dv.Tendv) ? "(Không tên)" : dv.Tendv;
             old.Idloai = dv.Idloai;
-            old.Giatien = dv.Giatien;
-            old.Soluong = dv.Soluong;
-            old.Hienthi = dv.Hienthi;
+            old.Giatien = dv.Giatien ?? 0;
+            old.Soluong = dv.Soluong ?? 0;
+            old.Hienthi = dv.Hienthi ?? false;
 
             if (imageFile != null)
             {
@@ -230,6 +283,7 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             return Json(new { success = true });
         }
+
 
         // =====================================================
         // DELETE AJAX
@@ -342,12 +396,27 @@ namespace BTL_LTW_QLBIDA.Controllers
         {
             var dv = await _context.Dichvus
                 .Include(d => d.IdloaiNavigation)
-                .FirstOrDefaultAsync(x => x.Iddv == id);
+                .Select(d => new Dichvu
+                {
+                    Iddv = d.Iddv,
+                    Tendv = d.Tendv ?? "(Không tên)",
+                    Idloai = d.Idloai,
+                    Giatien = d.Giatien ?? 0,
+                    Soluong = d.Soluong ?? 0,
+                    Hienthi = d.Hienthi ?? false,
+                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
+                        ? "/images/no-image.png"
+                        : d.Imgpath,
+                    IdloaiNavigation = d.IdloaiNavigation
+                })
+                .FirstOrDefaultAsync(d => d.Iddv == id);
 
-            if (dv == null) return NotFound();
+            if (dv == null)
+                return NotFound();
 
             return View(dv);
         }
+
 
     }
 }

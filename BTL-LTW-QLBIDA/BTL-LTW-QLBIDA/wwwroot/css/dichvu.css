@@ -58,7 +58,7 @@ body {
 
 .table-dv {
     border-collapse: separate !important;
-    border-spacing: 0 10px !important; /* mỗi hàng như 1 thẻ card */
+    border-spacing: 0 10px !important;
     font-size: 0.9rem;
     width: 100%;
 }
@@ -92,7 +92,6 @@ body {
             border-bottom-right-radius: 14px;
         }
 
-        /* Hover tím */
         .table-dv tbody tr:hover {
             transform: scale(1.01);
             box-shadow: 0 6px 18px rgba(118, 75, 162, 0.18);
@@ -160,7 +159,6 @@ body {
         background: #ece3ff;
     }
 
-/* Icon màu */
 .action-view i {
     color: #3b82f6;
 }
@@ -219,16 +217,16 @@ body {
     font-weight: 600;
     font-size: 0.85rem;
 }
+
 /* ============================================================
-   🌸 NÚT LỌC (btn-success cũ → đổi sang tím)
+   🌸 NÚT LỌC (tím mới)
 ============================================================ */
 #dvFilterForm .btn.btn-success,
 #filterForm .btn.btn-success {
-    background-color: #6a11cb !important; /* tím đậm */
+    background-color: #6a11cb !important;
     border-color: #6a11cb !important;
     font-weight: 600;
     box-shadow: 0 3px 10px rgba(106, 17, 203, 0.25);
-    transition: 0.2s;
 }
 
     #dvFilterForm .btn.btn-success:hover,
@@ -238,14 +236,13 @@ body {
         transform: translateY(-1px);
     }
 
-
 /* ============================================================
-   🎨 CARD FILTER – DỊCH VỤ
+   🌈 CARD FILTER – DỊCH VỤ
 ============================================================ */
 #dvFilterForm label.form-label {
     font-weight: 600;
     font-size: 0.85rem;
-    color: #6a11cb; /* tím giống header của dịch vụ */
+    color: #6a11cb;
 }
 
 #dvFilterForm input,
@@ -262,7 +259,7 @@ body {
     }
 
 /* ============================================================
-   🌿 NÚT "LỌC" – màu xanh lá theo dịch vụ
+   🌿 NÚT "LỌC" – màu xanh lá
 ============================================================ */
 #dvFilterForm .btn-success {
     border-radius: 8px;
@@ -271,19 +268,16 @@ body {
     background-color: #38a169 !important;
     border-color: #38a169 !important;
     box-shadow: 0 3px 10px rgba(56, 161, 105, 0.25);
-    transition: 0.2s;
 }
 
     #dvFilterForm .btn-success:hover {
         background-color: #2f855a !important;
         border-color: #2f855a !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 14px rgba(56, 161, 105, 0.4);
     }
 
 /* ============================================================
-   🍊 NÚT "XÓA LỌC" – GIỐNG HÓA ĐƠN 100%
-      Cam nhạt → hover cam đặc
+   🍊 NÚT "XÓA LỌC"
 ============================================================ */
 #dvFilterForm #clearFilter {
     border-radius: 8px;
@@ -299,5 +293,44 @@ body {
         background: #f7971e !important;
         color: #fff !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(247, 151, 30, 0.35);
+    }
+
+/* ============================================================
+   🌈 Layout giống Hóa đơn
+============================================================ */
+.dv-row {
+    margin-top: 20px !important;
+}
+
+.dv-sidebar-card {
+    margin-top: 4px;
+}
+
+.dv-content {
+    padding-left: 10px !important;
+}
+
+/* ============================================================
+   🌈 TITLE BAR – GIỐNG TRANG HÓA ĐƠN 100%
+============================================================ */
+.page-title-bar {
+    background: #f8f9fb;
+    padding: 18px 22px;
+    border-bottom: 2px solid #e4e7ed;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+    .page-title-bar h4 {
+        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+    }
+
+    .page-title-bar i {
+        font-size: 1.4rem;
+        color: #6a11cb;
     }
