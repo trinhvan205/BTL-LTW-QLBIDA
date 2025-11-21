@@ -3,6 +3,7 @@ using BTL_LTW_QLBIDA.Models;
 using BTL_LTW_QLBIDA.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Ocsp;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
@@ -19,11 +20,19 @@ namespace BTL_LTW_QLBIDA.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            
+            // Mỗi lần vào màn hình Login thì logout session
+            HttpContext.Session.Clear();
+            // ✅ XÓA LUÔN TEMPDATA
+            TempData.Clear();
+
             // Nếu đã đăng nhập rồi thì chuyển về trang chủ
             if (HttpContext.Session.GetString("TenDangNhap") != null)
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            
 
             return View();
         }
@@ -68,7 +77,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                     }
                     else // banhang
                     {
-                        return RedirectToAction("Index", "BanHang");
+                        return RedirectToAction("Index", "ThuNgan");
                     }
                 }
                 else
