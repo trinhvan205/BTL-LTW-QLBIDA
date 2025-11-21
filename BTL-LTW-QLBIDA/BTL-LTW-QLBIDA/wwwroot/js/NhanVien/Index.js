@@ -26,10 +26,6 @@ $(document).ready(function () {
         loadNhanviens();
     });
 
-    // Check all checkbox
-    $('#checkAll').on('change', function () {
-        $('tbody input[type="checkbox"]').prop('checked', this.checked);
-    });
 });
 
 // ==================== LOAD DATA FUNCTION ====================
@@ -93,9 +89,7 @@ function renderTable(data) {
 
         const row = `
             <tr>
-                <td class="text-center">
-                    <input type="checkbox" class="form-check-input">
-                </td>
+                
                 <td>
                     <div class="avatar-circle bg-primary text-white">
                         ${avatarLetter}

@@ -66,14 +66,6 @@
                             Tổng: <strong id="totalCount">0</strong> nhân viên
                         </p>
                     </div>
-                    @* <div>
-                        <button class="btn btn-outline-secondary">
-                            <i class="fas fa-file-import me-1"></i>Nhập file
-                        </button>
-                        <button class="btn btn-outline-secondary">
-                            <i class="fas fa-file-export me-1"></i>Xuất file
-                        </button>
-                    </div> *@
                 </div>
 
                 <!-- Alert Messages -->
@@ -110,9 +102,7 @@
                             <table class="table table-hover mb-0" id="nhanvienTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="text-center" style="width: 50px;">
-                                            <input type="checkbox" class="form-check-input" id="checkAll">
-                                        </th>
+                                        
                                         <th style="width: 80px;">Ảnh</th>
                                         <th>Mã nhân viên</th>
                                         <th>Tên đăng nhập</th>
@@ -146,6 +136,5 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/NhanVien/Index.js">
-        </script>
+    <script src="~/js/NhanVien/Index.js"></script>
 }
