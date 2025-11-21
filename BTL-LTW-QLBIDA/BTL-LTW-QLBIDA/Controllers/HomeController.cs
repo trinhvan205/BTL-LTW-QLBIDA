@@ -1,13 +1,15 @@
-﻿using BTL_LTW_QLBIDA.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using BTL_LTW_QLBIDA.Filters;
+using BTL_LTW_QLBIDA.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
+    [AdminAuthorize]
     public class HomeController : Controller
     {
         private readonly QlquanBilliardLtw2Context db;

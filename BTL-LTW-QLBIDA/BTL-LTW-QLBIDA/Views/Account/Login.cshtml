@@ -30,6 +30,9 @@
                     @TempData["SuccessMessage"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
+               
+                
+                
             }
 
             @if (!ViewData.ModelState.IsValid)
@@ -87,7 +90,7 @@
 
                     <div class="function-buttons">
                         <!-- NÚT BÁN HÀNG - Luôn có thể chọn -->
-                        <div class="btn-function active" onclick="selectFunction('banhang')" id="btn-banhang">
+                        <div class="btn-function active" onclick="selectFunction('ThuNgan')" id="btn-banhang">
                             <i class="fas fa-cash-register"></i>
                             <div class="function-name">BÁN HÀNG</div>
                             <div class="function-desc">Phục vụ khách hàng</div>

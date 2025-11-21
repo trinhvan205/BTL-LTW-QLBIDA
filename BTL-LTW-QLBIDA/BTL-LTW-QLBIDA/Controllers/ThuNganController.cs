@@ -1,11 +1,13 @@
-﻿using BTL_LTW_QLBIDA.Helpers; // ← THÊM
+﻿using BTL_LTW_QLBIDA.Filters;
+using BTL_LTW_QLBIDA.Helpers; // ← THÊM
 using BTL_LTW_QLBIDA.Models;
+using BTL_LTW_QLBIDA.Services; // ← THÊM
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BTL_LTW_QLBIDA.Services; // ← THÊM
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
+    [AuthorizeSession]
     public class ThuNganController : Controller
     {
         private readonly QlquanBilliardLtw2Context _context;

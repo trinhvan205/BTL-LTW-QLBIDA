@@ -9,10 +9,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
-                <label asp-for="Idban" class="form-label">Tên bàn</label>
-                @* 🟢 TỰ ĐỘNG ĐIỀN ID BÀN TIẾP THEO TỪ VIEWBAG *@
-                <input asp-for="Idban" class="form-control" value="@ViewBag.NextBanId" />
+                <label asp-for="Idban" class="form-label">Mã bàn</label>
+
+                <input asp-for="Idban" class="form-control" value="@ViewBag.NextBanId" readonly disabled style="background-color: #f0f0f0;" />
+
                 <span asp-validation-for="Idban" class="text-danger"></span>
+
+                <input type="hidden" asp-for="Idban" value="@ViewBag.NextBanId" />
             </div>
 
             <div class="mb-3">
@@ -26,8 +29,10 @@
 
             <div class="mb-3">
                 <label asp-for="Giatien" class="form-label">Giá tiền</label>
-                @* 🟢 GIỮ NGUYÊN step="any" để cho phép nhập số thập phân chính xác *@
-                <input asp-for="Giatien" class="form-control" type="number" step="any" />
+
+               
+                <input asp-for="Giatien" class="form-control" type="text" id="createGiatien" />
+
                 <span asp-validation-for="Giatien" class="text-danger"></span>
             </div>
 

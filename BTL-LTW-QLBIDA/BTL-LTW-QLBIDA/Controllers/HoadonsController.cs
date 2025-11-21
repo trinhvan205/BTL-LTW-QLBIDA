@@ -1,4 +1,6 @@
-﻿using BTL_LTW_QLBIDA.Models;
+﻿using System.Threading.Tasks;
+using BTL_LTW_QLBIDA.Filters;
+using BTL_LTW_QLBIDA.Models;
 using BTL_LTW_QLBIDA.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@ using static iTextSharp.text.pdf.AcroFields;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
+    [AdminAuthorize]
     public class HoadonsController(QlquanBilliardLtw2Context context) : Controller
     {
         private readonly QlquanBilliardLtw2Context _db = context;

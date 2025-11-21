@@ -8,22 +8,23 @@ namespace BTL_LTW_QLBIDA.Models;
 public partial class Ban
 {
     // Idban có lẽ đóng vai trò là Tên Bàn.
-    // Thêm [Required] để bắt buộc nhập.
     [Required(ErrorMessage = "Vui lòng nhập Tên bàn.")]
-    [DisplayName("Tên bàn")] // Dùng cho label trong View
+    [DisplayName("Tên bàn")]
     public string Idban { get; set; } = null!;
 
     // Idkhu (ID Khu vực)
-    // Thêm [Required] để bắt buộc chọn Khu vực.
     [Required(ErrorMessage = "Vui lòng chọn Khu vực.")]
     [DisplayName("Khu vực")]
     public string? Idkhu { get; set; }
 
     // Giatien
-    // Thêm [Required] và [Range] để đảm bảo là số dương hợp lệ.
-    [Required(ErrorMessage = "Vui lòng nhập Giá tiền.")]
-    [Range(0.01, (double)decimal.MaxValue, ErrorMessage = "Giá tiền phải là một con số hợp lệ và lớn hơn 0.")]
+    
+
+    // 🟢 ĐÃ SỬA: Cho phép Giá tiền là số thực lớn hơn hoặc bằng 0
+    [DataType(DataType.Currency, ErrorMessage = "Giá tiền phải là một con số hợp lệ.")]
+    [Range(0, (double)decimal.MaxValue, ErrorMessage = "Giá tiền phải là một con số hợp lệ và lớn hơn hoặc bằng 0.")]
     [DisplayName("Giá tiền")]
+    [Required(ErrorMessage = "Vui lòng nhập Giá tiền.")]
     public decimal? Giatien { get; set; }
 
     // Trangthai và Ghichu không bắt buộc (Optional)

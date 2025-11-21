@@ -3,245 +3,28 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BTL_LTW_QLBIDA</title>
+    <title>@ViewData["Title"] - Quản Lý Quán Billiards</title>
 
     @* CSS CORE/EXTERNAL *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     @* CSS TÙY CHỈNH CHUNG *@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BTL_LTW_QLBIDA.styles.css" asp-append-version="true" />
+    <link href="~/css/Home_Layout.css" rel="stylesheet" asp-append-version="true" />
 
-    @* CSS TỪ VIEW RIÊNG (Ban.css sẽ được tải ở đây) *@
+    @* CSS TỪ VIEW RIÊNG *@
     @await RenderSectionAsync("Styles", required: false)
-    <title>@ViewData["Title"] - Quản Lý Quán Billiards</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <style>
-        :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-        }
 
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .navbar-brand {
-            color: white !important;
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-
-            .navbar-brand:hover {
-                color: #f0f0f0 !important;
-            }
-
-        .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            font-weight: 500;
-            transition: all 0.3s;
-            padding: 0.5rem 1rem !important;
-        }
-
-            .nav-link:hover {
-                color: white !important;
-                background-color: rgba(255,255,255,0.1);
-                border-radius: 5px;
-            }
-
-            .nav-link.active {
-                background-color: rgba(255,255,255,0.2);
-                border-radius: 5px;
-            }
-
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            background: rgba(255,255,255,0.1);
-        }
-
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: white;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .badge-admin {
-            background: #dc3545;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-        }
-
-        footer {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            margin-top: 50px;
-        }
-
-            footer a {
-                color: white;
-                text-decoration: none;
-            }
-
-                footer a:hover {
-                    text-decoration: underline;
-                }
-    </style>
+    
 </head>
 
 <body>
-    @* Không có style ở đây *@
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-billiard-ball me-2"></i>Quản Lý Billiards
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (Context.Session.GetString("TenDangNhap") != null)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                    <i class="fas fa-home me-1"></i>Tổng quan
-                                </a>
-                            </li>
-
-                            <!-- Menu chỉ dành cho Admin -->
-                            @if (Context.Session.GetString("QuyenAdmin") == "1")
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-cog me-1"></i>Quản lý
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Nhanviens" asp-action="Index">
-                                                <i class="fas fa-users me-2"></i>Nhân viên
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Khachhangs" asp-action="Index">
-                                                <i class="fas fa-user-friends me-2"></i>Khách hàng
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Bans" asp-action="Index">
-                                                <i class="fas fa-table me-2"></i>Bàn billiards
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Dichvus" asp-action="Index">
-                                                <i class="fas fa-coffee me-2"></i>Dịch vụ
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Hoadons" asp-action="Index">
-                                        <i class="fas fa-receipt me-1"></i>Hóa đơn
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="BaoCao" asp-action="Index">
-                                        <i class="fas fa-chart-bar me-1"></i>Báo cáo
-                                    </a>
-                                </li>
-                            }
-
-                            <!-- Menu cho tất cả nhân viên -->
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="BanHang" asp-action="Index">
-                                    <i class="fas fa-cash-register me-1"></i>Bán hàng
-                                </a>
-                            </li>
-                        }
-                    </ul>
-
-                    <!-- User Info -->
-                    <ul class="navbar-nav">
-                        @if (Context.Session.GetString("TenDangNhap") != null)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown">
-                                    <div class="user-info">
-                                        <div class="user-avatar">
-                                            @(Context.Session.GetString("HoTenNV")?.Substring(0, 1).ToUpper() ?? "U")
-                                        </div>
-                                        <div class="d-none d-md-block">
-                                            <div class="fw-bold" style="font-size: 0.9rem;">
-                                                @Context.Session.GetString("HoTenNV")
-                                            </div>
-                                            @if (Context.Session.GetString("QuyenAdmin") == "1")
-                                            {
-                                                <span class="badge-admin">
-                                                    <i class="fas fa-crown me-1"></i>Admin
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <small style="opacity: 0.8;">Nhân viên</small>
-                                            }
-                                        </div>
-                                    </div>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
-                                            <i class="fas fa-key me-2"></i>Đổi mật khẩu
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                    <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-
-            </div>
-        </nav>
+        @* Navigation Partial *@
+        @await Html.PartialAsync("_NavigationPartial")
     </header>
 
     <div class="container-fluid px-4">
@@ -250,17 +33,15 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-center py-3">
-        <div class="container">
-            <span>&copy; 2025 - Hệ Thống Quản Lý Quán Billiards</span>
-        </div>
-    </footer>
+    @* Footer Partial *@
+    @await Html.PartialAsync("_FooterPartial")
 
+    @* JavaScript *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-   @* //await RenderSectionAsync("Scripts", required: false)\ *@
-    @RenderSection("Scripts", required: false)
+    @* Scripts từ View riêng *@
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

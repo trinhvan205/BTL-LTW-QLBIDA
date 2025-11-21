@@ -1,14 +1,16 @@
-﻿using BTL_LTW_QLBIDA.Models;
+﻿using System.Drawing;
+using BTL_LTW_QLBIDA.Filters;
+using BTL_LTW_QLBIDA.Models;
 using BTL_LTW_QLBIDA.Models.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using System.Drawing;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
+    [AdminAuthorize]
     public class DichvusController(QlquanBilliardLtw2Context context, IWebHostEnvironment env) : Controller
     {
         private readonly QlquanBilliardLtw2Context _context = context;
