@@ -4,7 +4,6 @@
         <div class="mb-3">
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <label class="form-label fw-semibold m-0">Khu vực</label>
-                @* <small><a href="#" class="text-decoration-none" onclick="alert('Tính năng QL Khu vực đang cập nhật')">Quản lý</a></small> *@
             </div>
             <select name="khuvuc" class="form-select" asp-items="ViewBag.KhuVucs">
                 <option value="">-- Tất cả --</option>
@@ -19,8 +18,8 @@
         <div class="mb-3">
             <label class="form-label fw-semibold">Trạng thái</label>
             <select name="trangthai" class="form-select">
-                <option value="">Tất cả</option>
-                <option value="false" selected>Trống</option>
+                <option value="" selected>Tất cả</option>
+                <option value="false">Trống</option>
                 <option value="true">Đang có khách</option>
             </select>
         </div>
