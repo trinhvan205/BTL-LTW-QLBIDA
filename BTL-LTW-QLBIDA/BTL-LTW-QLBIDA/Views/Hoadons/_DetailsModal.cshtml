@@ -70,7 +70,11 @@
             <div class="row mb-2">
                 <div class="col-md-6">
 
-                    <p><strong>Khách hàng:</strong> @Model.IdkhNavigation?.Hoten</p>
+                    <p>
+                        <strong>Khách hàng:</strong>
+                        @(Model.IdkhNavigation?.Hoten ?? "Khách lẻ")
+                    </p>
+
                     <p><strong>Nhân viên lập HĐ:</strong> @Model.IdnvNavigation?.Hotennv</p>
 
                     <p>
@@ -84,6 +88,13 @@
                     <p><strong>Ngày lập:</strong> @Model.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</p>
 
                     <p><strong>Bàn chơi:</strong> @Model.IdphienNavigation?.Idban</p>
+                    <p>
+                        <strong>Giá bàn:</strong>
+                        <span class="fw-bold text-primary">
+                            @((phien?.IdbanNavigation?.Giatien ?? 0).ToString("N0")) VNĐ
+                        </span>
+                    </p>
+
 
                     <p>
                         <strong>Giờ vào – Giờ ra:</strong><br />

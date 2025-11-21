@@ -17,8 +17,9 @@
 
         <td>
             <i class="bi bi-person-circle text-success me-1"></i>
-            @item.IdkhNavigation?.Hoten
+            @(item.IdkhNavigation?.Hoten ?? "Khách lẻ")
         </td>
+
 
         <td>
             <i class="bi bi-person-badge-fill text-info me-1"></i>
