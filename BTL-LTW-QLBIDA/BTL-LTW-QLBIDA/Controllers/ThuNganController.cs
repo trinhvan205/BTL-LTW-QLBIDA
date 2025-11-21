@@ -32,6 +32,11 @@ namespace BTL_LTW_QLBIDA.Controllers
             ViewBag.PhuongThucThanhToans = _context.Phuongthucthanhtoans
                 .Where(p => p.Hienthi == true)
                 .ToList();
+
+            // ✅ THÊM: Truyền thông tin nhân viên vào ViewBag
+            ViewBag.TenNhanVien = HttpContext.Session.GetString("HoTenNV") ?? "Nhân viên";
+            ViewBag.IdNhanVien = HttpContext.Session.GetString("IdNV") ?? "";
+
             return View();
         }
 
@@ -144,7 +149,13 @@ namespace BTL_LTW_QLBIDA.Controllers
                 string maHoaDon = MaHoaDonHelper.TaoMaHoaDon(_context);
 
                 //string? idNhanVien = HttpContext.Session.GetString("UserId");
-                string? idNhanVien = "NV001"; // ← Thay bằng ID nhân viên thật
+                // ✅ LẤY ID NHÂN VIÊN TỪ SESSION
+                string? idNhanVien = HttpContext.Session.GetString("IdNV");
+
+                if (string.IsNullOrEmpty(idNhanVien))
+                {
+                    return Json(new { success = false, message = "Phiên đăng nhập hết hạn!" });
+                }
 
                 var hoaDon = new Hoadon
                 {
@@ -275,11 +286,12 @@ namespace BTL_LTW_QLBIDA.Controllers
                         .ThenInclude(p => p.IdbanNavigation)
                     .Include(h => h.Hoadondvs)
                         .ThenInclude(hd => hd.IddvNavigation)
-                    .Include(h => h.IdnvNavigation) // ← THÊM: Để lấy tên nhân viên cho PDF
+                    .Include(h => h.IdnvNavigation)      // ← Load để hiển thị trong modal
+                    .Include(h => h.IdkhNavigation)      // ← Load khách hàng
                     .FirstOrDefault(h => h.Idhd == idHoaDon);
 
                 if (hoaDon == null)
-                    return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+                    return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
 
                 var phien = hoaDon.IdphienNavigation;
                 var ban = phien.IdbanNavigation;
@@ -301,14 +313,40 @@ namespace BTL_LTW_QLBIDA.Controllers
 
                 decimal tongTien = tienGio + tienDichVu;
 
-                // ← THANH TOÁN & ĐÓNG BÀN LUÔN
+                // ✅✅✅ QUAN TRỌNG: GÁN ID NHÂN VIÊN TỪ SESSION
+                var idNhanVien = HttpContext.Session.GetString("IdNV");
+                if (!string.IsNullOrEmpty(idNhanVien))
+                {
+                    hoaDon.Idnv = idNhanVien;
+                    Console.WriteLine($"✅ Đã gán IdNV: {idNhanVien}");
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ CẢNH BÁO: Không có IdNV trong session!");
+                }
+
+                // ← THANH TOÁN & ĐÓNG BÀN
                 hoaDon.Tongtien = tongTien;
                 hoaDon.Trangthai = true;
                 hoaDon.Idpttt = phuongThucThanhToan;
+                hoaDon.Ngaylap = DateTime.Now;  // ← Cập nhật thời gian thanh toán
                 phien.Gioketthuc = DateTime.Now;
                 ban.Trangthai = false;
 
                 _context.SaveChanges();
+                Console.WriteLine("✅ Đã SaveChanges");
+
+                // ✅ SAU KHI SAVE, LOAD LẠI ĐỂ CÓ NAVIGATION PROPERTIES
+                hoaDon = _context.Hoadons
+                    .Include(h => h.IdphienNavigation)
+                        .ThenInclude(p => p.IdbanNavigation)
+                    .Include(h => h.Hoadondvs)
+                        .ThenInclude(hd => hd.IddvNavigation)
+                    .Include(h => h.IdnvNavigation)      // ← QUAN TRỌNG: Load nhân viên
+                    .Include(h => h.IdkhNavigation)      // ← QUAN TRỌNG: Load khách hàng
+                    .FirstOrDefault(h => h.Idhd == idHoaDon);
+
+                Console.WriteLine($"✅ Reload hóa đơn - IdNV: {hoaDon.Idnv}, TenNV: {hoaDon.IdnvNavigation?.Hotennv}");
 
                 // ← Tạo PDF TẠM để preview
                 string pdfUrlTemp = _pdfService.TaoHoaDonPdfTemp(hoaDon, ban);
@@ -318,12 +356,13 @@ namespace BTL_LTW_QLBIDA.Controllers
                     success = true,
                     message = "Thanh toán thành công!",
                     tongTien = tongTien,
-                    pdfUrl = pdfUrlTemp, // ← PDF tạm
-                    idHoaDon = idHoaDon  // ← Trả về ID để dùng sau
+                    pdfUrl = pdfUrlTemp,
+                    idHoaDon = idHoaDon
                 });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"❌ Lỗi ThanhToan: {ex.Message}");
                 return Json(new { success = false, message = ex.Message });
             }
         }

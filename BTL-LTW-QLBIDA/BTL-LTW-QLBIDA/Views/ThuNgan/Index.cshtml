@@ -170,6 +170,9 @@
     </div>
 </div>
 
+<!-- ✅ THÊM: Hidden inputs cho thông tin nhân viên -->
+<input type="hidden" id="tenNhanVien" value="@ViewBag.TenNhanVien" />
+<input type="hidden" id="idNhanVien" value="@ViewBag.IdNhanVien" />
 
 <!-- Modal thanh toán - Chỉ load 1 lần -->
 @await Html.PartialAsync("~/Views/Shared/ThuNgan/_ModalThanhToan.cshtml")
