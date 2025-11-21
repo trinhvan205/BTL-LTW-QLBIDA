@@ -56,7 +56,13 @@
                         <label class="form-check-label" for="radioNgung">Trống </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" asp-for="SelectedTrangThai" value="" id="radioTatCa">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="SelectedTrangThai"
+                               value=""
+                               id="radioTatCa"
+                               @(Model.SelectedTrangThai == null ? Html.Raw("checked") : Html.Raw(""))>
+
                         <label class="form-check-label" for="radioTatCa">Tất cả</label>
                     </div>
                 </div>
@@ -85,7 +91,7 @@
 
     <div class="col-md-9 pt-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3>Bàn</h3>
+            <h3 class="page-title"><i class="bi bi-table me-2"></i> Bàn</h3>
             <div>
                 <button type="button" class="btn btn-custom-add"
                         data-bs-toggle="modal"

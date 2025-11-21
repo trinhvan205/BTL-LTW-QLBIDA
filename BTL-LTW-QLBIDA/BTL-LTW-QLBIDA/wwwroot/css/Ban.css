@@ -164,16 +164,7 @@ body {
         padding: 0;
     }
 
-/* --- CỘT HÀNH ĐỘNG (Dù không dùng cột này) --- */
-.action-buttons-cell {
-    width: 100px;
-    text-align: center;
-}
 
-    .action-buttons-cell .btn {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.85rem;
-    }
 
 /* ====================================================================== */
 /* --- 4. TÙY CHỈNH TAB CHI TIẾT (DETAIL TABS) --- */
@@ -291,3 +282,43 @@ body {
     font-weight: 500;
 }
 
+
+
+
+/* Áp dụng cho hàng dữ liệu có thể click được */
+.clickable-row {
+    /* 1. Đảm bảo các thuộc tính chuyển động hoạt động */
+    position: relative;
+    z-index: 1;
+    /* 2. Thiết lập chuyển động mượt mà cho các thay đổi */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+    /* Hiệu ứng khi di chuột qua */
+    .clickable-row:hover {
+        /* 3. Di chuyển dòng lên trên 2px (tạo cảm giác nhô lên) */
+        transform: translateY(-2px);
+        /* 4. Thêm đổ bóng nhẹ xung quanh dòng (tạo cảm giác nổi bật) */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        /* 5. Tăng độ ưu tiên z-index để dòng nổi lên trên các dòng khác */
+        z-index: 10;
+    }
+
+    /* ⚠️ Nếu bạn đang sử dụng Bootstrap table-hover: 
+   Bạn nên điều chỉnh màu nền nếu cần, vì table-hover sẽ đổi màu mặc định. 
+   Thêm dòng sau nếu bạn muốn giữ màu nền giống như khi không hover: 
+*/
+    .clickable-row:hover {
+        background-color: #f8f9fa !important; /* Ví dụ màu nền rất nhạt khi hover */
+    }
+
+
+
+
+/* Định kiểu cho tiêu đề trang */
+.page-title {
+    /* Đặt màu chữ thành màu tím. Bạn có thể thay đổi mã màu (#7F59B2) 
+       để phù hợp chính xác với màu tím bạn đang dùng. */
+    color: #7F59B2;
+    /* Đảm bảo icon (bi-controller) cũng thừa hưởng màu này */
+}
