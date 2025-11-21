@@ -86,24 +86,60 @@ setTimeout(() => {
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    /* =======================================================
+       1. LOAD LẠI BẢNG LẦN ĐẦU
+    ======================================================= */
     reloadTable();
 
+    /* =======================================================
+       2. INFINITE SCROLL
+    ======================================================= */
     $("#tableScrollArea").on("scroll", function () {
         if ($(this).scrollTop() + $(this).height() >= this.scrollHeight - 50) {
             loadMoreRows();
         }
     });
 
+    /* =======================================================
+       3. NÚT LỌC (SUBMIT FORM)
+    ======================================================= */
     $("#filterForm").on("submit", e => {
         e.preventDefault();
         reloadTable();
     });
 
+    /* =======================================================
+       4. NÚT XÓA LỌC
+    ======================================================= */
     $("#btnClearFilter").on("click", () => {
         $("#filterForm")[0].reset();
         reloadTable();
     });
+
+
+    /* =======================================================
+       5. AUTO FILTER – tự lọc khi người dùng nhập/chọn
+    ======================================================= */
+
+    // Auto: lọc khi gõ mã hoá đơn hoặc tên khách
+    let typingTimer;
+    $("input[name='ma'], input[name='khach']").on("keyup", function () {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => reloadTable(), 350);
+    });
+
+    // Auto: lọc khi chọn trạng thái
+    $("select[name='trangthai']").on("change", function () {
+        reloadTable();
+    });
+
+    // Auto: lọc khi chọn ngày
+    $("input[name='from'], input[name='to']").on("change", function () {
+        reloadTable();
+    });
+
 });
+
 
 
 // =============================
@@ -209,30 +245,3 @@ $(document).on("click", ".btn-delete", function () {
     });
 });
 
-
-// =============================
-//   PRINT
-// =============================
-$(document).on("click", ".btn-print", function () {
-    let id = $(this).data("id");
-    window.open("/Hoadons/Print?id=" + id, "_blank");
-});
-
-$(document).on("click", ".btn-print-detail", function () {
-    let id = $(this).data("id");
-    window.open("/Hoadons/Print?id=" + id, "_blank");
-});
-
-// ===============================
-// IN HÓA ĐƠN – HIỆN MODAL PDF
-// ===============================
-
-
-
-// =============================
-//   EXPORT EXCEL
-// =============================
-$("#btnExportExcel").on("click", function () {
-    let qs = $("#filterForm").serialize();
-    window.location = "/Hoadons/ExportExcel?" + qs;
-});

@@ -11,39 +11,32 @@
     <div class="modal-body p-3">
 
         <div class="mb-3">
-            <label class="form-label fw-bold">Tên dịch vụ</label>
-            <input name="Tendv" class="form-control form-control-sm" />
+            <label class="form-label fw-semibold">Tên dịch vụ</label>
+            <input id="add_Tendv" name="Tendv"
+                   class="form-control form-control-sm" placeholder="Nhập tên..." />
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Loại</label>
-                <select name="Idloai" class="form-select form-select-sm">
-                    <option value="">-- Chọn loại --</option>
-                    @foreach (var l in ViewBag.ListLoai)
-                    {
-                        <option value="@l.Idloai">@l.Tenloai</option>
-                    }
-                </select>
-            </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Loại</label>
+            <select id="add_Idloai" name="Idloai" class="form-select form-select-sm">
+                <option value="">-- Chọn loại --</option>
+                @foreach (var l in ViewBag.ListLoai)
+                {
+                    <option value="@l.Idloai">@l.Tenloai</option>
+                }
+            </select>
+        </div>
 
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Giá bán</label>
-                <input name="Giatien" type="number" class="form-control form-control-sm" min="0" />
-            </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Giá bán</label>
+            <input id="add_Gia" name="Giatien" type="number" min="0"
+                   class="form-control form-control-sm" />
+        </div>
 
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Tồn kho</label>
-                <input name="Soluong" type="number" class="form-control form-control-sm" min="0" />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Hiển thị</label>
-                <select name="Hienthi" class="form-select form-select-sm">
-                    <option value="true">Đang kinh doanh</option>
-                    <option value="false">Ngưng bán</option>
-                </select>
-            </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Tồn kho</label>
+            <input id="add_Soluong" name="Soluong" type="number" min="0"
+                   class="form-control form-control-sm" />
         </div>
 
         <label class="form-label fw-bold">Ảnh</label>

@@ -250,7 +250,13 @@ body {
 .text-muted {
     color: #e0e0ff !important;
 }
-
+/* Xoay icon con trỏ 180 độ */
+.function-icon {
+    /* Sử dụng transform: rotate(180deg) để xoay */
+    transform: rotate(180deg);
+    /* Thêm transition để hiệu ứng xoay mượt mà hơn (tùy chọn) */
+    transition: transform 0.3s ease;
+}
 /* Mobile */
 @media (max-width: 768px) {
     .login-container {
@@ -264,5 +270,12 @@ body {
     .login-section-right {
         border-left: none;
         border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    /* Xoay icon con trỏ 180 độ */
+    .function-icon {
+        /* Sử dụng transform: rotate(180deg) để xoay */
+        transform: rotate(180deg);
+        /* Thêm transition để hiệu ứng xoay mượt mà hơn (tùy chọn) */
+        transition: transform 0.3s ease;
     }
 }

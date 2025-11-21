@@ -68,10 +68,11 @@ namespace BTL_LTW_QLBIDA.Controllers
                     HttpContext.Session.SetString("QuyenAdmin", nhanVien.Quyenadmin == true ? "1" : "0");
                     HttpContext.Session.SetString("ChucNang", model.ChucNang);
 
-                    TempData["SuccessMessage"] = "Đăng nhập thành công!";
+					// ✅ THAY ĐỔI: Đặt nội dung thông báo chào mừng chính xác
+					TempData["SuccessMessage"] = $"Chào mừng {nhanVien.Hotennv}! Đăng nhập thành công.";
 
-                    // Chuyển hướng theo chức năng được chọn
-                    if (model.ChucNang == "quantri")
+					// Chuyển hướng theo chức năng được chọn
+					if (model.ChucNang == "quantri")
                     {
                         return RedirectToAction("Index", "Home");
                     }

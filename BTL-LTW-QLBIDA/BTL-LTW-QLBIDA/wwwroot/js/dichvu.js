@@ -1,10 +1,9 @@
 ﻿$(document).ready(function () {
 
     /* ================================================================
-       0. CLICK NÚT THÊM MỚI → RESET FORM & SINH MÃ DV
-    ============================================================== */
+       0. NÚT THÊM MỚI → RESET & LẤY MÃ DV
+    ================================================================ */
     $("#openAddModal").on("click", function () {
-
         $("#addForm")[0].reset();
         $("#preview_add_img").attr("src", "/images/no-image.png");
 
@@ -15,8 +14,8 @@
 
 
     /* ================================================================
-       1. BIẾN KHỞI TẠO
-    ============================================================== */
+       1. BIẾN
+    ================================================================ */
     let page = 1;
     let loading = false;
     let hasMore = true;
@@ -27,8 +26,8 @@
 
 
     /* ================================================================
-       2. HÀM LOAD DỮ LIỆU
-    ============================================================== */
+       2. LOAD DỮ LIỆU
+    ================================================================ */
     loadData(true);
 
     function loadData(reset = false) {
@@ -43,31 +42,26 @@
             hasMore = true;
         }
 
-        const formData = filterForm.serializeArray();
         let filter = {};
+        filterForm.serializeArray().forEach(x => {
 
-        formData.forEach(x => {
             if (x.name === "status") {
                 filter.status = (x.value === "" ? null : x.value === "true");
+            } else {
+                filter[x.name] = x.value;
             }
-            else filter[x.name] = x.value;
         });
 
         filter.page = page;
 
         $.ajax({
             url: "/Dichvus/LoadTable",
-            method: "GET",
+            type: "GET",
             data: filter,
 
             success: function (html) {
                 tableBody.append(html);
-
-                if (html.includes("no-more")) {
-                    hasMore = false;
-                } else {
-                    hasMore = true;
-                }
+                hasMore = !html.includes("no-more");
             },
 
             error: function () {
@@ -83,8 +77,8 @@
 
 
     /* ================================================================
-       3. INFINITE SCROLL TRONG TABLE
-    ============================================================== */
+       3. SCROLL
+    ================================================================ */
     tableScroll.on("scroll", function () {
         if (!hasMore || loading) return;
 
@@ -100,24 +94,43 @@
 
 
     /* ================================================================
-       4. FILTER SUBMIT
-    ============================================================== */
+       4. BỘ LỌC
+    ================================================================ */
     filterForm.on("submit", function (e) {
         e.preventDefault();
         loadData(true);
     });
 
-    $("#clearFilter").click(function () {
+    $("#btnClearFilter").on("click", function () {
         filterForm.trigger("reset");
+        loadData(true);
+    });
+    /* ======================================================
+   AUTO FILTER – tự lọc khi thay đổi input/select
+====================================================== */
+
+    // Gõ tên dịch vụ → tự lọc sau 350ms
+    let typingTimer;
+    $("input[name='keyword']").on("keyup", function () {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => loadData(true), 350);
+    });
+
+    // Chọn loại / trạng thái → lọc ngay
+    $("select[name='loaiId'], select[name='status']").on("change", function () {
+        loadData(true);
+    });
+
+    // Giá từ / giá đến → lọc ngay khi nhập số
+    $("input[name='minPrice'], input[name='maxPrice']").on("input", function () {
         loadData(true);
     });
 
 
     /* ================================================================
-       5. CLICK ROW → PANEL CHI TIẾT
-    ============================================================== */
+       5. CLICK ROW XEM CHI TIẾT
+    ================================================================ */
     tableBody.on("click", ".dv-row", function (e) {
-
         if ($(e.target).closest("button").length > 0) return;
 
         let id = $(this).data("id");
@@ -130,17 +143,15 @@
                 <div class="spinner-border text-success"></div>
             </div>`);
 
-        $.ajax({
-            url: "/Dichvus/DetailPartial",
-            method: "GET",
-            data: { id: id },
-            success: function (html) {
-                $("#dichvuDetail").html(html);
-            }
+        $.get("/Dichvus/DetailPartial", { id: id }, function (html) {
+            $("#dichvuDetail").html(html);
         });
     });
 
 
+    /* ================================================================
+       6. MODAL CHI TIẾT
+    ================================================================ */
     tableBody.on("click", ".btn-detail", function (e) {
         e.stopPropagation();
         let id = $(this).data("id");
@@ -160,8 +171,8 @@
 
 
     /* ================================================================
-       6. SỬA DỊCH VỤ
-    ============================================================== */
+       7. SỬA
+    ================================================================ */
     tableBody.on("click", ".btn-edit", function (e) {
         e.stopPropagation();
         let id = $(this).data("id");
@@ -188,8 +199,8 @@
         $.ajax({
             url: "/Dichvus/UpdateAjax",
             method: "POST",
-            contentType: false,
             processData: false,
+            contentType: false,
             data: formData,
 
             success: function (res) {
@@ -198,7 +209,7 @@
                     return;
                 }
 
-                Swal.fire("Thành công", res.message, "success");
+                Swal.fire("Thành công", "Cập nhật thành công!", "success");
                 $("#editModal").modal("hide");
                 loadData(true);
             }
@@ -207,39 +218,39 @@
 
 
     /* ================================================================
-       7. XÓA DỊCH VỤ
-    ============================================================== */
+       8. XÓA
+    ================================================================ */
     tableBody.on("click", ".btn-delete", function (e) {
         e.stopPropagation();
-
         let id = $(this).data("id");
 
         Swal.fire({
             title: "Xóa dịch vụ?",
-            text: "Hành động này không thể hoàn tác!",
+            text: "Không thể hoàn tác!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Xóa",
             cancelButtonText: "Hủy"
         }).then(r => {
 
-            if (r.isConfirmed) {
-                $.post("/Dichvus/DeleteAjax", { id: id }, function (res) {
-                    if (res.success) {
-                        Swal.fire("Đã xóa!", res.message, "success");
-                        loadData(true);
-                    } else {
-                        Swal.fire("Lỗi", res.message, "error");
-                    }
-                });
-            }
+            if (!r.isConfirmed) return;
+
+            $.post("/Dichvus/DeleteAjax", { id: id }, function (res) {
+                if (!res.success) {
+                    Swal.fire("Lỗi", res.message, "error");
+                    return;
+                }
+
+                Swal.fire("Đã xoá!", "Dịch vụ đã được xoá.", "success");
+                loadData(true);
+            });
         });
     });
 
 
     /* ================================================================
-       8. TOGGLE STATUS
-    ============================================================== */
+       9. TOGGLE STATUS
+    ================================================================ */
     tableBody.on("click", ".btn-toggle", function (e) {
         e.stopPropagation();
 
@@ -247,28 +258,51 @@
 
         $.post("/Dichvus/ToggleStatus", { id: id }, function (res) {
             if (res.success) {
-                Swal.fire("Thành công", "Đã cập nhật trạng thái!", "success");
+                Swal.fire("OK!", "Đã đổi trạng thái.", "success");
                 loadData(true);
-            } else {
-                Swal.fire("Lỗi", "Không thể cập nhật!", "error");
             }
         });
     });
 
 
     /* ================================================================
-       9. CREATE
-    ============================================================== */
-    $("#addForm").submit(function (e) {
+       10. VALIDATION + CREATE
+    ================================================================ */
+    $("#addForm").on("submit", function (e) {
         e.preventDefault();
+
+        let ten = $("#add_Tendv").val()?.trim();
+        let loai = $("#add_Idloai").val();
+        let gia = parseFloat($("#add_Gia").val());
+        let ton = parseInt($("#add_Soluong").val());
+
+        if (!ten || ten.length < 2) {
+            Swal.fire("Lỗi", "Tên dịch vụ phải từ 2 ký tự!", "error");
+            return;
+        }
+
+        if (!loai) {
+            Swal.fire("Lỗi", "Chọn loại dịch vụ!", "error");
+            return;
+        }
+
+        if (isNaN(gia) || gia <= 0) {
+            Swal.fire("Lỗi", "Giá phải > 0!", "error");
+            return;
+        }
+
+        if (isNaN(ton) || ton < 0) {
+            Swal.fire("Lỗi", "Tồn kho không hợp lệ!", "error");
+            return;
+        }
 
         let formData = new FormData(this);
 
         $.ajax({
             url: "/Dichvus/CreateAjax",
             method: "POST",
-            contentType: false,
             processData: false,
+            contentType: false,
             data: formData,
 
             success: function (res) {
@@ -277,7 +311,7 @@
                     return;
                 }
 
-                Swal.fire("Thành công", res.message, "success");
+                Swal.fire("Thành công", "Thêm dịch vụ thành công!", "success");
                 $("#addModal").modal("hide");
                 loadData(true);
             }
@@ -286,8 +320,8 @@
 
 
     /* ================================================================
-       10. PREVIEW ẢNH
-    ============================================================== */
+       11. PREVIEW IMAGE
+    ================================================================ */
     $("#input_add_img").change(function () {
         let f = this.files[0];
         if (f) $("#preview_add_img").attr("src", URL.createObjectURL(f));
@@ -300,22 +334,19 @@
 
 
     /* ================================================================
-       11. EXPORT
-    ============================================================== */
+       12. EXPORT
+    ================================================================ */
     $("#btnDvExportExcel").click(function () {
-        let qs = filterForm.serialize();
-        window.location = "/Dichvus/ExportExcel?" + qs;
+        window.location = "/Dichvus/ExportExcel?" + filterForm.serialize();
     });
 
 
     /* ================================================================
-   12. THÊM LOẠI DỊCH VỤ
-================================================================ */
+       13. THÊM LOẠI DỊCH VỤ
+    ================================================================ */
     $(document).on("click", "#btnSaveLoai", function () {
-
         let tenLoai = $("#tenLoaiMoi").val().trim();
 
-        // Validate input
         if (tenLoai === "") {
             $("#loaiError")
                 .text("Tên loại không được để trống")
@@ -323,27 +354,19 @@
             return;
         }
 
-        // Gửi AJAX
         $.post("/Loaidichvus/CreateAjax", { tenLoai: tenLoai }, function (res) {
 
             if (res.success) {
                 Swal.fire("Thành công", res.message, "success");
-
-                // Ẩn modal
                 $("#addLoaiModal").modal("hide");
-
-                // Reset input
                 $("#tenLoaiMoi").val("");
-                $("#loaiError").addClass("d-none");
-
-                // Reload trang để dropdown cập nhật
                 location.reload();
-            }
-            else {
+            } else {
                 $("#loaiError")
                     .text(res.message)
                     .removeClass("d-none");
             }
         });
     });
+
 });

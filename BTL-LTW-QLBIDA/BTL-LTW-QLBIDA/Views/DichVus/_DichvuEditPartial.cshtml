@@ -2,6 +2,13 @@
 @using BTL_LTW_QLBIDA.Models
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
+@{
+    // ⭐ CHUẨN HÓA ẢNH — đảm bảo luôn load đúng
+    string previewImg = string.IsNullOrEmpty(Model.Imgpath)
+        ? "/images/no-image.png"
+        : (Model.Imgpath.StartsWith("/") ? Model.Imgpath : "/" + Model.Imgpath);
+}
+
 <div class="container p-3">
 
     <h5 class="mb-3">
@@ -13,6 +20,7 @@
 
         <input type="hidden" id="editIddv" value="@Model.Iddv" />
 
+        <!-- TÊN DV -->
         <div class="col-md-12">
             <label class="form-label fw-bold">Tên dịch vụ</label>
             <input id="editTendv"
@@ -20,18 +28,25 @@
                    value="@Model.Tendv" />
         </div>
 
+        <!-- LOẠI -->
         <div class="col-md-6">
             <label class="form-label fw-bold">Loại</label>
             <select id="editIdloai" class="form-select form-select-sm">
                 @foreach (var l in ViewBag.ListLoai)
                 {
-                    <option value="@l.Idloai" selected='@(l.Idloai == Model.Idloai ? "selected" : null)'>
-                        @l.Tenloai
-                    </option>
+                    if (l.Idloai == Model.Idloai)
+                    {
+                        <option value="@l.Idloai" selected>@l.Tenloai</option>
+                    }
+                    else
+                    {
+                        <option value="@l.Idloai">@l.Tenloai</option>
+                    }
                 }
             </select>
         </div>
 
+        <!-- GIÁ -->
         <div class="col-md-6">
             <label class="form-label fw-bold">Giá bán</label>
             <input id="editGia" type="number"
@@ -39,6 +54,7 @@
                    value="@Model.Giatien" />
         </div>
 
+        <!-- SỐ LƯỢNG -->
         <div class="col-md-6">
             <label class="form-label fw-bold">Số lượng</label>
             <input id="editSoluong" type="number"
@@ -46,21 +62,26 @@
                    value="@Model.Soluong" />
         </div>
 
+        <!-- TRẠNG THÁI -->
         <div class="col-md-6">
             <label class="form-label fw-bold">Trạng thái</label>
             <select id="editHienthi" class="form-select form-select-sm">
-                <option value="true" selected='@(Model.Hienthi == true ? "selected" : null)'>Đang bán</option>
-                <option value="false" selected='@(Model.Hienthi == false ? "selected" : null)'>Ngưng bán</option>
+                <option value="true" selected="@(Model.Hienthi == true ? "selected" : null)">Đang bán</option>
+                <option value="false" selected="@(Model.Hienthi == false ? "selected" : null)">Ngưng bán</option>
             </select>
         </div>
 
+        <!-- ẢNH -->
         <div class="col-md-12 mt-2">
             <label class="form-label fw-bold">Ảnh</label>
+
             <div class="d-flex gap-3 align-items-center">
+
+                <!-- ⭐ ẢNH PREVIEW SỬA LỖI KHÔNG HIỆN -->
                 <img id="editPreview"
-                     src="@Model.Imgpath"
+                     src="@previewImg"
                      class="rounded shadow-sm"
-                     style="width:80px;height:80px;object-fit:cover;" />
+                     style="width:80px;height:80px;object-fit:cover;border:1px solid #ddd;" />
 
                 <input id="editImage" type="file"
                        class="form-control form-control-sm"
@@ -68,6 +89,7 @@
             </div>
         </div>
 
+        <!-- NÚT LƯU -->
         <div class="col-12 mt-4 text-end">
             <button class="btn btn-primary" id="btnSaveEdit">
                 <i class="bi bi-save"></i> Lưu thay đổi
