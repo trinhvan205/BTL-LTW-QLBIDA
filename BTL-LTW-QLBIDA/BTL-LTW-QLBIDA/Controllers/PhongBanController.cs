@@ -47,11 +47,12 @@ namespace BTL_LTW_QLBIDA.Controllers
         {
             int page = 1;
             int pageSize = 10;
+            // Trong [HÀM 1] HIỂN THỊ TRANG CHÍNH (Index)
 
             var banQuery = _context.Bans
-                                        .Include(b => b.IdkhuNavigation)
-                                        .Where(b => b.Trangthai == true)
-                                        .AsQueryable();
+                .Include(b => b.IdkhuNavigation)
+                // 🟢 Đã loại bỏ .Where(b => b.Trangthai == true)
+                .AsQueryable();
 
             var totalItems = await banQuery.CountAsync();
 
@@ -78,7 +79,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                 KhuVucs = new SelectList(khuVucList, "Idkhu", "Tenkhu"),
                 SelectedKhuVuc = "",
                 SearchString = "",
-                SelectedTrangThai = true
+                SelectedTrangThai = null 
             };
 
             return View(viewModel);
