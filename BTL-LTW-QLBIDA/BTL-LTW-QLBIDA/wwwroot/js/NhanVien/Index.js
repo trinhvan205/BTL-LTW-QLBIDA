@@ -1,9 +1,11 @@
 ﻿// ==================== VARIABLES ====================
 let searchTimeout;
+let currentPage = 1; // ⭐ Biến lưu trang hiện tại
+const pageSize = 10; // ⭐ Kích thước trang cố định
 
 // ==================== UTILITY FUNCTIONS ====================
 
-// ✅ HÀM MỚI: Hiển thị thông báo alert tự động tắt (Dùng cho lỗi AJAX)
+// ✅ HÀM: Hiển thị thông báo alert tự động tắt (Dùng cho lỗi AJAX)
 function showAutoCloseAlert(message, type = 'danger', duration = 2000) { // 2000ms = 2 giây
     const container = $('#apiAlertContainer');
     container.empty(); // Xóa thông báo cũ
@@ -26,51 +28,54 @@ function showAutoCloseAlert(message, type = 'danger', duration = 2000) { // 2000
 
 // ==================== DOCUMENT READY ====================
 $(document).ready(function () {
-    // Load data khi trang vừa load
-    loadNhanviens();
+    // Load data khi trang vừa load (trang 1)
+    loadNhanviens(1);
 
     // Tìm kiếm với debounce
     $('#searchInput').on('keyup', function () {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(function () {
-            loadNhanviens();
+            loadNhanviens(1); // ⭐ Reset về trang 1 khi tìm kiếm
         }, 500);
     });
 
     // Lọc theo trạng thái
     $('input[name="trangThai"]').on('change', function () {
-        loadNhanviens();
+        loadNhanviens(1); // ⭐ Reset về trang 1 khi lọc
     });
 
     // Reset filter
     $('#btnReset').on('click', function () {
         $('#searchInput').val('');
         $('#dangLam').prop('checked', true);
-        loadNhanviens();
+        loadNhanviens(1); // ⭐ Reset về trang 1
     });
 
-    // Check all checkbox
+    // Check all checkbox (Logic cũ, có thể bỏ qua)
     $('#checkAll').on('change', function () {
         $('tbody input[type="checkbox"]').prop('checked', this.checked);
     });
 
-    // ✅ LOGIC MỚI: Tự động đóng alert cho thông báo TempData (ID: AutoCloseAlert)
+    // Tự động đóng alert cho thông báo TempData
     const TEMP_DATA_TIMEOUT = 2000; // 2 giây
 
     var tempDataAlert = $('#AutoCloseAlert');
 
     if (tempDataAlert.length) {
         setTimeout(function () {
-            // Sử dụng hàm đóng alert của Bootstrap
             tempDataAlert.alert('close');
         }, TEMP_DATA_TIMEOUT);
     }
 });
 
 // ==================== LOAD DATA FUNCTION ====================
-function loadNhanviens() {
+// ⭐ Nhận tham số page
+function loadNhanviens(page = 1) {
     const searchString = $('#searchInput').val();
     const trangThai = $('input[name="trangThai"]:checked').val();
+
+    // Lưu lại trang hiện tại
+    currentPage = page;
 
     // Xóa alert AJAX cũ trước khi gọi API mới
     $('#apiAlertContainer').empty();
@@ -79,24 +84,32 @@ function loadNhanviens() {
     $('#loadingSpinner').show();
     $('#nhanvienTable').hide();
     $('#emptyState').hide();
+    $('#paginationContainer').empty(); // Xóa phân trang cũ
 
     $.ajax({
         url: '/Nhanviens/GetNhanviens',
         type: 'GET',
         data: {
             searchString: searchString,
-            trangThai: trangThai
+            trangThai: trangThai,
+            page: currentPage, // ⭐ Gửi trang hiện tại
+            pageSize: pageSize // ⭐ Gửi kích thước trang
         },
         success: function (response) {
             if (response.success) {
-                renderTable(response.data);
+                // response.data là object chứa items và pagination info
+                const data = response.data.items;
+                const totalItems = response.data.totalItems;
+                const totalPages = response.data.totalPages;
+                const currentPageFromResponse = response.data.currentPage;
+
+                renderTable(data, totalItems);
+                renderPagination(currentPageFromResponse, totalPages); // ⭐ Render phân trang
             } else {
-                // ✅ SỬA: Thay alert() bằng showAutoCloseAlert()
                 showAutoCloseAlert('Có lỗi xảy ra: ' + response.message, 'danger');
             }
         },
         error: function () {
-            // ✅ SỬA: Thay alert() bằng showAutoCloseAlert()
             showAutoCloseAlert('Không thể tải dữ liệu. Vui lòng thử lại!', 'danger');
         },
         complete: function () {
@@ -106,14 +119,15 @@ function loadNhanviens() {
 }
 
 // ==================== RENDER TABLE FUNCTION ====================
-function renderTable(data) {
+// ⭐ Nhận thêm tham số totalItems
+function renderTable(data, totalItems) {
     const tbody = $('#nhanvienTableBody');
     tbody.empty();
 
     // Update total count
-    $('#totalCount').text(data.length);
+    $('#totalCount').text(totalItems);
 
-    if (data.length === 0) {
+    if (data.length === 0 && totalItems === 0) {
         $('#emptyState').show();
         $('#nhanvienTable').hide();
         return;
@@ -168,5 +182,60 @@ function renderTable(data) {
             </tr>
         `;
         tbody.append(row);
+    });
+}
+
+
+// ==================== RENDER PAGINATION FUNCTION ====================
+// ⭐ HÀM MỚI: Dựng các nút phân trang
+function renderPagination(currentPage, totalPages) {
+    const paginationContainer = $('#paginationContainer');
+    paginationContainer.empty();
+
+    if (totalPages <= 1) {
+        return;
+    }
+
+    let html = '<ul class="pagination justify-content-center">';
+
+    // Nút "Trước" (Previous)
+    html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage - 1}">Trước</a>
+             </li>`;
+
+    // Hiển thị tối đa 5 trang xung quanh trang hiện tại
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    // Điều chỉnh nếu số lượng trang nhỏ hơn maxPagesToShow
+    if (endPage - startPage + 1 < maxPagesToShow) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    // Hiển thị các số trang
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                 </li>`;
+    }
+
+    // Nút "Sau" (Next)
+    html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage + 1}">Sau</a>
+             </li>`;
+
+    html += '</ul>';
+    paginationContainer.append(html);
+
+    // Gắn sự kiện click cho các nút phân trang
+    paginationContainer.off('click', 'a.page-link').on('click', 'a.page-link', function (e) {
+        e.preventDefault();
+        const newPage = parseInt($(this).data('page'));
+
+        // Kiểm tra tính hợp lệ trước khi tải
+        if (!isNaN(newPage) && newPage > 0 && newPage <= totalPages && newPage !== currentPage) {
+            loadNhanviens(newPage); // Gọi lại hàm tải dữ liệu với trang mới
+        }
     });
 }

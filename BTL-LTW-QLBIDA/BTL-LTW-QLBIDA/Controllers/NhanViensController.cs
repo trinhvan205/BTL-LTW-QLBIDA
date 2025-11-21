@@ -96,9 +96,14 @@ namespace BTL_LTW_QLBIDA.Controllers
             return View(nhanvienList);
         }
 
-        // API: Lấy danh sách nhân viên với filter (dùng cho AJAX)
+        // API: Lấy danh sách nhân viên với filter, Sắp xếp và Phân trang (dùng cho AJAX)
         [HttpGet]
-        public async Task<IActionResult> GetNhanviens(string? searchString, string? trangThai)
+        public async Task<IActionResult> GetNhanviens(
+            string? searchString,
+            string? trangThai,
+            string? sortBy, // Thêm SortBy nếu cần dùng
+            int page = 1, // ⭐ THAM SỐ PHÂN TRANG MỚI
+            int pageSize = 10) // ⭐ THAM SỐ PHÂN TRANG MỚI
         {
             if (HttpContext.Session.GetString("TenDangNhap") == null)
             {
@@ -107,7 +112,7 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             var nhanviens = _context.Nhanviens.AsQueryable();
 
-            // Lọc theo trạng thái
+            // 1. Lọc theo trạng thái
             if (!string.IsNullOrEmpty(trangThai))
             {
                 if (trangThai == "danglam")
@@ -125,7 +130,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                 nhanviens = nhanviens.Where(nv => nv.Nghiviec == false);
             }
 
-            // Tìm kiếm
+            // 2. Tìm kiếm
             if (!string.IsNullOrEmpty(searchString))
             {
                 nhanviens = nhanviens.Where(nv =>
@@ -139,15 +144,30 @@ namespace BTL_LTW_QLBIDA.Controllers
             // Chỉ hiển thị nhân viên có HIENTHI = true
             nhanviens = nhanviens.Where(nv => nv.Hienthi == true);
 
-            // Tải về memory trước khi sắp xếp
+            // Tải về memory trước khi sắp xếp (Bắt buộc vì sắp xếp dùng int.Parse trên chuỗi ID)
             var nhanvienList = await nhanviens.ToListAsync();
 
-            // Sắp xếp theo số trong IDNV
+            // 3. Sắp xếp (Theo số trong IDNV tăng dần, giống logic cũ)
             nhanvienList = nhanvienList
                 .OrderBy(nv => int.Parse(nv.Idnv.Substring(4)))
                 .ToList();
 
-            var result = nhanvienList
+            // ⭐ 4. PHÂN TRANG (PAGINATION)
+            var totalItems = nhanvienList.Count;
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Đảm bảo trang hiện tại hợp lệ
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            // Lấy dữ liệu theo trang bằng Skip và Take
+            var paginatedNhanviens = nhanvienList
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // 5. Tạo kết quả trả về
+            var items = paginatedNhanviens
                 .Select(nv => new
                 {
                     idnv = nv.Idnv,
@@ -161,7 +181,19 @@ namespace BTL_LTW_QLBIDA.Controllers
                 })
                 .ToList();
 
-            return Json(new { success = true, data = result });
+            // ⭐ Trả về dữ liệu cùng với thông tin phân trang
+            return Json(new
+            {
+                success = true,
+                data = new
+                {
+                    items = items, // Danh sách nhân viên trên trang hiện tại
+                    totalItems = totalItems, // Tổng số nhân viên
+                    currentPage = page,
+                    totalPages = totalPages,
+                    pageSize = pageSize
+                }
+            });
         }
 
         // GET: Nhanviens/Details/5
