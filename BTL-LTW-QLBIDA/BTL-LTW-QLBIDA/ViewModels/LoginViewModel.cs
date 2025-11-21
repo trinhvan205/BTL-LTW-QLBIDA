@@ -17,6 +17,6 @@ namespace BTL_LTW_QLBIDA.ViewModels
         public bool GhiNho { get; set; }
 
         // Loại chức năng được chọn: "banhang" hoặc "quantri"
-        public string ChucNang { get; set; } = "banhang";
+        public string ChucNang { get; set; } = "ThuNgan";
     }
 }
