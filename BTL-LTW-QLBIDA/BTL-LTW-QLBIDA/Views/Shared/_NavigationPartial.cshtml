@@ -1,13 +1,66 @@
-﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
+﻿@using Microsoft.AspNetCore.Http
+<nav class="navbar navbar-expand-lg navbar-toggleable-lg navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
             <i class="fas fa-billiard-ball me-2"></i>Quản Lý Billiards
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+
+        <ul class="navbar-nav flex-row ms-auto order-lg-last align-items-center gap-2 me-2">
+            @if (Context.Session.GetString("TenDangNhap") != null)
+            {
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle p-0 d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-info d-flex align-items-center">
+                            <div class="user-avatar">
+                                @(Context.Session.GetString("HoTenNV")?.Substring(0, 1).ToUpper() ?? "U")
+                            </div>
+                            <div class="d-none d-md-block ms-2">
+                                <div class="fw-bold" style="font-size: 0.9rem;">
+                                    @Context.Session.GetString("HoTenNV")
+                                </div>
+                                @if (Context.Session.GetString("QuyenAdmin") == "1")
+                                {
+                                    <span class="badge-admin"><i class="fas fa-crown me-1"></i>Admin</span>
+                                }
+                                else
+                                {
+                                    <small style="opacity: 0.8;">Nhân viên</small>
+                                }
+                            </div>
+                        </div>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end position-absolute" style="right: 0; left: auto;">
+                        <li>
+                            <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
+                                <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Account" asp-action="Login">
+                        <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                    </a>
+                </li>
+            }
+        </ul>
+
+        <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-            <ul class="navbar-nav flex-grow-1">
+
+        <div class="navbar-collapse collapse flex-grow-1" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 @if (Context.Session.GetString("TenDangNhap") != null)
                 {
                     <li class="nav-item">
@@ -16,7 +69,6 @@
                         </a>
                     </li>
 
-                    <!-- Menu chỉ dành cho Admin -->
                     @if (Context.Session.GetString("QuyenAdmin") == "1")
                     {
                         <li class="nav-item dropdown">
@@ -24,94 +76,23 @@
                                 <i class="fas fa-cog me-1"></i>Quản lý
                             </a>
                             <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Nhanviens" asp-action="Index">
-                                        <i class="fas fa-users me-2"></i>Nhân viên
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Khachhangs" asp-action="Index">
-                                        <i class="fas fa-user-friends me-2"></i>Khách hàng
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" asp-controller="Nhanviens" asp-action="Index"><i class="fas fa-users me-2"></i>Nhân viên</a></li>
+                                <li><a class="dropdown-item" asp-controller="Khachhangs" asp-action="Index"><i class="fas fa-user-friends me-2"></i>Khách hàng</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="PhongBan" asp-action="Index">
-                                        <i class="fas fa-table me-2"></i>Bàn billiards
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Dichvus" asp-action="Index">
-                                        <i class="fas fa-coffee me-2"></i>Dịch vụ
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" asp-controller="PhongBan" asp-action="Index"><i class="fas fa-table me-2"></i>Bàn billiards</a></li>
+                                <li><a class="dropdown-item" asp-controller="Dichvus" asp-action="Index"><i class="fas fa-coffee me-2"></i>Dịch vụ</a></li>
                             </ul>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Hoadons" asp-action="Index">
                                 <i class="fas fa-receipt me-1"></i>Hóa đơn
                             </a>
                         </li>
-
                     }
 
-                    <!-- Menu cho tất cả nhân viên -->
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="ThuNgan" asp-action="Index">
                             <i class="fas fa-cash-register me-1"></i>Thu ngân
-                        </a>
-                    </li>
-                }
-            </ul>
-
-            <!-- User Info -->
-            <ul class="navbar-nav">
-                @if (Context.Session.GetString("TenDangNhap") != null)
-                {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown">
-                            <div class="user-info">
-                                <div class="user-avatar">
-                                    @(Context.Session.GetString("HoTenNV")?.Substring(0, 1).ToUpper() ?? "U")
-                                </div>
-                                <div class="d-none d-md-block">
-                                    <div class="fw-bold" style="font-size: 0.9rem;">
-                                        @Context.Session.GetString("HoTenNV")
-                                    </div>
-                                    @if (Context.Session.GetString("QuyenAdmin") == "1")
-                                    {
-                                        <span class="badge-admin">
-                                            <i class="fas fa-crown me-1"></i>Admin
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <small style="opacity: 0.8;">Nhân viên</small>
-                                    }
-                                </div>
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
-                                    <i class="fas fa-key me-2"></i>Đổi mật khẩu
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                }
-                else
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Account" asp-action="Login">
-                            <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
                         </a>
                     </li>
                 }

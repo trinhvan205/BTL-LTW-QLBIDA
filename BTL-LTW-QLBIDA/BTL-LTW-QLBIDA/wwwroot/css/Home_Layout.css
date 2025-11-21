@@ -54,9 +54,11 @@ footer {
 .navbar {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 0.3rem 1rem; /* Giảm padding dọc */
-    min-height: 40px; /* Giới hạn chiều cao tối thiểu */
-    max-height: 50px;
+    padding: 0.5rem 1rem; /* Giảm padding dọc */
+    min-height: 50px; /* Giới hạn chiều cao tối thiểu */
+    height: auto;
+    position: relative;
+    z-index: 1030;
 }
 
 .navbar-brand {
@@ -101,7 +103,7 @@ footer {
     padding: 0.25rem 0.5rem !important; /* Override p-0 */
     display: flex !important;
     align-items: center !important;
-    height: 90%; /* Đảm bảo chiều cao đủ */
+    height: auto;
     align-self: center; /* Căn giữa theo chiều dọc */
     margin-top: auto; /* Căn giữa tự động */
     margin-bottom: auto; /* Căn giữa tự động */
@@ -194,6 +196,9 @@ align-items: center; /* Căn giữa tất cả nav items */
     margin-top: 0.3rem;
 }
 
+.nav-link, .navbar-brand, .user-info {
+    white-space: nowrap; /* Ngăn không cho chữ bị rớt dòng */
+}
 
 
 /* ==========================================
@@ -471,3 +476,53 @@ align-items: center; /* Căn giữa tất cả nav items */
         align-items: center;
     }
 }
+
+
+/* Đảm bảo nút 3 gạch luôn bấm được (nằm trên cùng) */
+.navbar-toggler {
+    z-index: 1031;
+    position: relative;
+}
+/* --- BẮT ĐẦU CODE MỚI --- */
+
+/* Đảm bảo User Info không dính sát nút 3 gạch */
+.navbar-toggler {
+    margin-left: 0.5rem;
+    border: none; /* Loại bỏ viền nút 3 gạch cho thoáng */
+    padding-right: 0;
+}
+
+/* Chỉnh sửa dropdown menu của User để không bị tràn màn hình trên điện thoại */
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Khi ở trên mobile, chỉnh lại khoảng cách menu chính */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        margin-top: 10px; /* Tạo khoảng cách với hàng trên cùng */
+        background: rgba(0,0,0,0.1); /* Làm nền menu tối đi một chút để dễ nhìn */
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    /* Đảm bảo user info luôn nằm ngang */
+    .navbar-nav.flex-row .nav-link {
+        padding-right: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+}
+
+/* Tinh chỉnh User Info gọn gàng hơn */
+.user-info {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 8px 4px 4px; /* Padding mỏng */
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+    .user-info:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+/* --- KẾT THÚC CODE MỚI --- */
