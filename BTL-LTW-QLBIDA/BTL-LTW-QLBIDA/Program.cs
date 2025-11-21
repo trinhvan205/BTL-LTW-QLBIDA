@@ -8,6 +8,7 @@ using QuestPDF.Infrastructure; // ← THÊM
 QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<PdfService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

@@ -27,5 +27,5 @@ public partial class Nhanvien
 
     public bool Nghiviec { get; set; }
 
-    public virtual ICollection<Hoadon> Hoadons { get; set; } = [];
+    public virtual ICollection<Hoadon> Hoadons { get; set; } = new List<Hoadon>();
 }

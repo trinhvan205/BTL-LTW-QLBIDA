@@ -1,26 +1,52 @@
 ﻿@model BTL_LTW_QLBIDA.Models.Hoadon
 
 @{
-    DateTime? vao = Model.IdphienNavigation?.Giobatdau;
-    DateTime? ra = Model.IdphienNavigation?.Gioketthuc;
+    var phien = Model.IdphienNavigation;
 
-    double gioChoi = 0;
-    if (vao != null && ra != null)
+    // ===========================
+    // ⏱ TÍNH SỐ PHÚT CHƠI THỰC
+    // ===========================
+    int tongPhut = 0;
+
+    if (phien?.Giobatdau != null && phien.Gioketthuc != null)
     {
-        gioChoi = (ra.Value - vao.Value).TotalHours;
-        gioChoi = Math.Round(gioChoi, 2);
+        tongPhut = (int)(phien.Gioketthuc.Value - phien.Giobatdau.Value).TotalMinutes;
+        if (tongPhut < 0) tongPhut = 0;
     }
 
-    decimal giaBan = Model.IdphienNavigation?.IdbanNavigation?.Giatien ?? 0;
-    decimal tienGio = (decimal)gioChoi * giaBan;
+    // ===========================
+    // 📌 TÍNH BLOCK 15 PHÚT
+    // Mỗi block = 15 phút
+    // >0 phút = 1 block
+    // ===========================
+    int soBlock = (tongPhut / 15) + 1;        // số block tính tiền
+    int phutTinhTien = soBlock * 15;          // phút được tính tiền
+    decimal gioTinhTien = phutTinhTien / 60m; // đổi ra giờ
 
-    decimal tongDv = 0;
-    foreach (var dv in Model.Hoadondvs)
-    {
-        tongDv += (dv.IddvNavigation?.Giatien ?? 0) * (dv.Soluong ?? 0);
-    }
+    // đơn giá bàn
+    decimal donGia = phien?.IdbanNavigation?.Giatien ?? 0;
 
-    decimal tongCong = tienGio + tongDv;
+    // tiền giờ
+    decimal tienGio = gioTinhTien * donGia;
+
+    // ===========================
+    // 💰 TIỀN DỊCH VỤ
+    // ===========================
+    decimal tienDv = Model.Hoadondvs.Sum(x =>
+        (x.IddvNavigation?.Giatien ?? 0) * (x.Soluong ?? 0)
+    );
+
+    // ===========================
+    // 💵 TỔNG TIỀN
+    // ===========================
+    decimal tongCong = tienGio + tienDv;
+
+    // thời gian hiển thị
+    int hThuc = tongPhut / 60;
+    int pThuc = tongPhut % 60;
+
+    int hTinh = phutTinhTien / 60;
+    int pTinh = phutTinhTien % 60;
 }
 
 <div class="modal-header bg-primary text-white">
@@ -32,11 +58,6 @@
 
 <div class="modal-body">
 
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-outline-primary btn-print-detail" data-id="@Model.Idhd">
-            <i class="bi bi-printer"></i> In hóa đơn
-        </button>
-    </div>
 
     <!-- THÔNG TIN CHUNG -->
     <div class="card mb-3 shadow-sm border-0">
@@ -48,8 +69,10 @@
 
             <div class="row mb-2">
                 <div class="col-md-6">
+
                     <p><strong>Khách hàng:</strong> @Model.IdkhNavigation?.Hoten</p>
                     <p><strong>Nhân viên lập HĐ:</strong> @Model.IdnvNavigation?.Hotennv</p>
+
                     <p>
                         <strong>Phương thức thanh toán:</strong>
                         <span class="badge bg-info text-dark px-3">@Model.IdptttNavigation?.Tenpttt</span>
@@ -57,29 +80,26 @@
                 </div>
 
                 <div class="col-md-6">
+
                     <p><strong>Ngày lập:</strong> @Model.Ngaylap?.ToString("dd/MM/yyyy HH:mm")</p>
 
                     <p><strong>Bàn chơi:</strong> @Model.IdphienNavigation?.Idban</p>
 
                     <p>
                         <strong>Giờ vào – Giờ ra:</strong><br />
-                        @(vao?.ToString("HH:mm") ?? "--") → @(ra?.ToString("HH:mm") ?? "--")
+                        @(phien?.Giobatdau?.ToString("HH:mm") ?? "--")
+                        →
+                        @(phien?.Gioketthuc?.ToString("HH:mm") ?? "--")
                     </p>
 
                     <p>
-                        <strong>Thời gian chơi:</strong>
-                        @{
-                            if (gioChoi > 0)
-                            {
-                                var h = Math.Floor(gioChoi);
-                                var m = Math.Round((gioChoi - h) * 60);
-                                @($"{h}h {m}p")
-                            }
-                            else
-                            {
-                                @("0h 0p")
-                            }
-                        }
+                        <strong>Thời gian chơi (thực):</strong>
+                        @($"{hThuc}h {pThuc}p")
+                    </p>
+
+                    <p>
+                        <strong>Thời gian tính tiền (block 15’):</strong>
+                        @($"{hTinh}h {pTinh}p")
                     </p>
 
                 </div>
@@ -108,6 +128,7 @@
         </div>
 
         <div class="card-body p-0">
+
             <table class="table table-bordered table-hover mb-0">
                 <thead class="table-light">
                     <tr class="text-center">
@@ -118,6 +139,7 @@
                         <th class="text-end" style="width: 150px;">Thành tiền</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @{
                         int i = 1;
@@ -140,15 +162,18 @@
                     }
                 </tbody>
             </table>
+
         </div>
 
         <div class="card-footer bg-white text-end">
+
             <p class="mb-1">Tiền giờ: <b>@tienGio.ToString("N0") VNĐ</b></p>
-            <p class="mb-1">Tiền dịch vụ: <b>@tongDv.ToString("N0") VNĐ</b></p>
+            <p class="mb-1">Tiền dịch vụ: <b>@tienDv.ToString("N0") VNĐ</b></p>
 
             <h5 class="fw-bold text-success">
                 Tổng cộng: @tongCong.ToString("N0") VNĐ
             </h5>
+
         </div>
 
     </div>

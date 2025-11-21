@@ -5,10 +5,9 @@
     ============================================================== */
     $("#openAddModal").on("click", function () {
 
-        $("#addForm")[0].reset();                      // reset form
+        $("#addForm")[0].reset();
         $("#preview_add_img").attr("src", "/images/no-image.png");
 
-        // SINH IDDV MỚI MỖI LẦN MỞ MODAL
         $.get("/Dichvus/GetNextId", function (id) {
             $("#newIddv").val(id);
         });
@@ -44,17 +43,14 @@
             hasMore = true;
         }
 
-        // CHUYỂN FILTER SANG OBJECT
         const formData = filterForm.serializeArray();
         let filter = {};
 
         formData.forEach(x => {
-
             if (x.name === "status") {
                 filter.status = (x.value === "" ? null : x.value === "true");
             }
             else filter[x.name] = x.value;
-
         });
 
         filter.page = page;
@@ -72,6 +68,10 @@
                 } else {
                     hasMore = true;
                 }
+            },
+
+            error: function () {
+                Swal.fire("Lỗi", "Không thể tải dữ liệu dịch vụ!", "error");
             },
 
             complete: function () {
@@ -114,28 +114,21 @@
 
 
     /* ================================================================
-       5. CLICK HÀNG → XEM CHI TIẾT
+       5. CLICK ROW → PANEL CHI TIẾT
     ============================================================== */
-    /* ================================================================
-       5. CLICK ROW → HIỂN THỊ PANEL CHI TIẾT BÊN PHẢI
-    ================================================================ */
     tableBody.on("click", ".dv-row", function (e) {
 
-        // Nếu click vào nút thao tác thì bỏ qua
         if ($(e.target).closest("button").length > 0) return;
 
         let id = $(this).data("id");
 
-        // Highlight row đang chọn
         $(".dv-row").removeClass("active-row");
         $(this).addClass("active-row");
 
-        // Load vào PANEL BÊN PHẢI
         $("#dichvuDetail").html(`
-        <div class="text-center py-4 text-muted">
-            <div class="spinner-border text-success"></div>
-        </div>
-    `);
+            <div class="text-center py-4 text-muted">
+                <div class="spinner-border text-success"></div>
+            </div>`);
 
         $.ajax({
             url: "/Dichvus/DetailPartial",
@@ -148,15 +141,14 @@
     });
 
 
-
     tableBody.on("click", ".btn-detail", function (e) {
-        e.stopPropagation();  // ngăn click row
+        e.stopPropagation();
         let id = $(this).data("id");
 
         $("#dvDetailModalContent").html(`
-        <div class="p-4 text-center text-muted">
-            <div class="spinner-border text-primary"></div>
-        </div>`);
+            <div class="p-4 text-center text-muted">
+                <div class="spinner-border text-primary"></div>
+            </div>`);
 
         let modal = new bootstrap.Modal(document.getElementById("dvDetailModal"));
         modal.show();
@@ -166,42 +158,12 @@
         });
     });
 
-    // Sửa trong panel
-    $(document).on("click", ".btn-edit-detail", function () {
-        let id = $(this).data("id");
-
-        $("#dvEditModalContent").html(`<div class="p-4 text-center"><div class="spinner-border"></div></div>`);
-
-        let modal = new bootstrap.Modal(document.getElementById("dvEditModal"));
-        modal.show();
-
-        $.get("/Dichvus/GetEditForm", { id: id }, function (html) {
-            $("#dvEditModalContent").html(html);
-        });
-    });
-
-
-
-
-
-    function loadDetail(id) {
-        $.ajax({
-            url: "/Dichvus/DetailPartial",
-            method: "GET",
-            data: { id: id },
-            success: function (html) {
-                $("#dichvuDetail").html(html);
-            }
-        });
-    }
-
 
     /* ================================================================
        6. SỬA DỊCH VỤ
     ============================================================== */
     tableBody.on("click", ".btn-edit", function (e) {
         e.stopPropagation();
-
         let id = $(this).data("id");
 
         $.get("/Dichvus/GetEditForm", { id: id }, function (html) {
@@ -238,7 +200,6 @@
 
                 Swal.fire("Thành công", res.message, "success");
                 $("#editModal").modal("hide");
-
                 loadData(true);
             }
         });
@@ -272,13 +233,12 @@
                     }
                 });
             }
-
         });
     });
 
 
     /* ================================================================
-       8. TOGGLE TRẠNG THÁI
+       8. TOGGLE STATUS
     ============================================================== */
     tableBody.on("click", ".btn-toggle", function (e) {
         e.stopPropagation();
@@ -297,7 +257,7 @@
 
 
     /* ================================================================
-       9. THÊM DỊCH VỤ (CREATE)
+       9. CREATE
     ============================================================== */
     $("#addForm").submit(function (e) {
         e.preventDefault();
@@ -318,7 +278,6 @@
                 }
 
                 Swal.fire("Thành công", res.message, "success");
-
                 $("#addModal").modal("hide");
                 loadData(true);
             }
@@ -341,7 +300,7 @@
 
 
     /* ================================================================
-       11. EXPORT EXCEL
+       11. EXPORT
     ============================================================== */
     $("#btnDvExportExcel").click(function () {
         let qs = filterForm.serialize();
@@ -350,26 +309,41 @@
 
 
     /* ================================================================
-       12. THÊM LOẠI DỊCH VỤ
-    ============================================================== */
-    $("#btnSaveLoai").click(function () {
+   12. THÊM LOẠI DỊCH VỤ
+================================================================ */
+    $(document).on("click", "#btnSaveLoai", function () {
 
         let tenLoai = $("#tenLoaiMoi").val().trim();
 
+        // Validate input
         if (tenLoai === "") {
-            $("#loaiError").text("Tên loại không được để trống").removeClass("d-none");
+            $("#loaiError")
+                .text("Tên loại không được để trống")
+                .removeClass("d-none");
             return;
         }
 
-        $.post("/Loaidichvus/CreateAjax", { Tenloai: tenLoai }, function (res) {
+        // Gửi AJAX
+        $.post("/Loaidichvus/CreateAjax", { tenLoai: tenLoai }, function (res) {
+
             if (res.success) {
-                Swal.fire("Thành công", "Đã thêm loại!", "success");
+                Swal.fire("Thành công", res.message, "success");
+
+                // Ẩn modal
                 $("#addLoaiModal").modal("hide");
+
+                // Reset input
+                $("#tenLoaiMoi").val("");
+                $("#loaiError").addClass("d-none");
+
+                // Reload trang để dropdown cập nhật
                 location.reload();
-            } else {
-                $("#loaiError").text(res.message).removeClass("d-none");
+            }
+            else {
+                $("#loaiError")
+                    .text(res.message)
+                    .removeClass("d-none");
             }
         });
     });
-
 });

@@ -147,12 +147,12 @@ $(document).on("click", ".btn-edit", function () {
 });
 
 
-$(document).on("click", ".btn-toggle", function () {
-    let id = $(this).data("id");
-    $.post("/Hoadons/ToggleStatusAjax", { id }, function () {
-        reloadTable();
-    });
-});
+//$(document).on("click", ".btn-toggle", function () {
+//    let id = $(this).data("id");
+//    $.post("/Hoadons/ToggleStatusAjax", { id }, function () {
+//        reloadTable();
+//    });
+//});
 
 // =============================
 //   SAVE EDIT
@@ -222,6 +222,13 @@ $(document).on("click", ".btn-print-detail", function () {
     let id = $(this).data("id");
     window.open("/Hoadons/Print?id=" + id, "_blank");
 });
+
+// ===============================
+// IN HÓA ĐƠN – HIỆN MODAL PDF
+// ===============================
+
+
+
 // =============================
 //   EXPORT EXCEL
 // =============================

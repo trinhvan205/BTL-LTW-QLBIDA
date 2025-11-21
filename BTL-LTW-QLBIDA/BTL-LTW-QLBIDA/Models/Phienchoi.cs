@@ -13,7 +13,7 @@ public partial class Phienchoi
 
     public DateTime? Gioketthuc { get; set; }
 
-    public virtual ICollection<Hoadon> Hoadons { get; set; } = [];
+    public virtual ICollection<Hoadon> Hoadons { get; set; } = new List<Hoadon>();
 
     public virtual Ban? IdbanNavigation { get; set; }
 }
