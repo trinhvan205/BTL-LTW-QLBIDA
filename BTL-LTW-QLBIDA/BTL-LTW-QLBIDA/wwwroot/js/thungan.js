@@ -1006,7 +1006,7 @@ function timKiemKhachHang(keyword) {
     });
 }
 
-// Hiển thị kết quả
+
 // Hiển thị kết quả
 function hienThiKetQuaTimKiem(data, keyword) {
     let html = '';
@@ -1102,38 +1102,91 @@ function xoaKhachHang() {
     showToast('ℹ️ Đã bỏ khách hàng');
 }
 
+// ===========================
+// MODAL THÊM KHÁCH HÀNG
+// ===========================
+
 // Mở modal thêm khách hàng mới
 function moModalThemKhachHang(keyword) {
-    // Kiểm tra keyword có phải SĐT không
+    // Reset form
+    $('#hoTenKhachHang').val('');
+    $('#soDienThoaiKhachHang').val('');
+    $('#diaChiKhachHang').val('');
+
+    // Nếu keyword là SĐT thì điền sẵn
     const isPhone = /^[0-9]+$/.test(keyword);
+    if (isPhone && keyword) {
+        $('#soDienThoaiKhachHang').val(keyword);
+        // Focus vào họ tên
+        setTimeout(() => {
+            $('#hoTenKhachHang').focus();
+        }, 500);
+    } else {
+        // Focus vào họ tên
+        setTimeout(() => {
+            $('#hoTenKhachHang').focus();
+        }, 500);
+    }
 
-    const tenKh = prompt('Nhập tên khách hàng:', '');
-    if (tenKh === null) return;
+    // Mở modal
+    $('#modalThemKhachHang').modal('show');
+}
 
-    const sdtInput = prompt('Nhập SĐT:', isPhone ? keyword : '');
-    if (!sdtInput) {
-        showToast('❌ Vui lòng nhập SĐT');
+
+// Xử lý khi click nút Lưu
+function xuLyThemKhachHang() {
+    const hoTen = $('#hoTenKhachHang').val().trim();
+    const sdt = $('#soDienThoaiKhachHang').val().trim();
+    const diaChi = $('#diaChiKhachHang').val().trim();
+
+    // Validate họ tên
+    if (!hoTen) {
+        showToast('❌ Vui lòng nhập họ tên');
+        $('#hoTenKhachHang').focus();
         return;
     }
 
+    // Validate SĐT
+    if (!sdt) {
+        showToast('❌ Vui lòng nhập số điện thoại');
+        $('#soDienThoaiKhachHang').focus();
+        return;
+    }
+
+    // Validate định dạng SĐT (10-11 số)
+    if (!/^[0-9]{10,11}$/.test(sdt)) {
+        showToast('❌ Số điện thoại không hợp lệ (10-11 số)');
+        $('#soDienThoaiKhachHang').focus();
+        return;
+    }
+
+    // Gọi API thêm khách hàng
     $.ajax({
         url: '/ThuNgan/ThemKhachHangNhanh',
         type: 'POST',
         data: {
-            tenKh: tenKh || 'Khách hàng',
-            sdt: sdtInput
+            tenKh: hoTen,
+            sdt: sdt,
+            diaChi: diaChi
         },
         success: function (response) {
             if (response.success) {
+                // ✅ HIỂN THỊ TOAST THÀNH CÔNG
                 showToast('✅ ' + response.message);
 
+                // Đóng modal
+                $('#modalThemKhachHang').modal('hide');
+
                 // Tự động chọn khách hàng vừa thêm
-                chonKhachHang(
-                    response.khachHang.idKh,
-                    response.khachHang.tenKh,
-                    response.khachHang.sdt
-                );
+                if (response.khachHang) {
+                    chonKhachHang(
+                        response.khachHang.idKh,
+                        response.khachHang.tenKh,
+                        response.khachHang.sdt
+                    );
+                }
             } else {
+                // ❌ HIỂN THỊ TOAST LỖI
                 showToast('❌ ' + response.message);
             }
         },
@@ -1143,12 +1196,20 @@ function moModalThemKhachHang(keyword) {
     });
 }
 
-// Đóng dropdown khi click bên ngoài
-$(document).click(function (e) {
-    if (!$(e.target).closest('.customer-search-container').length) {
-        $('#searchResults').removeClass('show');
+// Xử lý phím Enter trong modal
+$(document).on('shown.bs.modal', '#modalThemKhachHang', function () {
+    // Focus vào họ tên khi mở modal
+    $('#hoTenKhachHang').focus();
+});
+
+$(document).on('keypress', '#modalThemKhachHang input, #modalThemKhachHang textarea', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        xuLyThemKhachHang();
     }
 });
+
+
 
 // Reset khi thanh toán xong
 function resetAfterPayment() {

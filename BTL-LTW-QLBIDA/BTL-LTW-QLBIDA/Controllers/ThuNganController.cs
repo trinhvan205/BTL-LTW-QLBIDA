@@ -375,9 +375,6 @@ namespace BTL_LTW_QLBIDA.Controllers
             }
         }
 
-        // ===========================
-        // TÌM KIẾM KHÁCH HÀNG
-        // ===========================
 
         // ===========================
         // TÌM KIẾM KHÁCH HÀNG
@@ -463,68 +460,49 @@ namespace BTL_LTW_QLBIDA.Controllers
 
         // Thêm khách hàng mới nhanh
         [HttpPost]
-        public IActionResult ThemKhachHangNhanh(string tenKh, string sdt)
+        public IActionResult ThemKhachHangNhanh(string tenKh, string sdt, string diaChi)
         {
             try
             {
-                // Validate SĐT
-                if (string.IsNullOrWhiteSpace(sdt))
-                {
-                    return Json(new { success = false, message = "Vui lòng nhập SĐT" });
-                }
-
-                // Kiểm tra SĐT đã tồn tại chưa
+                // Kiểm tra SĐT đã tồn tại
                 var exists = _context.Khachhangs.Any(kh => kh.Sodt == sdt);
                 if (exists)
                 {
-                    return Json(new { success = false, message = "SĐT đã tồn tại trong hệ thống" });
+                    return Json(new { success = false, message = "Số điện thoại đã tồn tại!" });
                 }
 
-                // Tạo ID tự động
-                var lastKh = _context.Khachhangs
-                    .OrderByDescending(kh => kh.Idkh)
-                    .FirstOrDefault();
+                // Tạo ID mới
+                var maxId = _context.Khachhangs
+                    .Select(kh => kh.Idkh)
+                    .ToList()
+                    .Select(id => int.Parse(id.Substring(2)))
+                    .DefaultIfEmpty(0)
+                    .Max();
 
-                string newId;
-                if (lastKh != null && lastKh.Idkh.StartsWith("KH"))
-                {
-                    // Lấy số cuối và tăng lên
-                    var numPart = lastKh.Idkh.Substring(2);
-                    if (int.TryParse(numPart, out int lastNumber))
-                    {
-                        newId = "KH" + (lastNumber + 1).ToString("D3"); // VD: KH001, KH002
-                    }
-                    else
-                    {
-                        newId = "KH001";
-                    }
-                }
-                else
-                {
-                    newId = "KH001";
-                }
+                var newId = $"KH{(maxId + 1):D3}";
 
                 // Tạo khách hàng mới
                 var khachHang = new Khachhang
                 {
                     Idkh = newId,
-                    Hoten = string.IsNullOrWhiteSpace(tenKh) ? "Khách hàng" : tenKh,
+                    Hoten = tenKh,
                     Sodt = sdt,
-                    Dchi = null // Có thể để trống
+                    Dchi = diaChi
                 };
 
                 _context.Khachhangs.Add(khachHang);
                 _context.SaveChanges();
 
+                // ✅ THÊM: Trả về thông tin khách hàng
                 return Json(new
                 {
                     success = true,
-                    message = "Đã thêm khách hàng thành công",
+                    message = "Đã thêm khách hàng thành công!",
                     khachHang = new
                     {
                         idKh = khachHang.Idkh,
-                        tenKh = khachHang.Hoten, // ← Đổi từ Tenkh thành Hoten
-                        sdt = khachHang.Sodt     // ← Đổi từ Sdt thành Sodt
+                        tenKh = khachHang.Hoten,
+                        sdt = khachHang.Sodt
                     }
                 });
             }

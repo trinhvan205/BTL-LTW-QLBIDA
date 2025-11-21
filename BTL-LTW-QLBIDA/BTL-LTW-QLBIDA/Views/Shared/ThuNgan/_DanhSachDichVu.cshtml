@@ -9,17 +9,32 @@
             {
                 var disabledClass = (dv.Soluong <= 0) ? "disabled" : "";
 
+                @* ← THÊM: Xử lý đường dẫn ảnh *@
+                var imgPath = dv.Imgpath ?? "images/dichvu/default.png";
+                var imgUrl = Url.Content("~/" + imgPath);
+
                 <div class="dichvu-item @disabledClass"
                      data-id="@dv.Iddv"
                      data-ten="@dv.Tendv"
                      data-gia="@dv.Giatien"
                      data-sl="@dv.Soluong">
-                    <div class="dichvu-icon">🍺</div>
+
+                    @* ← THAY ICON BẰNG HÌNH ẢNH *@
+                    <div class="dichvu-image">
+                        <img src="@imgUrl"
+                             alt="@dv.Tendv"
+                             onerror="this.onerror=null; this.src='/images/dichvu/default.png'"
+                             loading="lazy">
+                    </div>
+
                     <div class="dichvu-name">@dv.Tendv</div>
                     <div class="dichvu-price">@((dv.Giatien ?? 0).ToString("N0"))đ</div>
+
                     @if (dv.Soluong <= 0)
                     {
-                        <div style="font-size: 10px; color: #ef4444; margin-top: 4px;">Hết hàng</div>
+                        <div style="font-size: 10px; color: #ef4444; margin-top: 4px;">
+                            <i class="bi bi-exclamation-circle"></i> Hết hàng
+                        </div>
                     }
                 </div>
             }
@@ -51,7 +66,6 @@
         const items = document.querySelectorAll('#dichvuGrid .dichvu-item');
         const totalPages = Math.ceil(items.length / itemsPerPage);
         let currentPage = 1;
-
         const pagination = document.getElementById('dichvuPagination');
         const pageInfo = document.getElementById('dichvuPageInfo');
         const prevBtn = document.getElementById('dichvuPrevBtn');
