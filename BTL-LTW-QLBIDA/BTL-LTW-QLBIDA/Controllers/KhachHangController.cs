@@ -170,7 +170,16 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Add(khachhangvm);
+                // ✅ ĐÚNG - Tạo Entity từ ViewModel
+                var khachhang = new Khachhang
+                {
+                    Idkh = khachhangvm.Idkh,
+                    Hoten = khachhangvm.Hoten,
+                    Sodt = khachhangvm.Sodt,
+                    Dchi = khachhangvm.Dchi
+                };
+
+                _context.Add(khachhang);  // ✅ Add Entity, không phải ViewModel
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Thêm khách hàng thành công!";
                 return RedirectToAction(nameof(Index));
