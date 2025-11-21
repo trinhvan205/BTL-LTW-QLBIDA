@@ -98,25 +98,26 @@
                     </div>
                 </div>
 
-                <!-- Alert Messages -->
+                <div id="apiAlertContainer" class="mb-3">
+                </div>
+
                 @if (TempData["SuccessMessage"] != null)
                 {
-                    <div class="alert alert-success alert-dismissible fade show">
+                    <div id="AutoCloseAlert" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                         <i class="fas fa-check-circle me-2"></i>
                         @TempData["SuccessMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
 
                 @if (TempData["ErrorMessage"] != null)
                 {
-                    <div class="alert alert-danger alert-dismissible fade show">
+                    <div id="AutoCloseAlert" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i>
                         @TempData["ErrorMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
-
                 <!-- Loading Spinner -->
                 <div id="loadingSpinner" class="text-center py-5" style="display: none;">
                     <div class="spinner-border text-primary" role="status">
