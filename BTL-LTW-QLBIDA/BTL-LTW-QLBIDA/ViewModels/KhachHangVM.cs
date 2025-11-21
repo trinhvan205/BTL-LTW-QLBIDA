@@ -13,7 +13,6 @@ public partial class KhachHangVM
 
     public string? Dchi { get; set; }
 
-    [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
     [RegularExpression(@"^(0[3|5|7|8|9])+([0-9]{8})$",
         ErrorMessage = "Số điện thoại không đúng định dạng (VD: 0901234567)")]
     [StringLength(10, MinimumLength = 10, ErrorMessage = "Số điện thoại phải đúng 10 số")]

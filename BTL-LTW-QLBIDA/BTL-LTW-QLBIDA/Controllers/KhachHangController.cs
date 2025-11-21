@@ -189,6 +189,7 @@ namespace BTL_LTW_QLBIDA.Controllers
         }
 
         // GET: Khachhangs/Edit/5
+        // GET: Khachhangs/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if (HttpContext.Session.GetString("QuyenAdmin") != "1")
@@ -201,33 +202,42 @@ namespace BTL_LTW_QLBIDA.Controllers
                 return NotFound();
             }
 
-            var khachhang = await _context.Khachhangs.FindAsync(id);
+            var khachhang = await _context.Khachhangs.FindAsync(id); // <-- Lấy Entity Model
             if (khachhang == null)
             {
                 return NotFound();
             }
 
-            return View(khachhang);
+            // ⭐ SỬA: Chuyển sang ViewModel trước khi trả về View
+            var khachhangvm = new KhachHangVM
+            {
+                Idkh = khachhang.Idkh,
+                Hoten = khachhang.Hoten,
+                Sodt = khachhang.Sodt,
+                Dchi = khachhang.Dchi
+            };
+
+            return View(khachhangvm); // <-- Truyền ViewModel
         }
 
         // POST: Khachhangs/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Khachhang khachhang)
+        public async Task<IActionResult> Edit(string id, KhachHangVM khachhangvm)
         {
             if (HttpContext.Session.GetString("QuyenAdmin") != "1")
             {
                 return RedirectToAction("Index", "Home");
             }
 
-            if (id != khachhang.Idkh)
+            if (id != khachhangvm.Idkh)
             {
                 return NotFound();
             }
 
             // Kiểm tra trùng SĐT (trừ chính nó)
-            if (!string.IsNullOrEmpty(khachhang.Sodt) &&
-                await _context.Khachhangs.AnyAsync(kh => kh.Sodt == khachhang.Sodt && kh.Idkh != id))
+            if (!string.IsNullOrEmpty(khachhangvm.Sodt) &&
+                await _context.Khachhangs.AnyAsync(kh => kh.Sodt == khachhangvm.Sodt && kh.Idkh != id))
             {
                 ModelState.AddModelError("Sodt", "Số điện thoại đã tồn tại!");
             }
@@ -242,16 +252,16 @@ namespace BTL_LTW_QLBIDA.Controllers
                         return NotFound();
                     }
 
-                    khachhangCu.Hoten = khachhang.Hoten;
-                    khachhangCu.Sodt = khachhang.Sodt;
-                    khachhangCu.Dchi = khachhang.Dchi;
+                    khachhangCu.Hoten = khachhangvm.Hoten;
+                    khachhangCu.Sodt = khachhangvm.Sodt;
+                    khachhangCu.Dchi = khachhangvm.Dchi;
 
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "Cập nhật khách hàng thành công!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!KhachhangExists(khachhang.Idkh))
+                    if (!KhachhangExists(khachhangvm.Idkh))
                     {
                         return NotFound();
                     }
@@ -263,7 +273,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(khachhang);
+            return View(khachhangvm);
         }
 
         // GET: Khachhangs/Delete/5

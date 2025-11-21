@@ -23,8 +23,8 @@ namespace BTL_LTW_QLBIDA.Controllers
             
             // Mỗi lần vào màn hình Login thì logout session
             HttpContext.Session.Clear();
-            // ✅ XÓA LUÔN TEMPDATA
-            TempData.Clear();
+            // ✅ XÓA LUÔN 
+            
 
             // Nếu đã đăng nhập rồi thì chuyển về trang chủ
             if (HttpContext.Session.GetString("TenDangNhap") != null)
@@ -110,49 +110,6 @@ namespace BTL_LTW_QLBIDA.Controllers
             return View();
         }
 
-        // POST: Account/ChangePassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(string matKhauCu, string matKhauMoi, string xacNhanMatKhau)
-        {
-            if (HttpContext.Session.GetString("TenDangNhap") == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            if (string.IsNullOrEmpty(matKhauCu) || string.IsNullOrEmpty(matKhauMoi))
-            {
-                ModelState.AddModelError("", "Vui lòng điền đầy đủ thông tin!");
-                return View();
-            }
-
-            if (matKhauMoi != xacNhanMatKhau)
-            {
-                ModelState.AddModelError("", "Mật khẩu mới và xác nhận không khớp!");
-                return View();
-            }
-
-            var idNV = HttpContext.Session.GetString("IdNV");
-            var nhanVien = await _context.Nhanviens.FindAsync(idNV);
-
-            if (nhanVien == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            if (nhanVien.Matkhau != matKhauCu)
-            {
-                ModelState.AddModelError("", "Mật khẩu cũ không đúng!");
-                return View();
-            }
-
-            // Cập nhật mật khẩu mới
-            nhanVien.Matkhau = matKhauMoi;
-            _context.Update(nhanVien);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
-            return RedirectToAction("Index", "Home");
-        }
+       
     }
 }
