@@ -1086,3 +1086,260 @@
     min-width: 35px;
     text-align: center;
 }
+
+
+
+/* ===========================
+   TÌM KIẾM KHÁCH HÀNG - DÁNG VIÊN THUỐC
+=========================== */
+.customer-search-container {
+    position: relative;
+    width: 360px; /* ← TĂNG từ 320px lên 360px */
+}
+
+/* Box tìm kiếm (chưa chọn) */
+.customer-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px; /* ← MỎNG HƠN: 4px top/bottom, 12px left/right */
+    background: white;
+    border: 1.5px solid #e5e7eb; /* ← GIẢM border từ 2px xuống 1.5px */
+    border-radius: 20px; /* ← GIẢM từ 24px xuống 20px */
+    transition: all 0.2s;
+}
+
+    .customer-search-box:focus-within {
+        border-color: #9333ea; /* ← Màu tím sáng (purple-600) khác với header */
+        box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1); /* ← Shadow tím sáng */
+    }
+
+    .customer-search-box i.bi-search {
+        color: #9ca3af;
+        font-size: 13px; /* ← Giảm từ 14px xuống 13px */
+        flex-shrink: 0;
+    }
+
+    .customer-search-box input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 12px; /* ← Giảm từ 13px xuống 12px */
+        color: #374151;
+        background: transparent;
+        padding: 0;
+        line-height: 1;
+    }
+
+        .customer-search-box input::placeholder {
+            color: #9ca3af;
+        }
+
+.btn-add-icon {
+    width: 24px; /* ← Giảm từ 26px xuống 24px */
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 12px; /* ← THÊM: icon nhỏ hơn */
+}
+
+    .btn-add-icon:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: scale(1.1);
+    }
+
+/* Box đã chọn khách hàng */
+.customer-selected-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px; /* ← MỎng hơn: 4px top/bottom */
+    background: white;
+    border: 1.5px solid #9333ea; /* ← Giảm border từ 2px xuống 1.5px */
+    border-radius: 20px; /* ← Giảm từ 24px xuống 20px */
+}
+
+    .customer-selected-box i.bi-person-circle {
+        color: var(--primary-color);
+        font-size: 16px; /* ← Giảm từ 18px xuống 16px */
+        flex-shrink: 0;
+    }
+
+    .customer-selected-box #selectedCustomerName {
+        flex: 1;
+        font-size: 12px; /* ← Giảm từ 13px xuống 12px */
+        font-weight: 600;
+        color: #374151;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+    }
+
+
+/* Nút X - Giống nút + */
+.btn-remove-icon {
+    width: 24px; /* ← Giảm từ 26px xuống 24px */
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 12px; /* ← THÊM: icon nhỏ hơn */
+}
+
+    .btn-remove-icon:hover {
+        background: #e5e7eb; /* ← ĐỔI: Hover xám đậm thay vì đỏ */
+        color: #374151; /* ← ĐỔI: Text đậm hơn */
+        transform: scale(1.1);
+    }
+
+/* Dropdown kết quả */
+.search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 350px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: none;
+}
+
+    .search-results-dropdown.show {
+        display: block;
+    }
+
+.search-result-item {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+
+    .search-result-item:hover {
+        background: #f9fafb;
+    }
+
+    .search-result-item i {
+        color: var(--primary-color);
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Tên và SĐT trên 1 dòng */
+.search-result-name-phone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+    .search-result-name-phone .name {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .search-result-name-phone .separator {
+        color: #d1d5db;
+        font-weight: 600;
+    }
+
+    .search-result-name-phone .phone {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+/* Mã khách hàng ở dòng dưới */
+.search-result-id {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.search-no-result {
+    padding: 32px 24px;
+    text-align: center;
+    color: #6b7280;
+}
+
+    .search-no-result i {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+        color: #d1d5db;
+    }
+
+    .search-no-result div {
+        font-size: 14px;
+    }
+
+.btn-add-customer {
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+    .btn-add-customer:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+/* Scrollbar cho dropdown */
+.search-results-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+
+.search-results-dropdown::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+    .search-results-dropdown::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }

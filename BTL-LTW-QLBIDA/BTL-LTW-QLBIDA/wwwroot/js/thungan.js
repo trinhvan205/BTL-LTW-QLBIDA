@@ -958,5 +958,226 @@ $('#modalThanhToan').on('hidden.bs.modal', function () {
 
 
 
+// ===========================
+// TÌM KIẾM KHÁCH HÀNG - CẢI TIẾN
+// ===========================
+
+let searchTimeout = null;
+let selectedKhachHang = null;
+
+// Xử lý input tìm kiếm
+$(document).on('input', '#searchKhachHang', function () {
+    const keyword = $(this).val().trim();
+
+    clearTimeout(searchTimeout);
+
+    if (keyword.length < 2) {
+        $('#searchResults').removeClass('show');
+        return;
+    }
+
+    searchTimeout = setTimeout(function () {
+        timKiemKhachHang(keyword);
+    }, 300);
+});
+
+// Focus vào search khi nhấn F4
+$(document).on('keydown', function (e) {
+    if (e.key === 'F4') {
+        e.preventDefault();
+        $('#searchKhachHang').focus();
+    }
+});
+
+// Gọi API tìm kiếm
+function timKiemKhachHang(keyword) {
+    $.ajax({
+        url: '/ThuNgan/SearchKhachHang',
+        type: 'GET',
+        data: { keyword: keyword },
+        success: function (response) {
+            if (response.success) {
+                hienThiKetQuaTimKiem(response.data, keyword);
+            }
+        },
+        error: function () {
+            showToast('❌ Lỗi khi tìm kiếm');
+        }
+    });
+}
+
+// Hiển thị kết quả
+// Hiển thị kết quả
+function hienThiKetQuaTimKiem(data, keyword) {
+    let html = '';
+
+    if (data.length > 0) {
+        data.forEach(kh => {
+            html += `
+                <div class="search-result-item" data-id="${kh.idKh}" data-ten="${kh.tenKh}" data-sdt="${kh.sdt}">
+                    <i class="bi bi-person-circle"></i>
+                    <div class="search-result-info">
+                        <div class="search-result-name-phone">
+                            <span class="name">${kh.tenKh}</span>
+                            <span class="separator">•</span>
+                            <span class="phone">${kh.sdt}</span>
+                        </div>
+                        <div class="search-result-id">Mã: ${kh.idKh}</div>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        // ← SỬA: Chỉ hiện thông báo, không có nút
+        html = `
+            <div class="search-no-result">
+                <i class="bi bi-search"></i>
+                <div>Không tìm thấy kết quả phù hợp</div>
+            </div>
+        `;
+    }
+
+    $('#searchResults').html(html).addClass('show');
+}
+
+// Click chọn khách hàng
+$(document).on('click', '.search-result-item', function () {
+    const idKh = $(this).data('id');
+    const tenKh = $(this).data('ten');
+    const sdt = $(this).data('sdt');
+
+    chonKhachHang(idKh, tenKh, sdt);
+});
+
+// Chọn khách hàng
+function chonKhachHang(idKh, tenKh, sdt) {
+    // Lấy ID hóa đơn hiện tại
+    const idHd = $('.btn-thanhtoan').data('hd');
+
+    if (!idHd) {
+        showToast('⚠️ Vui lòng chọn bàn trước');
+        return;
+    }
+
+    $.ajax({
+        url: '/ThuNgan/GanKhachHang',
+        type: 'POST',
+        data: {
+            idHoaDon: idHd,
+            idKhachHang: idKh
+        },
+        success: function (response) {
+            if (response.success) {
+                selectedKhachHang = { idKh, tenKh, sdt };
+
+                // Chuyển sang state đã chọn
+                $('#customerSearchBox').hide();
+                $('#customerSelectedBox').show();
+                $('#selectedCustomerName').text(tenKh);
+
+                // Ẩn kết quả
+                $('#searchResults').removeClass('show');
+                $('#searchKhachHang').val('');
+
+                showToast(`✅ Đã chọn: ${tenKh}`);
+            } else {
+                showToast('❌ ' + response.message);
+            }
+        },
+        error: function () {
+            showToast('❌ Lỗi khi gán khách hàng');
+        }
+    });
+}
+
+// Xóa khách hàng đã chọn
+function xoaKhachHang() {
+    selectedKhachHang = null;
+
+    // Chuyển về state chưa chọn
+    $('#customerSelectedBox').hide();
+    $('#customerSearchBox').show();
+    $('#searchKhachHang').val('').focus();
+
+    showToast('ℹ️ Đã bỏ khách hàng');
+}
+
+// Mở modal thêm khách hàng mới
+function moModalThemKhachHang(keyword) {
+    // Kiểm tra keyword có phải SĐT không
+    const isPhone = /^[0-9]+$/.test(keyword);
+
+    const tenKh = prompt('Nhập tên khách hàng:', '');
+    if (tenKh === null) return;
+
+    const sdtInput = prompt('Nhập SĐT:', isPhone ? keyword : '');
+    if (!sdtInput) {
+        showToast('❌ Vui lòng nhập SĐT');
+        return;
+    }
+
+    $.ajax({
+        url: '/ThuNgan/ThemKhachHangNhanh',
+        type: 'POST',
+        data: {
+            tenKh: tenKh || 'Khách hàng',
+            sdt: sdtInput
+        },
+        success: function (response) {
+            if (response.success) {
+                showToast('✅ ' + response.message);
+
+                // Tự động chọn khách hàng vừa thêm
+                chonKhachHang(
+                    response.khachHang.idKh,
+                    response.khachHang.tenKh,
+                    response.khachHang.sdt
+                );
+            } else {
+                showToast('❌ ' + response.message);
+            }
+        },
+        error: function () {
+            showToast('❌ Lỗi khi thêm khách hàng');
+        }
+    });
+}
+
+// Đóng dropdown khi click bên ngoài
+$(document).click(function (e) {
+    if (!$(e.target).closest('.customer-search-container').length) {
+        $('#searchResults').removeClass('show');
+    }
+});
+
+// Reset khi thanh toán xong
+function resetAfterPayment() {
+    if (timeUpdateInterval) {
+        clearInterval(timeUpdateInterval);
+        timeUpdateInterval = null;
+    }
+
+    currentHoaDonId = null;
+    banDangChon = null;
+
+    $('#tenBanHienTai').text('Chưa chọn bàn');
+    loadDanhSachBan();
+    $('#hoaDonArea').html(`
+        <div class="empty-state">
+            <i class="bi bi-cart-x"></i>
+            <p>Vui lòng chọn bàn</p>
+        </div>
+    `);
+
+    $('#btnShowBan').click();
+
+    // ← THÊM: Reset khách hàng
+    selectedKhachHang = null;
+    $('#customerSelectedBox').hide();
+    $('#customerSearchBox').show();
+    $('#searchKhachHang').val('');
+}
+
+
 
 
