@@ -7,10 +7,11 @@
         <!-- Ảnh -->
         <td style="width:60px;">
             <img src="@dv.Imgpath"
-                 style="width:45px;height:45px;object-fit:cover;border-radius:6px;border:1px solid #ddd;" />
+                 class="rounded"
+                 style="width:45px;height:45px;object-fit:cover;border:1px solid #ddd;" />
         </td>
 
-        <!-- Tên & Loại -->
+        <!-- Tên + Loại -->
         <td>
             <strong>@dv.Tendv</strong>
             <div class="text-muted small">@dv.IdloaiNavigation?.Tenloai</div>
@@ -34,7 +35,7 @@
         </td>
 
         <!-- Trạng thái -->
-        <td>
+        <td class="text-center">
             @if (dv.Hienthi == true)
             {
                 <span class="badge bg-success px-3 py-2">Đang bán</span>
@@ -45,21 +46,24 @@
             }
         </td>
 
-        <!-- Nút -->
+        <!-- Nút thao tác -->
         <td class="text-center">
-            <button class="btn btn-light border btn-sm"
-                    onclick="window.location='/Dichvus/Details?id=@dv.Iddv'">
+
+            <!-- Xem chi tiết trong modal -->
+            <button class="btn btn-light border btn-sm btn-detail"
+                    data-id="@dv.Iddv">
                 <i class="bi bi-eye text-primary"></i>
             </button>
 
-
-            <button class="btn btn-light border btn-sm btn-edit" data-id="@dv.Iddv">
+            <!-- Sửa -->
+            <button class="btn btn-light border btn-sm btn-edit"
+                    data-id="@dv.Iddv">
                 <i class="bi bi-pencil text-warning"></i>
             </button>
 
+            <!-- Toggle trạng thái -->
             <button class="btn btn-light border btn-sm btn-toggle"
                     data-id="@dv.Iddv">
-
                 @if (dv.Hienthi == true)
                 {
                     <i class="bi bi-toggle-on text-success fs-5"></i>
@@ -68,11 +72,11 @@
                 {
                     <i class="bi bi-toggle-off text-secondary fs-5"></i>
                 }
-
             </button>
 
-
-            <button class="btn btn-light border btn-sm btn-delete" data-id="@dv.Iddv">
+            <!-- Xóa -->
+            <button class="btn btn-light border btn-sm btn-delete"
+                    data-id="@dv.Iddv">
                 <i class="bi bi-trash text-danger"></i>
             </button>
         </td>
