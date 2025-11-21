@@ -64,7 +64,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                     .Take(10)
                     .Select(hd => new HoatDongViewModel
                     {
-                        TenKhachHang = hd.IdkhNavigation != null ? hd.IdkhNavigation.Hoten : "Khách vãng lai",
+                        TenKhachHang = hd.IdkhNavigation != null ? hd.IdkhNavigation.Hoten : "Khách lẻ",
                         LoaiHoatDong = hd.Trangthai == true ? "Đã thanh toán" : "Đang chơi",
                         SoTien = hd.Tongtien ?? 0,
                         ThoiGian = hd.Ngaylap ?? DateTime.Now

@@ -1,165 +1,273 @@
-﻿
+﻿/* =========================================
+   GIAO DIỆN LOGIN - FRESH PURPLE THEME
+   ========================================= */
+
+/* 1. CẤU HÌNH BODY */
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+    /* Nền tổng thể: Dùng màu tím đậm hơn một chút để làm nổi bật khung đăng nhập */
+    background: linear-gradient(135deg, #240b36, #c31432); /* Ví dụ nền tối, hoặc giữ video nền */
+    /* Nếu bạn dùng video nền thì dòng background này sẽ bị video che, không sao cả */
 
-.login-container {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    max-width: 450px;
-    width: 100%;
+    position: relative;
 }
 
+/* Video nền (Giữ nguyên) */
+#bg-video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -2;
+    object-fit: cover;
+    filter: brightness(0.6); /* Làm tối video xíu để khung tím nổi bật */
+}
+
+/* 2. MAIN CONTAINER - KHUNG MÀU TÍM TƯƠI */
+.login-container {
+    /* --- THAY ĐỔI QUAN TRỌNG --- */
+    /* Màu nền tím tươi pha chút xanh (Blurple) giống ảnh mẫu */
+    /* Dùng gradient nhẹ để tạo độ sâu, độ trong suốt 0.85 để vẫn thấy nền mờ phía sau */
+    background: linear-gradient(135deg, rgba(114, 102, 186, 0.9), rgba(90, 80, 180, 0.95));
+    /* Hiệu ứng kính mờ */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    /* Viền sáng nhẹ để tách biệt */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    /* Đổ bóng màu tím để khung phát sáng */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(114, 102, 186, 0.4);
+    max-width: 900px;
+    width: 95%;
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    overflow: hidden;
+}
+
+/* 3. HEADER */
 .login-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 40px 30px;
+    background: transparent;
+    padding: 30px 30px 10px;
     text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
     .login-header i {
-        font-size: 60px;
-        margin-bottom: 20px;
+        font-size: 45px;
+        margin-bottom: 10px;
+        /* Icon màu trắng sáng hoặc vàng kim để nổi trên nền tím */
+        color: #fff;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
     }
 
     .login-header h2 {
-        margin: 0;
-        font-weight: 600;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #fff;
+        margin-bottom: 5px;
     }
 
-.login-body {
-    padding: 40px 30px;
+    .login-header p {
+        color: #e0e0ff; /* Màu tím nhạt */
+        font-size: 13px;
+    }
+
+/* 4. LAYOUT */
+.login-body-wrapper {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
 }
 
-.form-control {
-    border-radius: 10px;
-    padding: 12px 15px;
-    border: 2px solid #e0e0e0;
-    transition: all 0.3s;
+.login-section-left {
+    flex: 3;
+    padding: 35px;
 }
 
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+.login-section-right {
+    flex: 2;
+    padding: 35px;
+    /* Cột phải màu đậm hơn một xíu để phân chia */
+    background: rgba(0, 0, 0, 0.15);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 5. INPUTS */
+.form-label {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.input-group {
+    /* Nền input màu trắng mờ */
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+    .input-group:focus-within {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: #fff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
     }
 
 .input-group-text {
-    background: white;
-    border: 2px solid #e0e0e0;
-    border-right: none;
-    border-radius: 10px 0 0 10px;
-}
-
-.input-group .form-control {
-    border-left: none;
-    border-radius: 0 10px 10px 0;
-}
-
-.btn-login {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: transparent;
     border: none;
-    border-radius: 10px;
-    padding: 12px;
-    font-weight: 600;
-    transition: transform 0.3s;
+    color: #fff;
+    padding-left: 15px;
+}
+
+.form-control {
+    background: transparent;
+    border: none;
+    color: #fff !important;
+    padding: 12px 15px;
+    font-weight: 500;
+}
+
+    .form-control::placeholder {
+        color: #d1d1e0;
+    }
+
+/* 6. BUTTONS */
+.btn-login {
+    /* Nút màu trắng chữ tím để tương phản tốt */
+    background: #fff;
+    color: #5a50b5; /* Màu chữ tím đậm */
+    border: none;
+    padding: 14px;
+    font-weight: 800;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
     .btn-login:hover {
+        background: #f0f0ff;
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        color: #483d8b;
     }
 
-.alert {
-    border-radius: 10px;
-}
-
-.form-check-input:checked {
-    background-color: #667eea;
-    border-color: #667eea;
-}
-
-/* Style cho 2 nút Bán hàng và Quản trị */
-.function-selection {
-    margin-top: 25px;
-    padding-top: 25px;
-    border-top: 2px dashed #e0e0e0;
-}
-
+/* 7. FUNCTION BUTTONS */
 .function-title {
+    color: #fff;
     text-align: center;
-    font-weight: 600;
-    color: #667eea;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    font-weight: 800;
+    opacity: 0.9;
 }
 
-.function-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+.function-buttons-vertical {
+    display: flex;
+    flex-direction: column;
     gap: 15px;
 }
 
 .btn-function {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     padding: 20px 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    background: white;
+    border-radius: 16px;
     cursor: pointer;
     transition: all 0.3s;
-    text-align: center;
+    color: #fff;
     position: relative;
 }
 
-    .btn-function:hover:not(.disabled) {
-        border-color: #667eea;
-        background: #f8f9ff;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    .btn-function:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateX(5px);
     }
 
     .btn-function.active {
-        border-color: #667eea;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        /* Active: Nền trắng, chữ tím */
+        background: #fff;
+        color: #5a50b5;
+        border-color: #fff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     }
 
-    .btn-function.disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        background: #f5f5f5;
-    }
-
-    .btn-function i {
-        font-size: 35px;
-        margin-bottom: 10px;
-        display: block;
-    }
-
-    .btn-function .function-name {
-        font-weight: 600;
-        font-size: 15px;
-    }
-
-    .btn-function .function-desc {
-        font-size: 11px;
-        margin-top: 5px;
-        opacity: 0.8;
-    }
-
-.lock-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 16px;
+.function-name {
+    font-weight: 700;
+    font-size: 1rem;
 }
 
-.fa-hand-pointer {
-    transform: rotate(180deg);
+.function-desc {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.function-icon {
+    font-size: 28px;
+    color: #e0e0ff;
+    transition: color 0.3s;
+}
+
+.btn-function.active .function-icon {
+    color: #5a50b5;
+}
+
+.lock-icon {
+    color: #ff9aa2 !important;
+    top: 15px;
+    right: 15px;
+    position: absolute;
+}
+
+/* Checkbox & Text */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+    .form-check-input:checked {
+        background-color: #fff;
+        border-color: #fff;
+        /* Hack icon màu tím */
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%235a50b5' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+    }
+
+.form-check-label {
+    color: #fff;
+}
+
+.text-muted {
+    color: #e0e0ff !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .login-container {
+        max-width: 450px;
+    }
+
+    .login-body-wrapper {
+        flex-direction: column;
+    }
+
+    .login-section-right {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
 }
