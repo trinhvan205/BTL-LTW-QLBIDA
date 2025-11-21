@@ -85,17 +85,6 @@
                             Tổng: <strong id="totalCount">0</strong> khách hàng
                         </p>
                     </div>
-                    <div>
-                        @* <a asp-action="Create" class="btn btn-success">
-                            <i class="fas fa-plus me-1"></i>Khách hàng
-                        </a> *@
-                        <button class="btn btn-outline-secondary">
-                            <i class="fas fa-file-import me-1"></i>Import
-                        </button>
-                        <button class="btn btn-outline-secondary">
-                            <i class="fas fa-file-export me-1"></i>Xuất file
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Alert Messages -->
@@ -132,9 +121,9 @@
                             <table class="table table-hover mb-0" id="khachhangTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th style="width: 50px;" class="text-center">
+                                        @* <th style="width: 50px;" class="text-center">
                                             <input type="checkbox" class="form-check-input" id="checkAll">
-                                        </th>
+                                        </th> *@
                                         <th>Mã khách hàng</th>
                                         <th>Tên khách hàng</th>
                                         <th>Điện thoại</th>

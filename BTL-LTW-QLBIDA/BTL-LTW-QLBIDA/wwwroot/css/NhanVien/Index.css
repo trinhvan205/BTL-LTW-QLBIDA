@@ -1,4 +1,4 @@
-﻿
+﻿/*
 .avatar-circle {
     width: 40px;
     height: 40px;
@@ -44,3 +44,167 @@
     font-size: 0.95rem;
 }
 
+*/
+/* ============================================================
+   🌈 GLOBAL – Tone tím giống hóa đơn
+============================================================ */
+body {
+    font-family: 'Inter', sans-serif !important;
+    background: #f3f4fd !important;
+    color: #2d3436;
+}
+
+/* ============================================================
+   🌈 TITLE BAR – Giống KiotViet
+============================================================ */
+h3 i {
+    color: #6a11cb !important;
+}
+
+#totalCount {
+    color: #6a11cb;
+    font-weight: 700;
+}
+
+/* ============================================================
+   🌈 SIDEBAR FILTER – Tím hoá đơn
+============================================================ */
+#searchInput,
+#dangLam,
+#daNghi {
+    border-radius: 8px !important;
+    border: 1px solid #d4c8ff !important;
+}
+
+    #searchInput:focus {
+        border-color: #6a11cb !important;
+        box-shadow: 0 0 0 3px rgba(106,17,203,0.2) !important;
+    }
+
+.form-check-input:checked {
+    background-color: #6a11cb !important;
+    border-color: #6a11cb !important;
+}
+
+#btnReset {
+    border-radius: 10px;
+    border: 1px solid #d7c6ff;
+    color: #6a11cb;
+}
+
+    #btnReset:hover {
+        background: #6a11cb !important;
+        color: #fff !important;
+    }
+
+/* ============================================================
+   🌈 TABLE – THIẾT KẾ NHƯ HÓA ĐƠN
+============================================================ */
+
+#nhanvienTable {
+    border-collapse: separate !important;
+    border-spacing: 0 10px !important;
+}
+
+    /* Header tím */
+    #nhanvienTable thead th {
+        background: #6a11cb !important;
+        color: #fff !important;
+        padding: 12px;
+        font-weight: 700;
+        font-size: 0.78rem;
+        border: none !important;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    #nhanvienTable tbody tr {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(118, 75, 162, .08);
+        transition: 0.25s;
+    }
+
+        #nhanvienTable tbody tr:hover {
+            transform: scale(1.01);
+            background: #f8f5ff;
+            box-shadow: 0 6px 18px rgba(118, 75, 162, .18);
+        }
+
+    #nhanvienTable tbody td:first-child {
+        border-top-left-radius: 14px;
+        border-bottom-left-radius: 14px;
+    }
+
+    #nhanvienTable tbody td:last-child {
+        border-top-right-radius: 14px;
+        border-bottom-right-radius: 14px;
+    }
+
+    #nhanvienTable td {
+        padding: 14px 16px !important;
+        vertical-align: middle;
+    }
+
+/* ============================================================
+   🌈 AVATAR – kiểu hóa đơn
+============================================================ */
+.avatar-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #e9ddff;
+    color: #6a11cb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+}
+
+/* ============================================================
+   🌈 BADGE – Trạng thái nhân viên
+============================================================ */
+.badge-status {
+    padding: 6px 14px;
+    border-radius: 18px;
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 0.75rem;
+}
+
+.badge-active {
+    background: #1abc9c !important; /* đang làm */
+}
+
+.badge-off {
+    background: #d35400 !important; /* đã nghỉ */
+}
+
+/* ============================================================
+   🌈 ACTION BUTTON – Giống hóa đơn
+============================================================ */
+.action-btn {
+    border-radius: 10px !important;
+    padding: 6px 8px !important;
+    background: #f3f0fd;
+    border: 1px solid #d7c6ff;
+    margin: 0 2px;
+    transition: 0.2s;
+}
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        background: #ece3ff;
+    }
+
+.action-view i {
+    color: #3b82f6;
+}
+
+.action-edit i {
+    color: #eab308;
+}
+
+.action-delete i {
+    color: #dc2626;
+}

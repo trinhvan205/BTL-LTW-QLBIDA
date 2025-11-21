@@ -3,6 +3,7 @@ let searchTimeout;
 
 // ==================== DOCUMENT READY ====================
 $(document).ready(function () {
+
     // Load data khi trang vừa load
     loadNhanviens();
 
@@ -11,7 +12,7 @@ $(document).ready(function () {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(function () {
             loadNhanviens();
-        }, 500);
+        }, 400);
     });
 
     // Lọc theo trạng thái
@@ -25,12 +26,8 @@ $(document).ready(function () {
         $('#dangLam').prop('checked', true);
         loadNhanviens();
     });
-
-    // Check all checkbox
-    $('#checkAll').on('change', function () {
-        $('tbody input[type="checkbox"]').prop('checked', this.checked);
-    });
 });
+
 
 // ==================== LOAD DATA FUNCTION ====================
 function loadNhanviens() {
@@ -43,7 +40,7 @@ function loadNhanviens() {
     $('#emptyState').hide();
 
     $.ajax({
-        url: '/Nhanviens/GetNhanviens', // ✅ Dùng URL tuyệt đối
+        url: '/Nhanviens/GetNhanviens',   // ✔ API chính xác
         type: 'GET',
         data: {
             searchString: searchString,
@@ -53,11 +50,11 @@ function loadNhanviens() {
             if (response.success) {
                 renderTable(response.data);
             } else {
-                alert('Có lỗi xảy ra: ' + response.message);
+                alert("Lỗi: " + response.message);
             }
         },
         error: function () {
-            alert('Không thể tải dữ liệu. Vui lòng thử lại!');
+            alert("Không thể tải dữ liệu!");
         },
         complete: function () {
             $('#loadingSpinner').hide();
@@ -65,12 +62,14 @@ function loadNhanviens() {
     });
 }
 
+
+
 // ==================== RENDER TABLE FUNCTION ====================
 function renderTable(data) {
     const tbody = $('#nhanvienTableBody');
     tbody.empty();
 
-    // Update total count
+    // Update total
     $('#totalCount').text(data.length);
 
     if (data.length === 0) {
@@ -81,55 +80,91 @@ function renderTable(data) {
 
     $('#nhanvienTable').show();
 
-    data.forEach(function (item) {
-        const avatarLetter = item.hotennv ? item.hotennv.substring(0, 1).toUpperCase() : 'N';
-        const gioitinh = item.gioitinh === false ? 'Nam' : 'Nữ';
-        const quyenBadge = item.quyenadmin === true
-            ? '<span class="badge bg-danger"><i class="fas fa-crown me-1"></i>Admin</span>'
-            : '<span class="badge bg-secondary"><i class="fas fa-user me-1"></i>Nhân viên</span>';
-        const trangThaiBadge = item.nghiviec === false
-            ? '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Đang làm</span>'
-            : '<span class="badge bg-secondary"><i class="fas fa-times-circle me-1"></i>Đã nghỉ</span>';
+    data.forEach(item => {
 
+        // Avatar ký tự đầu
+        const avatarLetter = item.hotennv
+            ? item.hotennv.substring(0, 1).toUpperCase()
+            : "N";
+
+        // Giới tính
+        const gioitinh = item.gioitinh === false ? "Nam" : "Nữ";
+
+        // Badge quyền
+        const quyenBadge = item.quyenadmin
+            ? `<span class="badge-status badge-active">
+                    <i class="fas fa-crown me-1"></i>Admin
+               </span>`
+            : `<span class="badge-status badge-off">
+                    <i class="fas fa-user me-1"></i>Nhân viên
+               </span>`;
+
+        // Badge trạng thái
+        const trangThaiBadge = item.nghiviec === false
+            ? `<span class="badge-status badge-active">
+                    <i class="fas fa-check-circle me-1"></i>Đang làm
+               </span>`
+            : `<span class="badge-status badge-off">
+                    <i class="fas fa-times-circle me-1"></i>Đã nghỉ
+               </span>`;
+
+        // HTML dòng
         const row = `
             <tr>
-                <td class="text-center">
-                    <input type="checkbox" class="form-check-input">
-                </td>
+
                 <td>
-                    <div class="avatar-circle bg-primary text-white">
+                    <div class="avatar-circle">
                         ${avatarLetter}
                     </div>
                 </td>
+
                 <td>
                     <a href="/Nhanviens/Details/${item.idnv}"
                        class="text-decoration-none fw-bold text-primary">
                         ${item.idnv}
                     </a>
                 </td>
-                <td>${item.tendangnhap || ''}</td>
+
+                <td>${item.tendangnhap || ""}</td>
+
                 <td>
-                    <div class="fw-bold">${item.hotennv || 'Chưa có'}</div>
+                    <div class="fw-bold">${item.hotennv || "Chưa có"}</div>
                     <small class="text-muted">${gioitinh}</small>
                 </td>
-                <td>${item.sodt || ''}</td>
-                <td>${item.cccd || ''}</td>
+
+                <td>${item.sodt || ""}</td>
+
+                <td>${item.cccd || ""}</td>
+
                 <td class="text-center">${quyenBadge}</td>
+
                 <td class="text-center">${trangThaiBadge}</td>
+
                 <td class="text-center">
-                    <div class="btn-group btn-group-sm">
+                    <div class="d-flex justify-content-center">
+
+                        <a href="/Nhanviens/Details/${item.idnv}" 
+                           class="action-btn action-view" title="Chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </a>
+
                         <a href="/Nhanviens/Edit/${item.idnv}"
-                           class="btn btn-outline-primary" title="Sửa">
+                           class="action-btn action-edit" title="Sửa">
                             <i class="fas fa-edit"></i>
                         </a>
+
                         <a href="/Nhanviens/Delete/${item.idnv}"
-                           class="btn btn-outline-danger" title="Xóa">
+                           class="action-btn action-delete" title="Xóa">
                             <i class="fas fa-trash"></i>
                         </a>
+
                     </div>
                 </td>
+
             </tr>
         `;
+
         tbody.append(row);
     });
 }
+

@@ -45,7 +45,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                 {
                     nhanviens = nhanviens.Where(nv => nv.Nghiviec == false);
                 }
-                else if (trangThai == "danghhi")
+                else if (trangThai == "danghi")
                 {
                     nhanviens = nhanviens.Where(nv => nv.Nghiviec == true);
                 }
@@ -114,7 +114,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                 {
                     nhanviens = nhanviens.Where(nv => nv.Nghiviec == false);
                 }
-                else if (trangThai == "danghhi")
+                else if (trangThai == "danghi")
                 {
                     nhanviens = nhanviens.Where(nv => nv.Nghiviec == true);
                 }
