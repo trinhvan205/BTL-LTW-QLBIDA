@@ -322,3 +322,10 @@ body {
     color: #7F59B2;
     /* Đảm bảo icon (bi-controller) cũng thừa hưởng màu này */
 }
+
+
+
+/* Áp dụng màu xanh cho Mã bàn ở mọi nơi */
+.ban-id {
+    color: #007bff; /* Mã màu xanh bạn muốn */
+}

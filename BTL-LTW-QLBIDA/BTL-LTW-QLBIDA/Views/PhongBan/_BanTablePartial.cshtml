@@ -14,9 +14,13 @@
         {
 
             <tr class="clickable-row" data-id="@item.Idban" style="cursor: pointer;">
-                <td>@item.Idban</td>
+
+                <td class="ban-id">@item.Idban</td>
+
                 <td>@item.IdkhuNavigation?.Tenkhu</td>
+
                 <td>@string.Format("{0:0.########}", item.Giatien ?? 0)</td>
+
                 <td>
                     @if (item.Trangthai == true)
                     {
