@@ -344,6 +344,26 @@ namespace BTL_LTW_QLBIDA.Controllers
                 newKhuVuc = new { id = newKhu.Idkhu, ten = newKhu.Tenkhu }
             });
         }
+        // [HÀM 6] LẤY CHI TIẾT KHU VỰC CHO MODAL SỬA (GET JSON)
+        [HttpGet]
+        public async Task<IActionResult> GetKhuVucDetails(string id)
+        {
+            var khuvuc = await _context.Khuvucs.FindAsync(id);
+
+            if (khuvuc == null)
+            {
+                return NotFound();
+            }
+
+            // Trả về JSON để JavaScript dễ dàng điền vào form sửa
+            return Json(new
+            {
+                idkhu = khuvuc.Idkhu,
+                tenkhu = khuvuc.Tenkhu,
+                ghichu = khuvuc.Ghichu
+            });
+        }
+
 
         // [HÀM 7] UPDATE KHU VỰC (ĐÃ SỬA: Thêm tham số page và pageSize)
         [HttpPost]
