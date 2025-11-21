@@ -7,7 +7,6 @@ body {
     color: #2d3436;
 }
 
-/* Card chung */
 .card {
     border-radius: 18px;
     border: none;
@@ -16,17 +15,15 @@ body {
 }
 
 /* ============================================================
-   🌈 BẢNG HÓA ĐƠN – Style giống table dịch vụ
+   🌈 BẢNG HÓA ĐƠN – FIX GIẬT LAYOUT
 ============================================================ */
-
 .table-hoadon {
     border-collapse: separate !important;
-    border-spacing: 0 10px !important; /* mỗi hàng là một card */
+    border-spacing: 0 10px !important;
     font-size: 0.9rem;
     width: 100%;
 }
 
-    /* HEADER */
     .table-hoadon thead th {
         background: #6a11cb !important;
         color: #fff !important;
@@ -38,13 +35,17 @@ body {
         letter-spacing: 0.05em;
     }
 
-    /* Hàng dạng card */
     .table-hoadon tbody tr {
         background: #fff;
         border-radius: 14px;
         box-shadow: 0 3px 12px rgba(118, 75, 162, 0.08);
-        transition: 0.25s;
+        transition: background 0.25s ease, box-shadow 0.25s ease;
     }
+
+        .table-hoadon tbody tr:hover {
+            background: #f8f5ff !important;
+            box-shadow: 0 8px 22px rgba(118, 75, 162, 0.18);
+        }
 
         .table-hoadon tbody tr td:first-child {
             border-top-left-radius: 14px;
@@ -56,26 +57,17 @@ body {
             border-bottom-right-radius: 14px;
         }
 
-        /* Hover */
-        .table-hoadon tbody tr:hover {
-            transform: scale(1.01);
-            background: #f8f5ff !important;
-            box-shadow: 0 6px 18px rgba(118, 75, 162, 0.18);
-        }
-
     .table-hoadon td {
         padding: 14px 16px !important;
         color: #2d2d2d;
         vertical-align: middle;
     }
 
-/* Tổng tiền */
 .col-tongtien {
     font-weight: 700;
     color: #6a11cb !important;
 }
 
-/* Tên khách / nhân viên */
 .col-khach,
 .col-nhanvien {
     white-space: normal !important;
@@ -83,14 +75,13 @@ body {
     font-weight: 500;
 }
 
-/* Cột thao tác */
 .col-thaotac {
     min-width: 210px;
     white-space: nowrap;
 }
 
 /* ============================================================
-   🌈 Trạng thái Hóa đơn – Đồng bộ với badge của Dịch vụ
+   🌈 TRẠNG THÁI HÓA ĐƠN
 ============================================================ */
 .badge-status {
     padding: 6px 14px;
@@ -103,14 +94,13 @@ body {
 .badge-success {
     background: #1abc9c !important;
 }
-/* Đã thanh toán */
+
 .badge-pending {
     background: #d35400 !important;
 }
-/* Chưa thanh toán */
 
 /* ============================================================
-   🌈 ACTION BUTTONS – Giống dịch vụ
+   🌈 ACTION BUTTON – FIX GIẬT
 ============================================================ */
 .action-btn {
     border-radius: 10px !important;
@@ -118,15 +108,14 @@ body {
     background: #f3f0fd;
     border: 1px solid #d7c6ff;
     margin: 0 2px;
-    transition: 0.2s;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
     .action-btn:hover {
-        transform: translateY(-3px);
         background: #ece3ff;
+        box-shadow: 0px 3px 10px rgba(118,75,162,0.25);
     }
 
-/* Icon màu */
 .action-view i {
     color: #3b82f6;
 }
@@ -175,12 +164,12 @@ body {
     }
 
 /* ============================================================
-   🌈 CARD FILTER – HÓA ĐƠN (Đồng bộ dịch vụ)
+   🌈 FILTER FORM – đồng bộ Dịch vụ
 ============================================================ */
 #filterForm label.form-label {
     font-weight: 600;
     font-size: 0.85rem;
-    color: #6a11cb;
+/*    color: #6a11cb;*/
 }
 
 #filterForm input,
@@ -196,7 +185,7 @@ body {
         box-shadow: 0 0 0 3px rgba(106,17,203,0.2);
     }
 
-/* Nút LỌC */
+/* Nút lọc tím */
 #filterForm .btn.btn-primary,
 #filterForm .btn.btn-success {
     background-color: #6a11cb !important;
@@ -204,40 +193,40 @@ body {
     font-weight: 600;
     border-radius: 8px;
     box-shadow: 0 3px 10px rgba(106,17,203,0.25);
-    transition: 0.2s;
 }
 
+/* Không hover để tránh giật */
 #filterForm .btn:hover {
-    background-color: #5a0fb0 !important;
-    border-color: #5a0fb0 !important;
-    transform: translateY(-2px);
+    background-color: #6a11cb !important;
+    border-color: #6a11cb !important;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-/* Nút XÓA LỌC – cam giống dịch vụ */
+/* Nút XÓA LỌC – cam */
 #btnClearFilter {
     border-radius: 8px !important;
     border: 1px solid #f7971e !important;
     color: #f7971e !important;
     font-weight: 600;
-    transition: 0.2s;
+    transition: none !important;
 }
 
+    /* Không hover */
     #btnClearFilter:hover {
-        background-color: #f7971e !important;
-        color: #fff !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(247,151,30,0.35);
+        background: transparent !important;
+        color: #f7971e !important;
+        transform: none !important;
+        box-shadow: none !important;
     }
-/* ============================================================
-   🌈 FIX LỆCH – làm khoảng cách đồng bộ với trang Dịch vụ
-============================================================ */
 
-/* Bọc cả layout hóa đơn */
+/* ============================================================
+   🌈 ALIGN LAYOUT – giống Dịch vụ
+============================================================ */
 .hoadon-row {
-    margin-top: 20px; /* giống dịch vụ */
+    margin-top: 20px;
 }
 
-/* Filter và Content thẳng hàng */
 .hoadon-filter {
     padding-right: 12px !important;
 }
@@ -247,7 +236,7 @@ body {
 }
 
 /* ============================================================
-   🌈 TITLE BAR – Giống KiotViet
+   🌈 TITLE BAR – Đồng bộ KiotViet
 ============================================================ */
 .page-title-bar {
     background: #f8f9fb;

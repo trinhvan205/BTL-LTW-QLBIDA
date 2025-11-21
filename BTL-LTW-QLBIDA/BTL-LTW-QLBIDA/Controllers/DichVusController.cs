@@ -16,9 +16,9 @@ namespace BTL_LTW_QLBIDA.Controllers
         private readonly QlquanBilliardLtw2Context _context = context;
         private readonly IWebHostEnvironment _env = env;
 
-        // =====================================================
-        // INDEX
-        // =====================================================
+        /* ============================================================
+           INDEX
+        ============================================================ */
         public async Task<IActionResult> Index()
         {
             ViewBag.ListLoai = await _context.Loaidichvus
@@ -28,9 +28,9 @@ namespace BTL_LTW_QLBIDA.Controllers
             return View();
         }
 
-        // =====================================================
-        // SINH MÃ DV
-        // =====================================================
+        /* ============================================================
+           SINH MÃ DV
+        ============================================================ */
         private async Task<string> GenerateNextIddvAsync()
         {
             var last = await _context.Dichvus
@@ -41,7 +41,7 @@ namespace BTL_LTW_QLBIDA.Controllers
             if (string.IsNullOrEmpty(last))
                 return "DV001";
 
-            string digits = new([.. last.Where(char.IsDigit)]);
+            string digits = new(last.Where(char.IsDigit).ToArray());
             int number = int.TryParse(digits, out int num) ? num : 0;
 
             return $"DV{(number + 1):D3}";
@@ -53,9 +53,9 @@ namespace BTL_LTW_QLBIDA.Controllers
             return Json(await GenerateNextIddvAsync());
         }
 
-        // =====================================================
-        // LOAD TABLE + FILTER
-        // =====================================================
+        /* ============================================================
+           LOAD TABLE + FILTER
+        ============================================================ */
         [HttpGet]
         public async Task<IActionResult> LoadTable(
             string? keyword,
@@ -79,13 +79,13 @@ namespace BTL_LTW_QLBIDA.Controllers
                     Hienthi = d.Hienthi ?? false,
                     Imgpath = string.IsNullOrEmpty(d.Imgpath)
                         ? "/images/no-image.png"
-                        : "/" + d.Imgpath.TrimStart('/'),   // ⭐ Sửa 100% đúng
+                        : "/" + d.Imgpath.TrimStart('/'),
                     IdloaiNavigation = d.IdloaiNavigation
                 })
                 .OrderBy(d => d.Tendv)
                 .AsQueryable();
 
-            // FILTER
+            // Filter
             if (!string.IsNullOrWhiteSpace(keyword))
                 query = query.Where(d => d.Tendv.Contains(keyword));
 
@@ -101,7 +101,6 @@ namespace BTL_LTW_QLBIDA.Controllers
             if (maxPrice.HasValue)
                 query = query.Where(d => d.Giatien <= maxPrice.Value);
 
-            // PHÂN TRANG
             int total = await query.CountAsync();
 
             var items = await query
@@ -118,9 +117,9 @@ namespace BTL_LTW_QLBIDA.Controllers
             });
         }
 
-        // =====================================================
-        // XỬ LÝ ẢNH — ĐÃ SỬA ĐÚNG CHUẨN
-        // =====================================================
+        /* ============================================================
+           XỬ LÝ ẢNH
+        ============================================================ */
         private string? SaveImage(string id, IFormFile file)
         {
             string ext = Path.GetExtension(file.FileName).ToLower();
@@ -136,7 +135,6 @@ namespace BTL_LTW_QLBIDA.Controllers
             using var stream = new FileStream(path, FileMode.Create);
             file.CopyTo(stream);
 
-            // ⭐ Đường dẫn CHUẨN webroot
             return "/images/dichvu/" + fileName;
         }
 
@@ -149,18 +147,32 @@ namespace BTL_LTW_QLBIDA.Controllers
                 System.IO.File.Delete(full);
         }
 
-        // =====================================================
-        // CREATE AJAX
-        // =====================================================
+        /* ============================================================
+           CREATE AJAX
+        ============================================================ */
         [HttpPost]
         public async Task<IActionResult> CreateAjax(Dichvu dv, IFormFile? imageFile)
         {
             dv.Iddv = await GenerateNextIddvAsync();
 
+            // VALIDATION
+            if (string.IsNullOrWhiteSpace(dv.Tendv) || dv.Tendv.Length < 2)
+                return Json(new { success = false, message = "Tên dịch vụ phải có ít nhất 2 ký tự!" });
+
+            if (string.IsNullOrEmpty(dv.Idloai))
+                return Json(new { success = false, message = "Vui lòng chọn loại dịch vụ!" });
+
+            if (dv.Giatien == null || dv.Giatien <= 0)
+                return Json(new { success = false, message = "Giá phải lớn hơn 0!" });
+
+            if (dv.Soluong == null || dv.Soluong < 0)
+                return Json(new { success = false, message = "Số lượng không hợp lệ!" });
+
             dv.Giatien ??= 0;
             dv.Soluong ??= 0;
             dv.Hienthi ??= true;
 
+            // Ảnh
             if (imageFile != null)
             {
                 string? img = SaveImage(dv.Iddv, imageFile);
@@ -169,20 +181,17 @@ namespace BTL_LTW_QLBIDA.Controllers
 
                 dv.Imgpath = img;
             }
-            else
-            {
-                dv.Imgpath = null;
-            }
+            else dv.Imgpath = null;
 
             _context.Add(dv);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true });
+            return Json(new { success = true, message = "Thêm dịch vụ thành công!" });
         }
 
-        // =====================================================
-        // DETAILS
-        // =====================================================
+        /* ============================================================
+           DETAIL PARTIAL
+        ============================================================ */
         public async Task<IActionResult> DetailPartial(string id)
         {
             var dv = await _context.Dichvus
@@ -208,13 +217,28 @@ namespace BTL_LTW_QLBIDA.Controllers
             return PartialView("_DichvuDetailModal", dv);
         }
 
-        // =====================================================
-        // EDIT
-        // =====================================================
+        /* ============================================================
+           GET EDIT FORM  (ĐÃ SỬA ẢNH)
+        ============================================================ */
         [HttpGet]
         public async Task<IActionResult> GetEditForm(string id)
         {
-            var dv = await _context.Dichvus.FindAsync(id);
+            var dv = await _context.Dichvus
+                .Where(d => d.Iddv == id)
+                .Select(d => new Dichvu
+                {
+                    Iddv = d.Iddv,
+                    Tendv = d.Tendv,
+                    Idloai = d.Idloai,
+                    Giatien = d.Giatien ?? 0,
+                    Soluong = d.Soluong ?? 0,
+                    Hienthi = d.Hienthi ?? false,
+                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
+                        ? "/images/no-image.png"
+                        : "/" + d.Imgpath.TrimStart('/')
+                })
+                .FirstOrDefaultAsync();
+
             if (dv == null) return NotFound();
 
             ViewBag.ListLoai = await _context.Loaidichvus.OrderBy(l => l.Tenloai).ToListAsync();
@@ -222,9 +246,9 @@ namespace BTL_LTW_QLBIDA.Controllers
             return PartialView("_DichvuEditPartial", dv);
         }
 
-        // =====================================================
-        // UPDATE AJAX
-        // =====================================================
+        /* ============================================================
+           UPDATE AJAX
+        ============================================================ */
         [HttpPost]
         public async Task<IActionResult> UpdateAjax(Dichvu dv, IFormFile? imageFile)
         {
@@ -232,7 +256,10 @@ namespace BTL_LTW_QLBIDA.Controllers
             if (old == null)
                 return Json(new { success = false, message = "Không tìm thấy dịch vụ!" });
 
-            old.Tendv = string.IsNullOrWhiteSpace(dv.Tendv) ? "(Không tên)" : dv.Tendv;
+            if (string.IsNullOrWhiteSpace(dv.Tendv) || dv.Tendv.Length < 2)
+                return Json(new { success = false, message = "Tên dịch vụ phải có ít nhất 2 ký tự!" });
+
+            old.Tendv = dv.Tendv;
             old.Idloai = dv.Idloai;
             old.Giatien = dv.Giatien ?? 0;
             old.Soluong = dv.Soluong ?? 0;
@@ -254,9 +281,9 @@ namespace BTL_LTW_QLBIDA.Controllers
             return Json(new { success = true });
         }
 
-        // =====================================================
-        // DELETE AJAX
-        // =====================================================
+        /* ============================================================
+           DELETE
+        ============================================================ */
         [HttpPost]
         public async Task<IActionResult> DeleteAjax(string id)
         {
@@ -276,9 +303,9 @@ namespace BTL_LTW_QLBIDA.Controllers
             return Json(new { success = true });
         }
 
-        // =====================================================
-        // TOGGLE STATUS
-        // =====================================================
+        /* ============================================================
+           TOGGLE STATUS
+        ============================================================ */
         [HttpPost]
         public async Task<IActionResult> ToggleStatus(string id)
         {

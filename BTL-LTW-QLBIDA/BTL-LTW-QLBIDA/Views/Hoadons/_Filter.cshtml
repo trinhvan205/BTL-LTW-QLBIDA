@@ -1,37 +1,59 @@
 ﻿@* Partial View: _Filter.cshtml *@
 
-<div class="card dv-sidebar-card p-3 shadow-sm border-0">
+<div class="card dv-sidebar-card p-3 shadow-sm border-0 hoadon-filter">
+
     <h5 class="fw-bold text-secondary mb-3">
         <i class="bi bi-funnel me-1"></i> Bộ lọc & tìm kiếm
     </h5>
 
     <form id="filterForm">
+
+        <!-- Mã hóa đơn -->
         <label class="form-label">Mã hóa đơn</label>
-        <input name="ma" class="form-control form-control-sm mb-2" placeholder="Nhập mã ..." />
+        <input name="ma"
+               class="form-control form-control-sm mb-2"
+               placeholder="Nhập mã ..." />
 
+        <!-- Khách hàng -->
         <label class="form-label">Khách hàng</label>
-        <input name="khach" class="form-control form-control-sm mb-3" placeholder="Tên khách ..." />
+        <input name="khach"
+               class="form-control form-control-sm mb-3"
+               placeholder="Tên khách ..." />
 
+        <!-- Từ ngày -->
         <label class="form-label">Từ ngày</label>
-        <input type="date" name="from" class="form-control form-control-sm mb-2" />
+        <input type="date"
+               name="from"
+               class="form-control form-control-sm mb-2" />
 
+        <!-- Đến ngày -->
         <label class="form-label">Đến ngày</label>
-        <input type="date" name="to" class="form-control form-control-sm mb-3" />
+        <input type="date"
+               name="to"
+               class="form-control form-control-sm mb-3" />
 
+        <!-- Trạng thái -->
         <label class="form-label">Trạng thái</label>
-        <select name="trangthai" class="form-select form-select-sm mb-3">
+        <select name="trangthai"
+                class="form-select form-select-sm mb-3">
             <option value="">Tất cả</option>
             <option value="false">Đang xử lý</option>
             <option value="true">Hoàn thành</option>
         </select>
 
-        <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary btn-sm">
+        <!-- Buttons -->
+        <div class="d-grid gap-2 mt-2">
+            <button type="submit"
+                    class="btn btn-primary btn-sm">
                 <i class="bi bi-search"></i> Lọc
             </button>
-            <button type="button" id="btnClearFilter" class="btn btn-outline-secondary btn-sm">
+
+            <button type="button"
+                    id="btnClearFilter"
+                    class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-arrow-counterclockwise"></i> Xóa lọc
             </button>
         </div>
+
     </form>
 </div>
