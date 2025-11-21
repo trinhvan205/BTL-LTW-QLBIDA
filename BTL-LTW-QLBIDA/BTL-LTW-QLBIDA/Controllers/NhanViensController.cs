@@ -193,16 +193,27 @@ namespace BTL_LTW_QLBIDA.Controllers
         }
 
         // 6. DELETE & TOGGLE
+        // 6. DELETE
         [HttpPost]
         public async Task<IActionResult> DeleteAjax(string id)
         {
             var nv = await _context.Nhanviens.FindAsync(id);
-            if (nv == null) return Json(new { success = false, message = "Không tìm thấy!" });
+            if (nv == null) return Json(new { success = false, message = "Không tìm thấy nhân viên!" });
 
-            // Logic an toàn: Không xoá người có tài khoản
-            if (!string.IsNullOrEmpty(nv.Tendangnhap) || !string.IsNullOrEmpty(nv.Matkhau))
-                return Json(new { success = false, message = "Không thể xóa nhân viên có tài khoản! Hãy chuyển sang 'Nghỉ việc'." });
+            // KIỂM TRA 1: Nếu có tài khoản đăng nhập -> KHÔNG CHO XÓA
+            if (!string.IsNullOrEmpty(nv.Tendangnhap))
+            {
+                return Json(new { success = false, message = "Nhân viên này đã có tài khoản hệ thống. Vui lòng sử dụng chức năng 'Đổi trạng thái' thay vì xóa!" });
+            }
 
+            // KIỂM TRA 2: Nếu đã có hóa đơn liên quan (Ràng buộc khóa ngoại)
+            bool hasHoadon = await _context.Hoadons.AnyAsync(h => h.Idnv == id);
+            if (hasHoadon)
+            {
+                return Json(new { success = false, message = "Nhân viên này đã lập hóa đơn. Không thể xóa để bảo toàn dữ liệu báo cáo!" });
+            }
+
+            // Nếu an toàn -> Xóa cứng
             _context.Nhanviens.Remove(nv);
             await _context.SaveChangesAsync();
             return Json(new { success = true });

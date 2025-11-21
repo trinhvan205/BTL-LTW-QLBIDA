@@ -1,27 +1,29 @@
 ﻿@model BTL_LTW_QLBIDA.Models.Nhanvien
 
 <div class="modal-header bg-warning text-dark">
-    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Cập nhật nhân viên: @Model.Hotennv</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Cập nhật: @Model.Hotennv</h5>
+    <button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
 <div class="modal-body">
-    <form id="editForm">
+    <form id="editForm" autocomplete="off">
         <input type="hidden" asp-for="Idnv" />
 
+        <input type="text" style="display:none" />
+        <input type="password" style="display:none" />
+
         <div class="row g-3">
-            <div class="col-md-6">
-                <h6 class="fw-bold text-primary border-bottom pb-1">Thông tin cá nhân</h6>
+            <div class="col-md-6 border-end">
+                <h6 class="text-primary border-bottom pb-2">Thông tin cá nhân</h6>
 
                 <div class="mb-2">
-                    <label class="form-label small fw-bold">Họ tên</label>
+                    <label class="form-label small fw-bold">Họ tên <span class="text-danger">*</span></label>
                     <input asp-for="Hotennv" class="form-control" required />
                 </div>
                 <div class="mb-2">
                     <label class="form-label small fw-bold">Ngày sinh</label>
                     <input asp-for="Ngaysinh" type="date" class="form-control" />
                 </div>
-
                 <div class="mb-2">
                     <label class="form-label small fw-bold">Giới tính</label>
                     <select name="Gioitinh" class="form-select">
@@ -29,37 +31,44 @@
                         <option value="true" selected="@(Model.Gioitinh == true)">Nữ</option>
                     </select>
                 </div>
-
                 <div class="mb-2">
                     <label class="form-label small fw-bold">SĐT</label>
                     <input asp-for="Sodt" class="form-control" />
                 </div>
                 <div class="mb-2">
                     <label class="form-label small fw-bold">CCCD</label>
-                    <input asp-for="Cccd" class="form-control" maxlength="12" />
+                    <input asp-for="Cccd" class="form-control" />
                 </div>
             </div>
 
             <div class="col-md-6">
-                <h6 class="fw-bold text-success border-bottom pb-1">Tài khoản & Quyền</h6>
+                <h6 class="text-success border-bottom pb-2">Tài khoản hệ thống</h6>
 
                 <div class="mb-2">
                     <label class="form-label small fw-bold">Tên đăng nhập</label>
-                    <input asp-for="Tendangnhap" class="form-control" placeholder="Để trống nếu không cấp TK" />
+                    <input asp-for="Tendangnhap" class="form-control" placeholder="Để trống nếu không cấp TK" autocomplete="new-password" />
                 </div>
 
                 <div class="mb-2">
                     <label class="form-label small fw-bold">Mật khẩu mới</label>
-                    <input name="Matkhau" type="password" class="form-control" placeholder="Để trống nếu không đổi" />
-                    <small class="text-muted" style="font-size: 0.75rem;">Chỉ nhập nếu muốn đổi mật khẩu</small>
+                    <input name="Matkhau" type="password" class="form-control" placeholder="Để trống nếu không đổi" autocomplete="new-password" />
+                    <small class="text-muted fst-italic" style="font-size: 0.75rem;">
+                        @if (string.IsNullOrEmpty(Model.Tendangnhap))
+                        {
+                            <span>(Nhân viên này chưa có tài khoản. Nhập vào đây để tạo mới)</span>
+                        }
+                        else
+                        {
+                            <span>(Chỉ nhập nếu muốn đổi mật khẩu cũ)</span>
+                        }
+                    </small>
                 </div>
 
-                <div class="card p-2 border bg-light mt-3">
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" name="Quyenadmin" value="true" id="chkAdmin" @(Model.Quyenadmin == true ? "checked" : "")>
-                        <input type="hidden" name="Quyenadmin" value="false" />
-
-                        <label class="form-check-label" for="chkAdmin">Quyền Admin</label>
+                <div class="card bg-light p-2 mt-3 border-0">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Quyenadmin" value="true" id="chkEditAdmin" @(Model.Quyenadmin == true ? "checked" : "")>
+                        <input type="hidden" name="Quyenadmin" value="false">
+                        <label class="form-check-label small fw-bold" for="chkEditAdmin">Cấp quyền Quản trị viên (Admin)</label>
                     </div>
                 </div>
             </div>
@@ -68,8 +77,6 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-    <button type="button" class="btn btn-warning" id="btnSaveEdit">
-        <i class="bi bi-check-circle me-1"></i> Lưu thay đổi
-    </button>
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+    <button class="btn btn-warning" id="btnSaveEdit">Lưu thay đổi</button>
 </div>

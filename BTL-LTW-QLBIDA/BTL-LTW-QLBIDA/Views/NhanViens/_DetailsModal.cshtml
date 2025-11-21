@@ -1,68 +1,97 @@
 ﻿@model BTL_LTW_QLBIDA.Models.Nhanvien
 
 <div class="modal-header bg-info text-white">
-    <h5 class="modal-title">Chi tiết nhân viên: @Model.Idnv</h5>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <h5 class="modal-title">Hồ sơ nhân viên: @Model.Idnv</h5>
+    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
 <div class="modal-body">
     <div class="text-center mb-4">
-        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2"
-             style="width: 80px; height: 80px; font-size: 32px;">
+        <div class="avatar-circle bg-primary text-white mx-auto mb-2" style="width:80px; height:80px; font-size:30px;">
             @(Model.Hotennv?.Substring(0, 1).ToUpper() ?? "N")
         </div>
-        <h4 class="mb-0">@Model.Hotennv</h4>
-        <div class="mt-2">
-            @if (Model.Nghiviec == true)
-            {
-                <span class="badge bg-secondary">Đã nghỉ việc</span>
-            }
-            else
-            {
-
-                <span class="badge bg-success">Đang làm việc</span>
-            }
-        </div>
+        <h4>@Model.Hotennv</h4>
+        <p class="text-muted">
+            @(Model.Gioitinh == false ? "Nam" : "Nữ") - @(Model.Sodt ?? "Không có SĐT")
+        </p>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header fw-bold">Thông tin cá nhân</div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Ngày sinh:</strong> @(Model.Ngaysinh?.ToString("dd/MM/yyyy") ?? "---")</li>
-                    <li class="list-group-item"><strong>Giới tính:</strong> @(Model.Gioitinh == false ? "Nam" : "Nữ")</li>
-                    <li class="list-group-item"><strong>SĐT:</strong> @Model.Sodt</li>
-                    <li class="list-group-item"><strong>CCCD:</strong> @Model.Cccd</li>
-                </ul>
-            </div>
+            <h6 class="border-bottom pb-2 text-primary">Thông tin cá nhân</h6>
+            <p class="mb-2"><strong>Ngày sinh:</strong> @(Model.Ngaysinh?.ToString("dd/MM/yyyy") ?? "---")</p>
+            <p class="mb-2"><strong>CCCD:</strong> @(Model.Cccd ?? "---")</p>
+            <p class="mb-2">
+                <strong>Trạng thái:</strong>
+                @if (Model.Nghiviec == true)
+                {
+                    <span class="text-danger fw-bold">Đã nghỉ việc</span>
+                }
+                else
+                {
+
+                    <span class="text-success fw-bold">Đang làm việc</span>
+                }
+            </p>
         </div>
+
         <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header fw-bold text-success">Tài khoản hệ thống</div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <strong>Username:</strong>
-                        @(string.IsNullOrEmpty(Model.Tendangnhap) ? "Chưa cấp" : Model.Tendangnhap)
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Quyền hạn:</strong>
+            <h6 class="border-bottom pb-2 text-primary">Tài khoản hệ thống</h6>
+
+            <div class="mb-2">
+                <label class="small text-muted">Tên đăng nhập:</label>
+                <div class="fw-bold">@(Model.Tendangnhap ?? "Chưa cấp tài khoản")</div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Tendangnhap))
+            {
+                <div class="mb-2">
+                    <label class="small text-muted">Mật khẩu hiện tại:</label>
+                    <div class="input-group input-group-sm">
+                        <input type="password" class="form-control bg-white" value="@Model.Matkhau" id="viewPass" readonly>
+
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePass()">
+                            <i class="bi bi-eye" id="iconEye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="small text-muted">Quyền hạn:</label>
+                    <div>
                         @if (Model.Quyenadmin == true)
                         {
-                            <span class="text-danger fw-bold"><i class="bi bi-crown"></i> Admin</span>
+                            <span class="badge bg-warning text-dark">Quản trị viên (Admin)</span>
                         }
                         else
                         {
 
-                            <span>Nhân viên thường</span>
+                            <span class="badge bg-info text-dark">Nhân viên thường</span>
                         }
-                    </li>
-                </ul>
-            </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
 </div>
+
+<script>
+    function togglePass() {
+        var input = document.getElementById("viewPass");
+        var icon = document.getElementById("iconEye");
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        }
+    }
+</script>

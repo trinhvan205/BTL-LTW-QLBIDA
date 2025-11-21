@@ -4,20 +4,14 @@
 {
     <tr>
         <td class="fw-bold text-primary">@item.Idnv</td>
-
         <td>
             <div class="d-flex align-items-center">
-                <div class="rounded-circle bg-primary text-white text-center me-2 fw-bold d-flex align-items-center justify-content-center"
-                     style="width: 35px; height: 35px; font-size: 14px;">
+                <div class="avatar-circle bg-primary text-white me-2">
                     @(item.Hotennv?.Substring(0, 1).ToUpper() ?? "N")
                 </div>
-                <div>
-                    <div class="fw-semibold">@item.Hotennv</div>
-                    <small class="text-muted" style="font-size: 0.8em;">@item.Cccd</small>
-                </div>
+                <span class="fw-semibold">@item.Hotennv</span>
             </div>
         </td>
-
         <td>
             @if (item.Gioitinh == false)
             {
@@ -29,21 +23,22 @@
                 <span class="text-danger"><i class="bi bi-gender-female"></i> Nữ</span>
             }
         </td>
-
         <td>@item.Sodt</td>
 
         <td>
             @if (!string.IsNullOrEmpty(item.Tendangnhap))
             {
-                <div><i class="bi bi-person-circle text-success me-1"></i> @item.Tendangnhap</div>
-                @if (item.Quyenadmin == true)
-                {
-                    <span class="badge bg-danger mt-1"><i class="bi bi-crown-fill me-1"></i>Admin</span>
-                }
+                <div class="d-flex flex-column">
+                    <span class="fw-bold text-dark">@item.Tendangnhap</span>
+                    @if (item.Quyenadmin == true)
+                    {
+                        <span class="badge bg-warning text-dark mt-1" style="width:fit-content">Admin</span>
+                    }
+                </div>
             }
             else
             {
-                <span class="text-muted small fst-italic">Chưa có TK</span>
+                <span class="text-muted small fst-italic">Chưa cấp TK</span>
             }
         </td>
 
@@ -59,24 +54,25 @@
         </td>
 
         <td class="text-center">
-            <div class="btn-group" role="group">
-                <button class="btn btn-sm btn-outline-info btn-details" data-id="@item.Idnv" title="Chi tiết">
-                    <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-warning btn-edit" data-id="@item.Idnv" title="Sửa">
-                    <i class="bi bi-pencil"></i>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-details" data-id="@item.Idnv" title="Chi tiết">
+                    <i class="bi bi-eye text-primary"></i>
                 </button>
 
-                @if (string.IsNullOrEmpty(item.Tendangnhap))
+                <button class="btn btn-sm btn-edit" data-id="@item.Idnv" title="Sửa">
+                    <i class="bi bi-pencil text-warning"></i>
+                </button>
+
+                @if (!string.IsNullOrEmpty(item.Tendangnhap))
                 {
-                    <button class="btn btn-sm btn-outline-danger btn-delete" data-id="@item.Idnv" title="Xóa vĩnh viễn">
-                        <i class="bi bi-trash"></i>
+                    <button class="btn btn-sm btn-toggle" data-id="@item.Idnv" title="Đổi trạng thái Nghỉ/Làm">
+                        <i class="bi bi-arrow-repeat text-success"></i>
                     </button>
                 }
                 else
                 {
-                    <button class="btn btn-sm btn-outline-secondary btn-toggle" data-id="@item.Idnv" title="Đổi trạng thái Nghỉ/Làm">
-                        <i class="bi bi-arrow-repeat"></i>
+                    <button class="btn btn-sm btn-delete" data-id="@item.Idnv" title="Xóa vĩnh viễn">
+                        <i class="bi bi-trash text-danger"></i>
                     </button>
                 }
             </div>
@@ -86,9 +82,5 @@
 
 @if (!Model.HasMore)
 {
-    <tr class="no-more">
-        <td colspan="7" class="text-center text-muted py-3">
-            <i class="bi bi-check2-circle me-1"></i> Hết dữ liệu hiển thị
-        </td>
-    </tr>
+    <tr class="no-more"><td colspan="7" class="text-center text-muted py-3">Hết dữ liệu</td></tr>
 }
