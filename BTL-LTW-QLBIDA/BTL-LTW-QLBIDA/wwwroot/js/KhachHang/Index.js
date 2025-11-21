@@ -130,9 +130,6 @@ function renderTable(data) {
     data.forEach(function (item) {
         const row = `
             <tr>
-                <td class="text-center">
-                    <input type="checkbox" class="form-check-input">
-                </td>
                 <td>
                     <a href="/Khachhangs/Details/${item.idkh}"
                        class="text-decoration-none fw-bold text-primary">

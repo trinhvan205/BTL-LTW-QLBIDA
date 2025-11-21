@@ -133,9 +133,6 @@ function renderTable(data) {
 
         const row = `
             <tr>
-                <td class="text-center">
-                    <input type="checkbox" class="form-check-input">
-                </td>
                 <td>
                     <div class="avatar-circle bg-primary text-white">
                         ${avatarLetter}

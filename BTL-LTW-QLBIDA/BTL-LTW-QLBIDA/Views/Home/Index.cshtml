@@ -8,6 +8,16 @@
 <div class="container-fluid dashboard-wrapper">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 dashboard-page-title">Tổng Quan Kinh Doanh</h1>
+        @* Thêm đoạn này vào Home/Index.cshtml *@
+        @* Sửa đổi thẻ Alert ở đây *@
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div id="loginSuccessAlert" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
         <div>
             <span class="mr-2">Xem theo:</span>
             <select id="chartType" class="form-control filter-time-select" onchange="refreshAllCharts()">
@@ -163,6 +173,20 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             refreshAllCharts();
+            // ✅ LOGIC TỰ ĐỘNG ĐÓNG ALERT ĐÃ SỬA ĐỔI
+            var alertElement = document.getElementById('loginSuccessAlert');
+            if (alertElement) {
+                // Khởi tạo đối tượng Alert của Bootstrap
+                // Sử dụng 'new bootstrap.Alert(alertElement)' hoặc getOrCreateInstance
+                var bsAlert = new bootstrap.Alert(alertElement);
+
+                // Tự động đóng sau 2000ms (2 giây)
+                setTimeout(function () {
+                    // Gọi phương thức close() của Alert
+                    bsAlert.close();
+                }, 2000);
+            }
+            // KẾT THÚC LOGIC TỰ ĐỘNG ĐÓNG ALERT
         });
 
         // ... (Phần còn lại của script giữ nguyên) ...
