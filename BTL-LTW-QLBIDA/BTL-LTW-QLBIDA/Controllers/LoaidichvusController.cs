@@ -1,9 +1,11 @@
-﻿using BTL_LTW_QLBIDA.Models;
+﻿using BTL_LTW_QLBIDA.Filters;
+using BTL_LTW_QLBIDA.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
+    [AdminAuthorize]
     public class LoaidichvusController(QlquanBilliardLtw2Context context) : Controller
     {
         private readonly QlquanBilliardLtw2Context _context = context;

@@ -1,15 +1,18 @@
-﻿using BTL_LTW_QLBIDA.Models;
+﻿using System; // Import System để sử dụng Math
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+using BTL_LTW_QLBIDA.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-using System; // Import System để sử dụng Math
+using BTL_LTW_QLBIDA.Filters;
+
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
+    [AdminAuthorize]
     public class PhongBanController : Controller
     {
         private readonly QlquanBilliardLtw2Context _context;

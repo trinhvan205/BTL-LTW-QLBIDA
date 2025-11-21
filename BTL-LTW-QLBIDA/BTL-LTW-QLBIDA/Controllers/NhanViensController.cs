@@ -1,10 +1,13 @@
 ﻿using System.Globalization;
+using BTL_LTW_QLBIDA.Filters;
 using BTL_LTW_QLBIDA.Models;
+using BTL_LTW_QLBIDA.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BTL_LTW_QLBIDA.Controllers
 {
+    [AdminAuthorize]
     public class NhanviensController : Controller
     {
         private readonly QlquanBilliardLtw2Context _context;
@@ -217,14 +220,65 @@ namespace BTL_LTW_QLBIDA.Controllers
             // Format: Luôn giữ NV00 + số tăng dần
             string newIdnv = $"NV00{newNumber}";
 
-            var nhanvien = new Nhanvien { Idnv = newIdnv };
-            return View(nhanvien);
+            var nhanvienvm = new NhanVienVM { Idnv = newIdnv };
+            return View(nhanvienvm);
         }
+
+        //// POST: Nhanviens/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("Idnv,Hotennv,Ngaysinh,Gioitinh,Cccd,Sodt,Tendangnhap,Matkhau,Quyenadmin")] NhanVienVM nhanvienvm)
+        //{
+        //    if (HttpContext.Session.GetString("QuyenAdmin") != "1")
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+
+        //    // Kiểm tra trùng IDNV
+        //    if (await _context.Nhanviens.AnyAsync(nv => nv.Idnv == nhanvienvm.Idnv))
+        //    {
+        //        ModelState.AddModelError("Idnv", "Mã nhân viên đã tồn tại!");
+        //    }
+
+        //    // Kiểm tra trùng CCCD
+        //    if (!string.IsNullOrEmpty(nhanvienvm.Cccd) &&
+        //        await _context.Nhanviens.AnyAsync(nv => nv.Cccd == nhanvienvm.Cccd))
+        //    {
+        //        ModelState.AddModelError("Cccd", "CCCD đã tồn tại!");
+        //    }
+
+        //    // Kiểm tra trùng Tên đăng nhập
+        //    if (!string.IsNullOrEmpty(nhanvienvm.Tendangnhap) &&
+        //        await _context.Nhanviens.AnyAsync(nv => nv.Tendangnhap == nhanvienvm.Tendangnhap))
+        //    {
+        //        ModelState.AddModelError("Tendangnhap", "Tên đăng nhập đã tồn tại!");
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        nhanvienvm.Hienthi = true;
+        //        nhanvienvm.Nghiviec = false;
+
+        //        // Nếu không nhập mật khẩu, để NULL
+        //        if (string.IsNullOrEmpty(nhanvienvm.Matkhau))
+        //        {
+        //            nhanvienvm.Matkhau = null;
+        //        }
+
+        //        _context.Add(nhanvienvm);
+        //        await _context.SaveChangesAsync();
+
+        //        TempData["SuccessMessage"] = "Thêm nhân viên thành công!";
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    return View(nhanvienvm);
+        //}
 
         // POST: Nhanviens/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Idnv,Hotennv,Ngaysinh,Gioitinh,Cccd,Sodt,Tendangnhap,Matkhau,Quyenadmin")] Nhanvien nhanvien)
+        public async Task<IActionResult> Create(NhanVienVM viewModel)
         {
             if (HttpContext.Session.GetString("QuyenAdmin") != "1")
             {
@@ -232,35 +286,42 @@ namespace BTL_LTW_QLBIDA.Controllers
             }
 
             // Kiểm tra trùng IDNV
-            if (await _context.Nhanviens.AnyAsync(nv => nv.Idnv == nhanvien.Idnv))
+            if (await _context.Nhanviens.AnyAsync(nv => nv.Idnv == viewModel.Idnv))
             {
                 ModelState.AddModelError("Idnv", "Mã nhân viên đã tồn tại!");
             }
 
             // Kiểm tra trùng CCCD
-            if (!string.IsNullOrEmpty(nhanvien.Cccd) &&
-                await _context.Nhanviens.AnyAsync(nv => nv.Cccd == nhanvien.Cccd))
+            if (!string.IsNullOrEmpty(viewModel.Cccd) &&
+                await _context.Nhanviens.AnyAsync(nv => nv.Cccd == viewModel.Cccd))
             {
                 ModelState.AddModelError("Cccd", "CCCD đã tồn tại!");
             }
 
             // Kiểm tra trùng Tên đăng nhập
-            if (!string.IsNullOrEmpty(nhanvien.Tendangnhap) &&
-                await _context.Nhanviens.AnyAsync(nv => nv.Tendangnhap == nhanvien.Tendangnhap))
+            if (!string.IsNullOrEmpty(viewModel.Tendangnhap) &&
+                await _context.Nhanviens.AnyAsync(nv => nv.Tendangnhap == viewModel.Tendangnhap))
             {
                 ModelState.AddModelError("Tendangnhap", "Tên đăng nhập đã tồn tại!");
             }
 
             if (ModelState.IsValid)
             {
-                nhanvien.Hienthi = true;
-                nhanvien.Nghiviec = false;
-
-                // Nếu không nhập mật khẩu, để NULL
-                if (string.IsNullOrEmpty(nhanvien.Matkhau))
+                // ✅ CHUYỂN TỪ VIEWMODEL SANG MODEL
+                var nhanvien = new Nhanvien
                 {
-                    nhanvien.Matkhau = null;
-                }
+                    Idnv = viewModel.Idnv,
+                    Hotennv = viewModel.Hotennv,
+                    Ngaysinh = viewModel.Ngaysinh,
+                    Gioitinh = viewModel.Gioitinh ?? false, // Nếu null thì mặc định false (Nam)
+                    Cccd = viewModel.Cccd,
+                    Sodt = viewModel.Sodt,
+                    Tendangnhap = viewModel.Tendangnhap,
+                    Matkhau = string.IsNullOrEmpty(viewModel.Matkhau) ? null : viewModel.Matkhau,
+                    Quyenadmin = viewModel.Quyenadmin ?? false,
+                    Hienthi = true,
+                    Nghiviec = false
+                };
 
                 _context.Add(nhanvien);
                 await _context.SaveChangesAsync();
@@ -269,7 +330,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(nhanvien);
+            return View(viewModel);
         }
 
         // GET: Nhanviens/Edit/5
