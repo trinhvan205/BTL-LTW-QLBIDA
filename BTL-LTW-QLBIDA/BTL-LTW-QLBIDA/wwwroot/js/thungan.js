@@ -457,7 +457,8 @@ function themDichVu(idDv, tenDv) {
                 showToast(`✅ Đã thêm ${tenDv}`);
 
                 if (viewHienTai === 'dichvu') {
-                    loadDanhSachDichVu();
+                    // ✅ SỬA: Truyền loại dịch vụ đang chọn
+                    loadDanhSachDichVu(loaiDvHienTai);
                 }
             } else {
                 showToast('❌ ' + response.message);
@@ -487,7 +488,8 @@ function capNhatSoLuong(idHd, idDv, soLuong) {
                 loadHoaDonChiTiet(banDangChon);
 
                 if (viewHienTai === 'dichvu') {
-                    loadDanhSachDichVu();
+                    // ✅ SỬA: Truyền loại dịch vụ đang chọn
+                    loadDanhSachDichVu(loaiDvHienTai);
                 }
             } else {
                 showToast('❌ ' + (response.message || 'Lỗi cập nhật số lượng'));
@@ -759,7 +761,7 @@ function updateTienThua() {
     }
 }
 
-// Xác nhận thanh toán → Thanh toán & Hiện preview PDF
+// click thanh toán trong ModalThanhToan → ModalXacNhanThanhToan -> Hiện preview PDF
 $(document).on('click', '#btnXacNhanThanhToan', function () {
     const idHd = $(this).data('hd');
     const idBan = $(this).data('ban');
@@ -767,12 +769,38 @@ $(document).on('click', '#btnXacNhanThanhToan', function () {
     const khachTra = $('#khachThanhToanInput').data('raw-value') || 0;
     const tongTien = parseFloat($('#tongTienDisplay').text().replace(/[^\d]/g, '')) || 0;
 
+    // Validate tiền
     if (khachTra < tongTien) {
         showToast('❌ Số tiền khách trả không đủ!');
         return;
     }
 
-    // Gọi thanh toán (đã đóng bàn + tạo PDF tạm)
+    // ✅ Lưu thông tin vào nút "Đồng ý"
+    $('#btnDongYThanhToan').data({
+        'hd': idHd,
+        'ban': idBan,
+        'phuongthuc': phuongThuc
+    });
+
+    // ✅ Hiện modal xác nhận
+    $('#modalXacNhanThanhToan').modal('show');
+});
+
+// ===========================
+// CLICK NÚT "CÓ, THANH TOÁN" TRONG MODAL XÁC NHẬN
+// ===========================
+$(document).on('click', '#btnDongYThanhToan', function () {
+    const idHd = $(this).data('hd');
+    const idBan = $(this).data('ban');
+    const phuongThuc = $(this).data('phuongthuc');
+
+    // ✅ Đóng modal xác nhận
+    $('#modalXacNhanThanhToan').modal('hide');
+
+    // ✅ Đóng modal thanh toán
+    $('#modalThanhToan').modal('hide');
+
+    // ✅ Gọi API thanh toán
     thanhToanVaPreview(idHd, idBan, phuongThuc);
 });
 

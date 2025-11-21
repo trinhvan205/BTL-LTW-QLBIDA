@@ -1556,3 +1556,32 @@
     #modalThemKhachHang .btn-primary:hover {
         background: #82408E;
     }
+
+
+
+
+
+/* ===========================
+   MODAL XÁC NHẬN THANH TOÁN
+=========================== */
+#modalXacNhanThanhToan .modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+#modalXacNhanThanhToan .modal-header {
+    border-radius: 16px 16px 0 0;
+    padding: 16px 20px;
+}
+
+#modalXacNhanThanhToan .btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s;
+}
+
+#modalXacNhanThanhToan .btn-primary:hover {
+    background: #8a3d96 !important;
+    border-color: #8a3d96 !important;
+}
+

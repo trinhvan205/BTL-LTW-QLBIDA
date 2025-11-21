@@ -177,6 +177,38 @@
 <!-- Modal thanh toán - Chỉ load 1 lần -->
 @await Html.PartialAsync("~/Views/Shared/ThuNgan/_ModalThanhToan.cshtml")
 
+<!-- MODAL XÁC NHẬN THANH TOÁN -->
+<div class="modal fade" id="modalXacNhanThanhToan" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #A250B2; color: white; border: none;">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Xác nhận
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div style="font-size: 64px; color: #A250B2; margin-bottom: 16px;">
+                    <i class="bi bi-question-circle"></i>
+                </div>
+                <h6 style="font-weight: 600; color: #1f2937; line-height: 1.6;">
+                    Bạn có chắc muốn<br>
+                    <strong style="color: #A250B2;">dừng tính giờ và thanh toán</strong><br>
+                    không?
+                </h6>
+            </div>
+            <div class="modal-footer" style="border: none; padding: 0 20px 20px 20px;">
+                <button type="button" class="btn btn-secondary w-100 mb-2" data-bs-dismiss="modal" style="border-radius: 8px; padding: 10px;">
+                    <i class="bi bi-x-circle"></i> Không
+                </button>
+                <button type="button" class="btn btn-primary w-100" id="btnDongYThanhToan" style="background: #A250B2; border-color: #A250B2; border-radius: 8px; padding: 10px;">
+                    <i class="bi bi-check-circle"></i> Có, thanh toán
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ← THÊM: Modal preview PDF -->
 @await Html.PartialAsync("~/Views/Shared/ThuNgan/_ModalPreviewPdf.cshtml")
 
