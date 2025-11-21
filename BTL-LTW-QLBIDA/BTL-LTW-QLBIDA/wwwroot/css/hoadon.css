@@ -1,81 +1,73 @@
 ﻿/* ============================================================
-   🌸 GLOBAL
+   🌈 GLOBAL STYLE – Tone tím Dashboard
 ============================================================ */
 body {
-    font-family: "Inter", sans-serif !important;
-    background: #f3f4fd; /* tím nhạt */
+    font-family: 'Inter', sans-serif !important;
+    background: #f3f4fd;
     color: #2d3436;
 }
 
-/* Bọc bảng */
-#tableScrollArea {
+/* Card chung */
+.card {
     border-radius: 18px;
-    background: #fff;
+    border: none;
+    background: #ffffff;
     box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12);
-    padding: 0;
-    border: none !important;
 }
 
 /* ============================================================
-   🌸 TABLE – Áp dụng cho table trong Index Hóa đơn
+   🌈 BẢNG HÓA ĐƠN – Style giống table dịch vụ
 ============================================================ */
 
-.table {
-    font-size: 0.9rem !important;
+.table-hoadon {
+    border-collapse: separate !important;
+    border-spacing: 0 10px !important; /* mỗi hàng là một card */
+    font-size: 0.9rem;
+    width: 100%;
 }
 
-    /* HEADER – tím đặc */
-    .table thead th {
+    /* HEADER */
+    .table-hoadon thead th {
         background: #6a11cb !important;
         color: #fff !important;
-        border: none !important;
+        padding: 12px;
         font-weight: 700;
         font-size: 0.78rem;
+        border: none !important;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
-        padding: 12px;
+        letter-spacing: 0.05em;
     }
 
-    /* BODY CELL */
-    .table tbody td {
-        padding: 12px 14px !important;
+    /* Hàng dạng card */
+    .table-hoadon tbody tr {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(118, 75, 162, 0.08);
+        transition: 0.25s;
+    }
+
+        .table-hoadon tbody tr td:first-child {
+            border-top-left-radius: 14px;
+            border-bottom-left-radius: 14px;
+        }
+
+        .table-hoadon tbody tr td:last-child {
+            border-top-right-radius: 14px;
+            border-bottom-right-radius: 14px;
+        }
+
+        /* Hover */
+        .table-hoadon tbody tr:hover {
+            transform: scale(1.01);
+            background: #f8f5ff !important;
+            box-shadow: 0 6px 18px rgba(118, 75, 162, 0.18);
+        }
+
+    .table-hoadon td {
+        padding: 14px 16px !important;
+        color: #2d2d2d;
         vertical-align: middle;
-        background: #ffffff;
-        border-bottom: 1px solid #eee3ff; /* tím nhạt */
-        color: #333;
     }
-
-/* HOVER */
-.table-hover tbody tr:hover td {
-    background: #f6efff !important; /* tím pastel nhẹ */
-    transform: translateY(-1px);
-    transition: 0.18s ease;
-}
-
-/* SELECTED / ACTIVE ROW */
-.selected-row td,
-.active-row td {
-    background: #eadbff !important; /* tím nhạt hơn hover */
-    border-left: 4px solid #6a11cb;
-}
-
-/* ============================================================
-   🌸 CỘT ĐẶC THÙ (Khách – Nhân viên – Thao tác)
-============================================================ */
-
-/* Tên khách / nhân viên cho phép xuống dòng */
-.col-khach,
-.col-nhanvien {
-    white-space: normal !important;
-    max-width: 220px;
-    font-weight: 500;
-}
-
-/* Cột thao tác cố định kích thước */
-.col-thaotac {
-    min-width: 210px;
-    white-space: nowrap;
-}
 
 /* Tổng tiền */
 .col-tongtien {
@@ -83,71 +75,80 @@ body {
     color: #6a11cb !important;
 }
 
-/* Trạng thái */
-.badge-status {
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #fff;
+/* Tên khách / nhân viên */
+.col-khach,
+.col-nhanvien {
+    white-space: normal !important;
+    max-width: 220px;
+    font-weight: 500;
 }
 
-.badge-success {
-    background: #6a11cb !important;
-}
-
-.badge-pending {
-    background: #b693ff !important;
+/* Cột thao tác */
+.col-thaotac {
+    min-width: 210px;
+    white-space: nowrap;
 }
 
 /* ============================================================
-   🌸 ACTION BUTTONS (Chi tiết – Sửa – Xóa – In)
+   🌈 Trạng thái Hóa đơn – Đồng bộ với badge của Dịch vụ
 ============================================================ */
+.badge-status {
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #fff !important;
+}
 
-.btn-detail,
-.btn-edit,
-.btn-delete,
-.btn-print {
-    border-radius: 8px !important;
+.badge-success {
+    background: #1abc9c !important;
+}
+/* Đã thanh toán */
+.badge-pending {
+    background: #d35400 !important;
+}
+/* Chưa thanh toán */
+
+/* ============================================================
+   🌈 ACTION BUTTONS – Giống dịch vụ
+============================================================ */
+.action-btn {
+    border-radius: 10px !important;
     padding: 6px 8px !important;
-    margin: 0 2px;
     background: #f3f0fd;
     border: 1px solid #d7c6ff;
+    margin: 0 2px;
     transition: 0.2s;
 }
 
-    .btn-detail:hover,
-    .btn-edit:hover,
-    .btn-delete:hover,
-    .btn-print:hover {
+    .action-btn:hover {
         transform: translateY(-3px);
         background: #ece3ff;
     }
 
-    /* Icon màu */
-    .btn-detail i {
-        color: #2575fc !important;
-    }
+/* Icon màu */
+.action-view i {
+    color: #3b82f6;
+}
 
-    .btn-edit i {
-        color: #f7971e !important;
-    }
+.action-edit i {
+    color: #eab308;
+}
 
-    .btn-delete i {
-        color: #e63946 !important;
-    }
+.action-delete i {
+    color: #dc2626;
+}
 
-    .btn-print i {
-        color: #6a11cb !important;
-    }
+.action-print i {
+    color: #6a11cb;
+}
 
 /* ============================================================
-   🌸 LOADING ROW / EMPTY
+   🌈 LOADING & NO MORE
 ============================================================ */
-
 #loadingRow td {
     background: #f6efff !important;
-    color: #6a11cb !important;
+    color: #6a11cb;
     font-weight: 600;
 }
 
@@ -158,7 +159,7 @@ body {
 }
 
 /* ============================================================
-   🌸 SCROLLBAR
+   🌈 SCROLLBAR
 ============================================================ */
 #tableScrollArea::-webkit-scrollbar {
     width: 6px;
@@ -172,34 +173,16 @@ body {
     #tableScrollArea::-webkit-scrollbar-thumb:hover {
         background: #764ba2;
     }
+
 /* ============================================================
-   🌸 CARD FILTER – HÓA ĐƠN
+   🌈 CARD FILTER – HÓA ĐƠN (Đồng bộ dịch vụ)
 ============================================================ */
-#filterForm {
-    font-size: 0.9rem;
-}
-
-.card.shadow-sm.p-3 {
-    border-radius: 16px;
-    background: #ffffff;
-    box-shadow: 0 6px 18px rgba(118, 75, 162, 0.12) !important;
-}
-
-    .card.shadow-sm.p-3 h5 {
-        font-size: 1.05rem;
-        font-weight: 800;
-        color: #6a11cb; /* tím đặc */
-        margin-bottom: 15px;
-    }
-
-/* Label */
 #filterForm label.form-label {
     font-weight: 600;
-    color: #6a11cb;
     font-size: 0.85rem;
+    color: #6a11cb;
 }
 
-/* Input + select */
 #filterForm input,
 #filterForm select {
     border-radius: 8px;
@@ -210,33 +193,30 @@ body {
     #filterForm input:focus,
     #filterForm select:focus {
         border-color: #6a11cb;
-        box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+        box-shadow: 0 0 0 3px rgba(106,17,203,0.2);
     }
 
-/* ============================================================
-   🌸 BUTTON: LỌC – TONE TÍM
-============================================================ */
-#filterForm .btn.btn-primary {
+/* Nút LỌC */
+#filterForm .btn.btn-primary,
+#filterForm .btn.btn-success {
     background-color: #6a11cb !important;
     border-color: #6a11cb !important;
     font-weight: 600;
     border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(106, 17, 203, 0.25);
+    box-shadow: 0 3px 10px rgba(106,17,203,0.25);
     transition: 0.2s;
 }
 
-    #filterForm .btn.btn-primary:hover {
-        background-color: #5a0fb0 !important;
-        border-color: #5a0fb0 !important;
-        transform: translateY(-2px);
-    }
+#filterForm .btn:hover {
+    background-color: #5a0fb0 !important;
+    border-color: #5a0fb0 !important;
+    transform: translateY(-2px);
+}
 
-/* ============================================================
-   🌸 BUTTON: XÓA LỌC – THEO DỊCH VỤ (CAM)
-============================================================ */
+/* Nút XÓA LỌC – cam giống dịch vụ */
 #btnClearFilter {
     border-radius: 8px !important;
-    border-color: #f7971e !important;
+    border: 1px solid #f7971e !important;
     color: #f7971e !important;
     font-weight: 600;
     transition: 0.2s;
@@ -246,5 +226,5 @@ body {
         background-color: #f7971e !important;
         color: #fff !important;
         transform: translateY(-2px);
-        box-shadow: 0 3px 10px rgba(247, 151, 30, 0.35);
+        box-shadow: 0 4px 10px rgba(247,151,30,0.35);
     }
