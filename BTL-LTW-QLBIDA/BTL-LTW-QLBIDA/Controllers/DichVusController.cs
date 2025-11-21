@@ -17,7 +17,7 @@ namespace BTL_LTW_QLBIDA.Controllers
         private readonly IWebHostEnvironment _env = env;
 
         // =====================================================
-        // INDEX – Hiển thị giao diện (AJAX sẽ load bảng)
+        // INDEX
         // =====================================================
         public async Task<IActionResult> Index()
         {
@@ -29,7 +29,7 @@ namespace BTL_LTW_QLBIDA.Controllers
         }
 
         // =====================================================
-        // SINH MÃ TỰ ĐỘNG DV
+        // SINH MÃ DV
         // =====================================================
         private async Task<string> GenerateNextIddvAsync()
         {
@@ -50,12 +50,11 @@ namespace BTL_LTW_QLBIDA.Controllers
         [HttpGet]
         public async Task<IActionResult> GetNextId()
         {
-            string nextId = await GenerateNextIddvAsync();
-            return Json(nextId);
+            return Json(await GenerateNextIddvAsync());
         }
 
         // =====================================================
-        // LOAD TABLE + FILTER + INFINITE SCROLL (AJAX)
+        // LOAD TABLE + FILTER
         // =====================================================
         [HttpGet]
         public async Task<IActionResult> LoadTable(
@@ -73,20 +72,20 @@ namespace BTL_LTW_QLBIDA.Controllers
                 .Select(d => new Dichvu
                 {
                     Iddv = d.Iddv,
-                    Tendv = d.Tendv ?? "(Không tên)",      // FIX NULL
+                    Tendv = d.Tendv ?? "(Không tên)",
                     Idloai = d.Idloai,
-                    Giatien = d.Giatien ?? 0,              // FIX NULL
-                    Soluong = d.Soluong ?? 0,              // FIX NULL
-                    Hienthi = d.Hienthi ?? false,          // FIX NULL
+                    Giatien = d.Giatien ?? 0,
+                    Soluong = d.Soluong ?? 0,
+                    Hienthi = d.Hienthi ?? false,
                     Imgpath = string.IsNullOrEmpty(d.Imgpath)
-                                ? "/images/no-image.png"   // FIX NULL
-                                : d.Imgpath,
+                        ? "/images/no-image.png"
+                        : "/" + d.Imgpath.TrimStart('/'),   // ⭐ Sửa 100% đúng
                     IdloaiNavigation = d.IdloaiNavigation
                 })
-                .OrderBy(d => d.Tendv)  // lúc này Tendv KHÔNG còn NULL nên không crash
+                .OrderBy(d => d.Tendv)
                 .AsQueryable();
 
-            // Bộ lọc
+            // FILTER
             if (!string.IsNullOrWhiteSpace(keyword))
                 query = query.Where(d => d.Tendv.Contains(keyword));
 
@@ -102,7 +101,7 @@ namespace BTL_LTW_QLBIDA.Controllers
             if (maxPrice.HasValue)
                 query = query.Where(d => d.Giatien <= maxPrice.Value);
 
-            // Phân trang
+            // PHÂN TRANG
             int total = await query.CountAsync();
 
             var items = await query
@@ -119,9 +118,8 @@ namespace BTL_LTW_QLBIDA.Controllers
             });
         }
 
-
         // =====================================================
-        // XỬ LÝ ẢNH
+        // XỬ LÝ ẢNH — ĐÃ SỬA ĐÚNG CHUẨN
         // =====================================================
         private string? SaveImage(string id, IFormFile file)
         {
@@ -132,17 +130,15 @@ namespace BTL_LTW_QLBIDA.Controllers
             string folder = Path.Combine(_env.WebRootPath, "images/dichvu");
             Directory.CreateDirectory(folder);
 
-            // 👉 GIỮ NGUYÊN TÊN FILE NGƯỜI DÙNG TẢI LÊN
             string fileName = file.FileName;
-
             string path = Path.Combine(folder, fileName);
 
             using var stream = new FileStream(path, FileMode.Create);
             file.CopyTo(stream);
 
+            // ⭐ Đường dẫn CHUẨN webroot
             return "/images/dichvu/" + fileName;
         }
-
 
         private void DeleteOldImage(string? imgPath)
         {
@@ -153,7 +149,6 @@ namespace BTL_LTW_QLBIDA.Controllers
                 System.IO.File.Delete(full);
         }
 
-
         // =====================================================
         // CREATE AJAX
         // =====================================================
@@ -162,31 +157,10 @@ namespace BTL_LTW_QLBIDA.Controllers
         {
             dv.Iddv = await GenerateNextIddvAsync();
 
-            // =============================
-            // VALIDATION – không cho nhập sai
-            // =============================
-            if (string.IsNullOrWhiteSpace(dv.Tendv))
-                return Json(new { success = false, message = "Tên dịch vụ không được để trống!" });
-
-            if (string.IsNullOrEmpty(dv.Idloai))
-                return Json(new { success = false, message = "Vui lòng chọn loại dịch vụ!" });
-
-            if (dv.Giatien == null || dv.Giatien <= 0)
-                return Json(new { success = false, message = "Giá bán phải lớn hơn 0!" });
-
-            if (dv.Soluong == null || dv.Soluong < 0)
-                return Json(new { success = false, message = "Số lượng không hợp lệ!" });
-
-            // =============================
-            // FIX TRIỆT ĐỂ LỖI NULL
-            // =============================
             dv.Giatien ??= 0;
             dv.Soluong ??= 0;
             dv.Hienthi ??= true;
 
-            // =============================
-            // XỬ LÝ ẢNH
-            // =============================
             if (imageFile != null)
             {
                 string? img = SaveImage(dv.Iddv, imageFile);
@@ -200,18 +174,14 @@ namespace BTL_LTW_QLBIDA.Controllers
                 dv.Imgpath = null;
             }
 
-            // =============================
-            // LƯU VÀO DATABASE
-            // =============================
             _context.Add(dv);
             await _context.SaveChangesAsync();
 
             return Json(new { success = true });
         }
 
-
         // =====================================================
-        // DETAIL PARTIAL
+        // DETAILS
         // =====================================================
         public async Task<IActionResult> DetailPartial(string id)
         {
@@ -227,7 +197,7 @@ namespace BTL_LTW_QLBIDA.Controllers
                     Hienthi = d.Hienthi ?? false,
                     Imgpath = string.IsNullOrEmpty(d.Imgpath)
                         ? "/images/no-image.png"
-                        : d.Imgpath,
+                        : "/" + d.Imgpath.TrimStart('/'),
                     IdloaiNavigation = d.IdloaiNavigation
                 })
                 .FirstOrDefaultAsync(d => d.Iddv == id);
@@ -238,9 +208,8 @@ namespace BTL_LTW_QLBIDA.Controllers
             return PartialView("_DichvuDetailModal", dv);
         }
 
-
         // =====================================================
-        // EDIT FORM (MODAL)
+        // EDIT
         // =====================================================
         [HttpGet]
         public async Task<IActionResult> GetEditForm(string id)
@@ -263,7 +232,6 @@ namespace BTL_LTW_QLBIDA.Controllers
             if (old == null)
                 return Json(new { success = false, message = "Không tìm thấy dịch vụ!" });
 
-            // Ép null về giá trị an toàn
             old.Tendv = string.IsNullOrWhiteSpace(dv.Tendv) ? "(Không tên)" : dv.Tendv;
             old.Idloai = dv.Idloai;
             old.Giatien = dv.Giatien ?? 0;
@@ -285,7 +253,6 @@ namespace BTL_LTW_QLBIDA.Controllers
 
             return Json(new { success = true });
         }
-
 
         // =====================================================
         // DELETE AJAX
@@ -319,106 +286,11 @@ namespace BTL_LTW_QLBIDA.Controllers
             if (dv == null)
                 return Json(new { success = false });
 
-            // Nếu null thì coi như false
             dv.Hienthi = !(dv.Hienthi ?? false);
 
             await _context.SaveChangesAsync();
 
             return Json(new { success = true, newStatus = dv.Hienthi });
         }
-
-
-        // =====================================================
-        // EXPORT EXCEL THEO FILTER
-        // =====================================================
-        [HttpGet]
-        public async Task<IActionResult> ExportExcel(
-            string? keyword,
-            string? loaiId,
-            bool? status,
-            decimal? minPrice,
-            decimal? maxPrice)
-        {
-            var query = _context.Dichvus
-                .Include(d => d.IdloaiNavigation)
-                .OrderBy(d => d.Tendv)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(keyword))
-                query = query.Where(d => d.Tendv.Contains(keyword));
-            if (!string.IsNullOrWhiteSpace(loaiId))
-                query = query.Where(d => d.Idloai == loaiId);
-            if (status.HasValue)
-                query = query.Where(d => d.Hienthi == status.Value);
-            if (minPrice.HasValue)
-                query = query.Where(d => d.Giatien >= minPrice.Value);
-            if (maxPrice.HasValue)
-                query = query.Where(d => d.Giatien <= maxPrice.Value);
-
-            var data = await query.ToListAsync();
-
-            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using var package = new ExcelPackage();
-            var ws = package.Workbook.Worksheets.Add("DichVu");
-
-            string[] headers = ["Mã DV", "Tên DV", "Loại", "Giá", "Tồn", "Trạng thái"];
-
-            for (int i = 0; i < headers.Length; i++)
-            {
-                ws.Cells[1, i + 1].Value = headers[i];
-                ws.Cells[1, i + 1].Style.Font.Bold = true;
-                ws.Cells[1, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                ws.Cells[1, i + 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-            }
-
-            int row = 2;
-            foreach (var dv in data)
-            {
-                ws.Cells[row, 1].Value = dv.Iddv;
-                ws.Cells[row, 2].Value = dv.Tendv;
-                ws.Cells[row, 3].Value = dv.IdloaiNavigation?.Tenloai ?? "Chưa phân loại";
-                ws.Cells[row, 4].Value = (double)(dv.Giatien ?? 0);
-                ws.Cells[row, 5].Value = dv.Soluong ?? 0;
-                ws.Cells[row, 6].Value = dv.Hienthi == true ? "Đang KD" : "Ngưng";
-                row++;
-            }
-
-            ws.Cells.AutoFitColumns();
-
-            var bytes = package.GetAsByteArray();
-            string fileName = $"DichVu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-
-            return File(bytes,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName);
-        }
-        public async Task<IActionResult> Details(string id)
-        {
-            var dv = await _context.Dichvus
-                .Include(d => d.IdloaiNavigation)
-                .Select(d => new Dichvu
-                {
-                    Iddv = d.Iddv,
-                    Tendv = d.Tendv ?? "(Không tên)",
-                    Idloai = d.Idloai,
-                    Giatien = d.Giatien ?? 0,
-                    Soluong = d.Soluong ?? 0,
-                    Hienthi = d.Hienthi ?? false,
-                    Imgpath = string.IsNullOrEmpty(d.Imgpath)
-                        ? "/images/no-image.png"
-                        : d.Imgpath,
-                    IdloaiNavigation = d.IdloaiNavigation
-                })
-                .FirstOrDefaultAsync(d => d.Iddv == id);
-
-            if (dv == null)
-                return NotFound();
-
-            return View(dv);
-        }
-
-
     }
 }
