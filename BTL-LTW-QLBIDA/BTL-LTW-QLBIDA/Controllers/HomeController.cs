@@ -283,6 +283,24 @@ namespace BTL_LTW_QLBIDA.Controllers
                 avgKhach = trungBinhKhach
             });
         }
+
+        [HttpGet]
+        public JsonResult GetTopSanPham()
+        {
+            var data = db.Hoadondvs
+                .Include(d => d.IddvNavigation)
+                .GroupBy(hdv => hdv.IddvNavigation.Tendv)
+                .Select(g => new
+                {
+                    TenSanPham = g.Key,
+                    SoLuongBan = g.Sum(x => x.Soluong) ?? 0
+                })
+                .OrderByDescending(x => x.SoLuongBan)
+                .Take(10)
+                .ToList();
+
+            return Json(data);
+        }
     }
 
 }

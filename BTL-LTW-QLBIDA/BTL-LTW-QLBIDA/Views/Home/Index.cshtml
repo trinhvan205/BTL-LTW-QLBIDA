@@ -167,29 +167,24 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // (Giữ nguyên phần script JS như cũ vì ID không đổi)
         let chartDoanhThu = null;
         let chartKhachHang = null;
 
         document.addEventListener("DOMContentLoaded", function () {
             refreshAllCharts();
-            // ✅ LOGIC TỰ ĐỘNG ĐÓNG ALERT ĐÃ SỬA ĐỔI
+
             var alertElement = document.getElementById('loginSuccessAlert');
             if (alertElement) {
-                // Khởi tạo đối tượng Alert của Bootstrap
-                // Sử dụng 'new bootstrap.Alert(alertElement)' hoặc getOrCreateInstance
                 var bsAlert = new bootstrap.Alert(alertElement);
-
-                // Tự động đóng sau 2000ms (2 giây)
                 setTimeout(function () {
-                    // Gọi phương thức close() của Alert
                     bsAlert.close();
                 }, 2000);
             }
-            // KẾT THÚC LOGIC TỰ ĐỘNG ĐÓNG ALERT
+
+            // ✅ RENDER BIỂU ĐỒ TRÒN AN TOÀN
+            renderPieChart();
         });
 
-        // ... (Phần còn lại của script giữ nguyên) ...
         function refreshAllCharts() {
             const type = document.getElementById('chartType').value;
             loadDoanhThu(type);
@@ -197,8 +192,6 @@
             loadGeneralStats(type);
         }
 
-        // Paste lại các hàm loadGeneralStats, loadDoanhThu, loadLuuLuongKhach, và Pie Chart y hệt như cũ
-        // vì chúng ta chỉ đổi CSS class, không đổi ID của các thẻ HTML
         function loadGeneralStats(type) {
             fetch(`/Home/GetGeneralStats?type=${type}`)
                 .then(res => res.json())
@@ -277,21 +270,90 @@
                 });
         }
 
-        @if (Model.Top10SanPham != null && Model.Top10SanPham.Count > 0)
-        {
-                <text>
-                    new Chart(document.getElementById('chartSanPham'), {
-                        type: 'doughnut',
-                        data: {
-                            labels: [@Html.Raw(string.Join(",", Model.Top10SanPham.Select(s => "'" + s.TenSanPham + "'")))],
-                            datasets: [{
-                                data: [@string.Join(",", Model.Top10SanPham.Select(s => s.SoLuongBan))],
-                                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
-                            }]
-                        },
-                        options: { maintainAspectRatio: false, legend: { position: 'bottom' } }
-                    });
-                </text>
+        function createGradient(ctx, color1, color2) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            return gradient;
+        }
+        // ✅ HÀM RENDER BIỂU ĐỒ TRÒN - GỌI API
+        function renderPieChart() {
+            fetch('/Home/GetTopSanPham')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const ctx = document.getElementById('chartSanPham').getContext('2d');
+
+                        new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: data.map(x => x.tenSanPham),
+                                datasets: [{
+                                    data: data.map(x => x.soLuongBan),
+                                    backgroundColor: [
+                                        '#FF6384',
+                                        '#36A2EB',
+                                        '#FFCE56',
+                                        '#4BC0C0',
+                                        '#9966FF',
+                                        '#FF9F40',
+                                        '#E7E9ED',
+                                        '#FF6384',
+                                        '#36A2EB',
+                                        '#FFCE56'
+                                    ],
+                                    borderWidth: 3,
+                                    borderColor: '#ffffff'
+                                }]
+                            },
+                            options: {
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            padding: 15,
+                                            font: {
+                                                size: 13,
+                                                family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                                            },
+                                            usePointStyle: true,
+                                            pointStyle: 'circle'
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        padding: 12,
+                                        titleFont: {
+                                            size: 14
+                                        },
+                                        bodyFont: {
+                                            size: 13
+                                        },
+                                        callbacks: {
+                                            label: function(context) {
+                                                let label = context.label || '';
+                                                if (label) {
+                                                    label += ': ';
+                                                }
+                                                label += context.parsed + ' lượt';
+
+                                                let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                let percentage = ((context.parsed / total) * 100).toFixed(1);
+                                                label += ' (' + percentage + '%)';
+
+                                                return label;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi load biểu đồ sản phẩm:', error);
+                });
         }
     </script>
 }
